@@ -28,6 +28,33 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-build
 
+      - name: Smoke test API
+        shell: bash
+        run: |
+          dotnet publish src/Inventory.Api/Inventory.Api.csproj --configuration Release --no-build --output ./publish
+          ASPNETCORE_URLS=http://127.0.0.1:8080 dotnet ./publish/Inventory.Api.dll &
+          api_pid=$!
+
+          cleanup() {
+            kill "$api_pid" || true
+          }
+          trap cleanup EXIT
+
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8080/health > /tmp/assetflow-health.json; then
+              break
+            fi
+
+            if ! kill -0 "$api_pid" 2>/dev/null; then
+              echo "API process exited before becoming healthy"
+              exit 1
+            fi
+
+            sleep 1
+          done
+
+          curl --fail --silent http://127.0.0.1:8080/ | tee /tmp/assetflow-root.json
+          grep -q "Marketplace inventory platform is running." /tmp/assetflow-root.json
+
       - name: Docker build
         run: docker build -t inventory-api:ci .
-
