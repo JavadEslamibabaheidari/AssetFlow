@@ -18,3 +18,5 @@ app.MapGet("/health", () => Results.Ok(new
 .WithName("GetHealth");
 
 app.Run();
+
+public partial class Program;
