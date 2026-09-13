@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+.dotnet_home/
+.git/
+.github/
+.agents/
+.codex/
+outputs/
+work/
+TestResults/
+README.md
+docs/
+

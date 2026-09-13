@@ -1,0 +1,29 @@
+name: Task
+description: Track an implementation, documentation, infrastructure, or learning task.
+title: "[Task]: "
+labels: ["task"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What should be true when this task is complete?
+    validations:
+      required: true
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Break the work into small steps.
+      value: |
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification
+      description: Commands, tests, or checks used to prove this is done.
+    validations:
+      required: false
+

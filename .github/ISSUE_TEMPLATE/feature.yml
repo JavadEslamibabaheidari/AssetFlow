@@ -1,0 +1,42 @@
+name: Feature
+description: Plan and implement a product feature.
+title: "[Feature]: "
+labels: ["feature", "spec-needed"]
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: User story
+      description: Describe the user, goal, and reason.
+      placeholder: As a vendor, I want to reserve stock across channels so that I do not oversell.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable conditions that must be true when the feature is done.
+    validations:
+      required: true
+  - type: textarea
+    id: contracts
+    attributes:
+      label: API and data contracts
+      description: Link or describe OpenAPI, JSON Schema, database, event, or gRPC contract changes.
+    validations:
+      required: false
+  - type: textarea
+    id: tests
+    attributes:
+      label: Tests required
+      description: Unit, integration, contract, concurrency, or smoke tests.
+    validations:
+      required: false
+  - type: textarea
+    id: ai
+    attributes:
+      label: AI workflow notes
+      description: Prompts, model choice, expected risks, and review notes.
+    validations:
+      required: false
+
