@@ -76,7 +76,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/assetflow-inventory-api
+          images: ghcr.io/javadeslamibabaheidari/assetflow-inventory-api
           tags: |
             type=raw,value=latest
             type=sha,prefix=sha-

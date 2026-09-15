@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE: ghcr.io/${{ github.repository_owner }}/assetflow-inventory-api
+  IMAGE: ghcr.io/javadeslamibabaheidari/assetflow-inventory-api
 
 jobs:
   verify-container:
@@ -88,4 +88,4 @@ jobs:
 
       - name: Stop service container
         if: always()
-        run: docker rm --force inventory-api
+        run: docker rm --force inventory-api || true
