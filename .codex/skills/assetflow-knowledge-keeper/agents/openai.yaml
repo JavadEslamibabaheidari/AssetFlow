@@ -1,0 +1,6 @@
+interface:
+  display_name: "AssetFlow Knowledge Keeper"
+  short_description: "Maintain compact repo knowledge"
+  default_prompt: "Use $assetflow-knowledge-keeper to update AssetFlow project knowledge after this change."
+policy:
+  allow_implicit_invocation: true

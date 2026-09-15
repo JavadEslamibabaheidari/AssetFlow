@@ -1,0 +1,6 @@
+interface:
+  display_name: "AssetFlow Tester"
+  short_description: "Verify changes with proper tests"
+  default_prompt: "Use $assetflow-tester to verify this AssetFlow change with the right level of tests."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "AssetFlow Planner"
+  short_description: "Plan backend work before coding"
+  default_prompt: "Use $assetflow-planner to inspect the repo, clarify the work, and create a practical implementation plan."
+policy:
+  allow_implicit_invocation: true

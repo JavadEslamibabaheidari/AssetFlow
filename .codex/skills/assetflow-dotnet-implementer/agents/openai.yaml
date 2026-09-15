@@ -1,0 +1,6 @@
+interface:
+  display_name: "AssetFlow .NET Implementer"
+  short_description: "Build production .NET backend code"
+  default_prompt: "Use $assetflow-dotnet-implementer to implement the planned AssetFlow backend change."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "AssetFlow Prioritizer"
+  short_description: "Sequence planned work by risk"
+  default_prompt: "Use $assetflow-prioritizer to order the planned AssetFlow tasks by dependency, risk, and feedback speed."
+policy:
+  allow_implicit_invocation: true

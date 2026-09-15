@@ -1,0 +1,6 @@
+interface:
+  display_name: "AssetFlow Reviewer"
+  short_description: "Run a senior quality gate"
+  default_prompt: "Use $assetflow-reviewer to inspect the AssetFlow diff and report quality-gate findings."
+policy:
+  allow_implicit_invocation: true
