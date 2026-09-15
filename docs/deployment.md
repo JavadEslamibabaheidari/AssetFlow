@@ -56,17 +56,27 @@ Call:
 curl http://localhost:8080/health
 ```
 
-## GitHub Deployment Direction
+## GitHub Actions Container Verification
 
-The first GitHub Actions workflow will:
+The GitHub Actions CI workflow:
 
 - restore dependencies
 - build
 - test
 - build Docker image
+- publish the Docker image to GitHub Container Registry on pushes to `main`
 
-Later workflows may:
+After CI succeeds on `main`, `.github/workflows/deploy.yml` verifies the
+published image by running it as a Docker container inside the GitHub Actions
+runner. It pulls the immutable `sha-<short-commit-sha>` image tag, starts the
+API, checks `http://localhost:8080/health`, and removes the container.
 
-- publish Docker image to GitHub Container Registry
-- deploy to a real hosting target
-- deploy to a Kubernetes cluster when a cluster is available
+GitHub Actions runners are temporary. This is a deployment verification step,
+not persistent hosting. It proves the published service image can run in a clean
+container environment without connecting to Kubernetes on a local machine.
+
+Later workflows may deploy that same published image to:
+
+- a real hosting target such as Azure Container Apps, Azure App Service, Fly.io,
+  Render, Railway, AWS ECS, or Google Cloud Run
+- a remote Kubernetes cluster when a cluster is available
