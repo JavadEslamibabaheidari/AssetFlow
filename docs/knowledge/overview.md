@@ -21,6 +21,8 @@ M1, Spec-First Workflow, is complete: GitHub status workflow, repo knowledge enf
 
 M2, Core Inventory Domain, is the next milestone and should start from the reviewed inventory contract and spec-first workflow.
 
+M2 must introduce EF Core through a CQRS application layer using MediatR. API endpoints should dispatch commands and queries; EF Core access belongs behind handlers, not inside route bodies. M3 reservation work should use the same MediatR/CQRS shape for concurrency-sensitive reservation and availability behavior. M4 event-driven synchronization should publish events from application handlers or an outbox-style boundary after successful state changes, not directly from controllers.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, and event-driven synchronization when the product need justifies it.
