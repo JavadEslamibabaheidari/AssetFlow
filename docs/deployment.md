@@ -20,6 +20,8 @@ GitHub does not host Kubernetes applications directly. GitHub Actions can build,
 
 For learning, this repo includes local Kubernetes manifests that can run in `kind` or `minikube`.
 
+Host requirement: a running Docker-compatible container runtime is required before using `kind`. On this workstation, Docker Desktop was started and the Docker context was set to `desktop-linux`.
+
 Build the local image:
 
 ```bash
@@ -29,7 +31,8 @@ docker build -t inventory-api:local .
 For `kind`, load the image into the cluster:
 
 ```bash
-kind load docker-image inventory-api:local
+kind create cluster --name assetflow-m0
+kind load docker-image inventory-api:local --name assetflow-m0
 ```
 
 For `minikube`, build against the Minikube Docker daemon or load the image:
