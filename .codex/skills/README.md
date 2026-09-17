@@ -11,7 +11,7 @@ Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Learn
 For substantial work, use:
 
 ```text
-Knowledge -> Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Knowledge Update
+Knowledge -> Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Planned-State Validation -> Knowledge Update
 ```
 
 ## Skills
@@ -21,6 +21,6 @@ Knowledge -> Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> 
 - `$assetflow-dotnet-implementer`: implement production .NET backend changes.
 - `$assetflow-tester`: verify changes with risk-based tests.
 - `$assetflow-reviewer`: inspect diffs as the senior quality gate.
-- `$assetflow-knowledge-keeper`: maintain compact project knowledge.
+- `$assetflow-knowledge-keeper`: maintain compact project knowledge and enforce planned-state validation after milestones, big issues, and features.
 
 The named agent entrypoints live in `.agents/`.
