@@ -37,8 +37,9 @@ Deliverables:
 
 - OpenAPI contract for core inventory APIs
 - PostgreSQL schema
-- EF Core persistence
-- basic CRUD endpoints
+- EF Core persistence behind CQRS command/query handlers
+- MediatR-based application layer
+- basic CRUD endpoints that dispatch commands and queries
 - unit and integration tests
 
 ## M3 - Reservations and Availability
@@ -51,6 +52,7 @@ Deliverables:
 - availability calculation
 - reservation expiration
 - concurrency handling
+- MediatR command/query handlers for reservation and availability use cases
 - acceptance tests for stock reduction and release
 
 ## M4 - Event-Driven Synchronization
@@ -62,6 +64,7 @@ Deliverables:
 - Kafka integration
 - stock changed events
 - reservation events
+- event publication from application handlers or an outbox-style boundary
 - channel sync worker
 - event documentation
 
@@ -77,4 +80,3 @@ Deliverables:
 - Prometheus/Grafana setup
 - AI prompt/model usage tracking
 - dashboard for iteration count, quality, and cost signals
-

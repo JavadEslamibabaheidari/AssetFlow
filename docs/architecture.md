@@ -14,10 +14,26 @@ The target direction is:
 
 - services own their data
 - service APIs are documented with OpenAPI
+- API endpoints delegate application behavior to CQRS command/query handlers through MediatR
+- EF Core is used behind application handlers for relational persistence when the core inventory domain starts
 - internal service communication may use gRPC where useful
 - business events are published through Kafka
 - read models and dashboards consume event streams where useful
 - metrics, logs, and traces are available from the beginning
+
+## Application Architecture Rule
+
+When AssetFlow introduces core inventory persistence, use CQRS with MediatR as the application boundary.
+
+- Commands represent state-changing use cases such as creating vendors, products, channels, stock items, and reservations.
+- Queries represent read use cases such as listing or getting vendors, products, channels, stock items, and availability.
+- HTTP endpoints should validate transport concerns and dispatch commands or queries through MediatR; they should not contain domain or persistence logic.
+- EF Core `DbContext` usage belongs behind command/query handlers and supporting persistence abstractions, not in controllers or minimal API route bodies.
+- Transaction boundaries for state-changing use cases should be explicit in command handlers.
+
+Use this same shape for M3 reservation workflows so concurrency-sensitive behavior is isolated in command handlers and tested at the application boundary.
+
+For M4 event-driven synchronization, publish domain/integration events from application handlers or a clear outbox-style boundary after successful state changes. Do not publish marketplace synchronization events directly from controllers.
 
 ## Event-Driven vs Event Sourcing
 
@@ -33,4 +49,3 @@ Event sourcing may become useful later for auditability and rebuilding state fro
 - `GET /health`
 
 Later milestones will turn it into the core inventory API.
-
