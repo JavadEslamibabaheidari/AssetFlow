@@ -11,7 +11,7 @@ Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Learn
 For substantial work, use:
 
 ```text
-Knowledge -> Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Knowledge Update
+GitHub Status -> Knowledge -> Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Knowledge Update -> GitHub Status
 ```
 
 ## Skills
@@ -22,5 +22,6 @@ Knowledge -> Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> 
 - `$assetflow-tester`: verify changes with risk-based tests.
 - `$assetflow-reviewer`: inspect diffs as the senior quality gate.
 - `$assetflow-knowledge-keeper`: maintain compact project knowledge.
+- `$assetflow-github-status`: keep GitHub issues, tasks, milestones, board status, and local status docs synchronized.
 
 The named agent entrypoints live in `.agents/`.
