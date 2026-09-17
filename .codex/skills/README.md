@@ -11,7 +11,7 @@ Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Learn
 For substantial work, use:
 
 ```text
-GitHub Status -> Knowledge -> Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Knowledge Update -> GitHub Status
+GitHub Status -> Knowledge -> Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Planned-State Validation -> Knowledge Update -> GitHub Status
 ```
 
 ## Skills
@@ -21,7 +21,7 @@ GitHub Status -> Knowledge -> Understand -> Plan -> Prioritize -> Implement -> T
 - `$assetflow-dotnet-implementer`: implement production .NET backend changes.
 - `$assetflow-tester`: verify changes with risk-based tests.
 - `$assetflow-reviewer`: inspect diffs as the senior quality gate.
-- `$assetflow-knowledge-keeper`: maintain compact project knowledge.
+- `$assetflow-knowledge-keeper`: maintain compact project knowledge and enforce planned-state validation after milestones, big issues, and features.
 - `$assetflow-github-status`: keep GitHub issues, tasks, milestones, board status, and local status docs synchronized.
 
 The named agent entrypoints live in `.agents/`.
