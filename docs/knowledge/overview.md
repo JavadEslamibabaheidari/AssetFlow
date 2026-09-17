@@ -15,9 +15,11 @@ The test project `Inventory.Api.Tests` verifies both endpoints through `WebAppli
 
 ## Milestone State
 
-M0, Repository and Hello Service, is mostly complete: repository skeleton, minimal API, Docker support, local Kubernetes manifests, CI, issue templates, and planning docs exist. The remaining known M0 gap is local Kubernetes verification with `kind` or `minikube`.
+M0, Repository and Hello Service, is complete: repository skeleton, minimal API, Docker support, local Kubernetes manifests, CI, issue templates, planning docs, GitHub work tracking, and local Kubernetes verification with `kind` exist.
 
-M1, Spec-First Workflow, is the active workflow milestone. Its work should define how features are specified, reviewed, tracked, and implemented before the core inventory domain is built.
+M1, Spec-First Workflow, is complete: GitHub status workflow, repo knowledge enforcement, OpenAPI style guidance, AI feature workflow guidance, the first inventory OpenAPI contract, and the M1 report exist.
+
+M2, Core Inventory Domain, is the next milestone and should start from the reviewed inventory contract and spec-first workflow.
 
 ## Architecture Direction
 
