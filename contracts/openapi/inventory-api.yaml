@@ -1,0 +1,553 @@
+openapi: 3.1.0
+info:
+  title: AssetFlow Inventory API
+  version: 0.1.0
+  summary: Core inventory contract for vendors, products, sales channels, and stock items.
+  description: >
+    Contract-first design for the first real Inventory API. This contract is
+    design input only; implementation follows after review.
+servers:
+  - url: https://api.assetflow.local/v1
+    description: Local or development API base path.
+tags:
+  - name: Vendors
+    description: Suppliers or brands that provide products.
+  - name: Products
+    description: Sellable product catalog records.
+  - name: Channels
+    description: Marketplace or sales channels where products can be listed.
+  - name: StockItems
+    description: Physical or logical inventory quantities for products.
+paths:
+  /vendors:
+    get:
+      tags:
+        - Vendors
+      operationId: listVendors
+      summary: List vendors.
+      description: Returns vendors ordered by creation time, newest first.
+      responses:
+        "200":
+          description: Vendors returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorListResponse"
+              examples:
+                vendors:
+                  $ref: "#/components/examples/VendorListExample"
+    post:
+      tags:
+        - Vendors
+      operationId: createVendor
+      summary: Create a vendor.
+      description: Creates a vendor that can own products.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVendorRequest"
+      responses:
+        "201":
+          description: Vendor created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /vendors/{vendorId}:
+    parameters:
+      - $ref: "#/components/parameters/VendorId"
+    get:
+      tags:
+        - Vendors
+      operationId: getVendor
+      summary: Get a vendor.
+      description: Returns one vendor by identifier.
+      responses:
+        "200":
+          description: Vendor found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /products:
+    get:
+      tags:
+        - Products
+      operationId: listProducts
+      summary: List products.
+      description: Returns products, optionally filtered by vendor.
+      parameters:
+        - name: vendorId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Products returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+    post:
+      tags:
+        - Products
+      operationId: createProduct
+      summary: Create a product.
+      description: Creates a product catalog record owned by a vendor.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductRequest"
+      responses:
+        "201":
+          description: Product created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /products/{productId}:
+    parameters:
+      - $ref: "#/components/parameters/ProductId"
+    get:
+      tags:
+        - Products
+      operationId: getProduct
+      summary: Get a product.
+      description: Returns one product by identifier.
+      responses:
+        "200":
+          description: Product found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /channels:
+    get:
+      tags:
+        - Channels
+      operationId: listChannels
+      summary: List sales channels.
+      description: Returns configured sales channels.
+      responses:
+        "200":
+          description: Channels returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChannelListResponse"
+    post:
+      tags:
+        - Channels
+      operationId: createChannel
+      summary: Create a sales channel.
+      description: Creates a sales channel such as Shopify, Amazon, or a custom storefront.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateChannelRequest"
+      responses:
+        "201":
+          description: Channel created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChannelResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /stock-items:
+    get:
+      tags:
+        - StockItems
+      operationId: listStockItems
+      summary: List stock items.
+      description: Returns stock items, optionally filtered by product or channel.
+      parameters:
+        - name: productId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: channelId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Stock items returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockItemListResponse"
+    post:
+      tags:
+        - StockItems
+      operationId: createStockItem
+      summary: Create a stock item.
+      description: Creates inventory for a product on a channel with an initial on-hand quantity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStockItemRequest"
+      responses:
+        "201":
+          description: Stock item created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /stock-items/{stockItemId}:
+    parameters:
+      - $ref: "#/components/parameters/StockItemId"
+    get:
+      tags:
+        - StockItems
+      operationId: getStockItem
+      summary: Get a stock item.
+      description: Returns one stock item by identifier.
+      responses:
+        "200":
+          description: Stock item found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockItemResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  parameters:
+    VendorId:
+      name: vendorId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ProductId:
+      name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    StockItemId:
+      name: stockItemId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    BadRequest:
+      description: The request is invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    Conflict:
+      description: The request conflicts with existing state.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+  schemas:
+    Vendor:
+      type: object
+      required:
+        - id
+        - name
+        - createdAtUtc
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        createdAtUtc:
+          type: string
+          format: date-time
+    CreateVendorRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+    VendorResponse:
+      type: object
+      required:
+        - vendor
+      properties:
+        vendor:
+          $ref: "#/components/schemas/Vendor"
+    VendorListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Vendor"
+    Product:
+      type: object
+      required:
+        - id
+        - vendorId
+        - sku
+        - name
+        - createdAtUtc
+      properties:
+        id:
+          type: string
+          format: uuid
+        vendorId:
+          type: string
+          format: uuid
+        sku:
+          type: string
+          minLength: 1
+          maxLength: 80
+        name:
+          type: string
+          minLength: 1
+          maxLength: 240
+        createdAtUtc:
+          type: string
+          format: date-time
+    CreateProductRequest:
+      type: object
+      required:
+        - vendorId
+        - sku
+        - name
+      properties:
+        vendorId:
+          type: string
+          format: uuid
+        sku:
+          type: string
+          minLength: 1
+          maxLength: 80
+        name:
+          type: string
+          minLength: 1
+          maxLength: 240
+    ProductResponse:
+      type: object
+      required:
+        - product
+      properties:
+        product:
+          $ref: "#/components/schemas/Product"
+    ProductListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+    Channel:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - createdAtUtc
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          minLength: 1
+          maxLength: 80
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        createdAtUtc:
+          type: string
+          format: date-time
+    CreateChannelRequest:
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 80
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+    ChannelResponse:
+      type: object
+      required:
+        - channel
+      properties:
+        channel:
+          $ref: "#/components/schemas/Channel"
+    ChannelListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Channel"
+    StockItem:
+      type: object
+      required:
+        - id
+        - productId
+        - channelId
+        - onHandQuantity
+        - availableQuantity
+        - updatedAtUtc
+      properties:
+        id:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        channelId:
+          type: string
+          format: uuid
+        onHandQuantity:
+          type: integer
+          minimum: 0
+        availableQuantity:
+          type: integer
+          minimum: 0
+        updatedAtUtc:
+          type: string
+          format: date-time
+    CreateStockItemRequest:
+      type: object
+      required:
+        - productId
+        - channelId
+        - onHandQuantity
+      properties:
+        productId:
+          type: string
+          format: uuid
+        channelId:
+          type: string
+          format: uuid
+        onHandQuantity:
+          type: integer
+          minimum: 0
+    StockItemResponse:
+      type: object
+      required:
+        - stockItem
+      properties:
+        stockItem:
+          $ref: "#/components/schemas/StockItem"
+    StockItemListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockItem"
+    ProblemDetails:
+      type: object
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        traceId:
+          type: string
+  examples:
+    VendorListExample:
+      summary: Vendor list
+      value:
+        items:
+          - id: "2d7f8df9-71df-47ef-992a-25a684f17d6a"
+            name: "Northwind Supply"
+            createdAtUtc: "2026-09-17T12:00:00Z"
+x-edge-cases:
+  - Duplicate vendor names should return 409 Conflict.
+  - Duplicate product SKUs for the same vendor should return 409 Conflict.
+  - Product creation with an unknown vendor should return 404 Not Found.
+  - Channel creation with a duplicate code should return 409 Conflict.
+  - Stock item creation with an unknown product or channel should return 404 Not Found.
+  - Negative stock quantities should return 400 Bad Request.
+  - Available quantity must not exceed on-hand quantity.
+x-test-plan:
+  contract:
+    - Validate the OpenAPI document parses before implementation.
+    - Review operation IDs, schemas, errors, and examples against the OpenAPI style guide.
+  implementation:
+    - Add endpoint tests for each success path.
+    - Add validation tests for required fields and invalid quantities.
+    - Add conflict tests for duplicate vendor names, duplicate SKUs, and duplicate channel codes.
+    - Add not-found tests for missing vendor, product, channel, and stock item references.
+    - Add persistence tests once PostgreSQL schema work begins.
