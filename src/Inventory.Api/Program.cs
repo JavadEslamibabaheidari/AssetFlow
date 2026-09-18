@@ -1,4 +1,10 @@
+using Inventory.Api.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddMediatR(configuration =>
+    configuration.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddInventoryPersistence(builder.Configuration);
 
 var app = builder.Build();
 

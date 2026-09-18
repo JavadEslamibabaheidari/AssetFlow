@@ -24,13 +24,13 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore MarketplaceInventoryPlatform.sln
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build MarketplaceInventoryPlatform.sln --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-build
+        run: dotnet test MarketplaceInventoryPlatform.sln --configuration Release --no-build
 
       - name: Smoke test API
         shell: bash

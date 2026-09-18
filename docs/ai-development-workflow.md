@@ -12,6 +12,97 @@ Requirement Intake -> Feature Spec -> Task Breakdown -> Implementation -> Verifi
 
 For tracked GitHub work, keep one task per branch and pull request unless the user explicitly asks to combine tasks.
 
+## Milestone Start Gate
+
+Milestone work must not start from roadmap bullets alone. Before opening implementation branches or moving milestone issues into active work, run this start gate:
+
+- A milestone plan exists in `docs/plans/` and names the milestone, goal, scope, non-goals, deliverables, acceptance criteria, task breakdown, dependencies, risks, testing strategy, and GitHub tracking.
+- Every product, architecture, data, API, infrastructure, rollout, and testing decision needed to start the milestone is either decided in the plan or explicitly deferred out of scope.
+- The plan has no unresolved placeholders such as `TBD`, `TODO`, `unknown`, `undecided`, or open questions that affect implementation order, public contracts, persistence, concurrency, security, deployment, or verification.
+- The task breakdown is small enough to execute one tracked task per branch and pull request unless a combined PR is deliberately justified.
+- GitHub milestones and issues match the local plan before implementation begins.
+- `docs/knowledge/` captures any durable planned behavior that future implementation and review must compare against.
+
+If the gate fails, stay in planning mode. Do not begin implementation until the undecided items are resolved or moved out of scope.
+
+When the gate passes, mark the milestone as ready to start in the plan and begin with the first prioritized task.
+
+## Milestone Plan Template
+
+Use this template for each milestone before implementation starts.
+
+```markdown
+# Milestone Plan: <Mx - title>
+
+## Goal
+
+What must be true when this milestone is complete?
+
+## Scope
+
+In scope:
+
+-
+
+Out of scope:
+
+-
+
+## Decisions
+
+Decided:
+
+-
+
+Deferred out of scope:
+
+-
+
+Open questions:
+
+- None.
+
+## Deliverables
+
+-
+
+## Acceptance Criteria
+
+- [ ]
+
+## Task Breakdown
+
+| Order | Task | Objective | Depends on | Verification | GitHub issue |
+| --- | --- | --- | --- | --- | --- |
+| 1 |  |  |  |  |  |
+
+## Risks and Mitigations
+
+-
+
+## Testing Strategy
+
+- Unit:
+- Integration:
+- Contract:
+- Concurrency/failure:
+
+## GitHub Tracking
+
+- Milestone:
+- Issues:
+- Project board:
+
+## Start Gate Result
+
+- [ ] Plan is complete enough to implement.
+- [ ] No implementation-blocking decisions remain undecided.
+- [ ] GitHub tracking matches this plan.
+- [ ] Knowledge docs capture durable planned behavior.
+
+Status: Not ready / Ready to start
+```
+
 ## Requirement Intake Template
 
 Use this template before writing a spec for meaningful work.
@@ -37,11 +128,11 @@ What should be true when this work is complete?
 
 In scope:
 
-- 
+-
 
 Out of scope:
 
-- 
+-
 
 ## Constraints
 
@@ -51,7 +142,7 @@ Out of scope:
 
 ## Open Questions
 
-- 
+-
 
 ## GitHub Tracking
 
@@ -73,11 +164,11 @@ Short description of the planned behavior.
 
 ## Goals
 
-- 
+-
 
 ## Non-Goals
 
-- 
+-
 
 ## User Stories
 
@@ -85,7 +176,7 @@ Short description of the planned behavior.
 
 ## Acceptance Criteria
 
-- [ ] 
+- [ ]
 
 ## API Contract
 
@@ -148,19 +239,19 @@ Objective:
 
 Acceptance criteria:
 
-- [ ] 
+- [ ]
 
 Affected files or components:
 
-- 
+-
 
 Dependencies:
 
-- 
+-
 
 Verification:
 
-- 
+-
 
 PR scope:
 

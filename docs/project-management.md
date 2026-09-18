@@ -8,6 +8,20 @@ Keep the full roadmap visible, but only create detailed GitHub issues for the cu
 
 This keeps the project focused while still showing the future direction.
 
+## Milestone Start Rule
+
+A milestone may start only after its plan passes the start gate in `docs/ai-development-workflow.md`.
+
+Before implementation begins:
+
+- create or update the milestone plan in `docs/plans/`
+- decide every implementation-blocking product, API, data, infrastructure, testing, rollout, and GitHub-tracking question
+- move any deliberately deferred questions out of scope
+- verify there are no unresolved `TBD`, `TODO`, `unknown`, `undecided`, or blocking open-question entries
+- align GitHub milestone/issues/project status with the local plan
+
+If any blocking decision remains unresolved, keep the milestone in planning. Implementation starts only after the plan says `Status: Ready to start`.
+
 ## GitHub Structure
 
 Recommended GitHub setup:
@@ -49,4 +63,3 @@ Recommended GitHub setup:
 - `spec-needed`
 - `ready`
 - `review`
-
