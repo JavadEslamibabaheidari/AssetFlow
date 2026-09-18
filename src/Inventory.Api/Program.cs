@@ -1,3 +1,4 @@
+using Inventory.Api.Api.Vendors;
 using Inventory.Api.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,8 @@ app.MapGet("/health", () => Results.Ok(new
     checkedAtUtc = DateTimeOffset.UtcNow
 }))
 .WithName("GetHealth");
+
+app.MapVendorEndpoints();
 
 app.Run();
 
