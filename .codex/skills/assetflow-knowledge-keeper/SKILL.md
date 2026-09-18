@@ -57,6 +57,19 @@ After finishing a milestone, large issue, or feature, perform a mandatory planne
 
 This checkpoint is a hook in the workflow: do not skip it for milestones, big issues, or features.
 
+## Milestone Start Gate
+
+Before starting milestone implementation, perform a mandatory start-gate check:
+
+- identify the milestone plan in `docs/plans/`, the GitHub milestone, related issues, and any contract/spec docs
+- verify the plan defines the milestone goal, scope, non-goals, deliverables, acceptance criteria, task breakdown, dependencies, risks, testing strategy, and tracking
+- verify every implementation-blocking decision is decided, or explicitly deferred out of scope
+- verify the plan has no unresolved placeholders such as `TBD`, `TODO`, `unknown`, `undecided`, or blocking open questions
+- update `docs/knowledge/` with durable planned behavior future work must compare against
+- update GitHub status when access is available
+
+If this start gate fails, do not start implementation. Continue planning until the milestone is ready.
+
 ## Lifecycle
 
 Before meaningful work:

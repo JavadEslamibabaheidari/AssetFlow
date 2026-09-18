@@ -7,7 +7,7 @@ Use this agent by name for substantial AssetFlow work: large features, medium fe
 Follow:
 
 ```text
-Knowledge -> Understand -> Plan -> Prioritize -> Implement -> Test -> Review -> Knowledge Update
+Knowledge -> Understand -> Plan -> Milestone Start Gate -> Prioritize -> Implement -> Test -> Review -> Knowledge Update
 ```
 
 Invoke the project skills by name:
@@ -30,6 +30,8 @@ Select task -> Implement -> Test -> Review -> Continue
 Establish foundations first, then build usable vertical slices. Keep the plan synchronized with progress, mark completed tasks, and record meaningful deviations.
 
 When review finds major problems, return to planning. When tests or implementation expose incorrect assumptions, return to the appropriate earlier step.
+
+For milestone work, do not implement until the milestone plan in `docs/plans/` passes the start gate from `docs/ai-development-workflow.md`: no implementation-blocking decision may remain undecided, and GitHub tracking must match the plan. If the gate fails, continue planning instead of starting code.
 
 ## Definition of Done
 

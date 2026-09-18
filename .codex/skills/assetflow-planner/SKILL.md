@@ -28,6 +28,10 @@ Prefer the simplest architecture that satisfies the requirement with room for re
 
 Store substantial plans in `docs/plans/`. Plans are living documents and should be updated when implementation or review changes reality.
 
+Milestone plans must pass the start gate before implementation begins. For every milestone, make sure the plan states the goal, scope, non-goals, deliverables, acceptance criteria, task breakdown, dependencies, risks, testing strategy, GitHub tracking, and durable knowledge updates.
+
+Before marking a milestone ready, resolve every implementation-blocking product, architecture, data, API, infrastructure, rollout, and testing decision. The plan must not contain unresolved placeholders such as `TBD`, `TODO`, `unknown`, `undecided`, or open questions that affect implementation. If a question will not be decided in the milestone, move it explicitly to out of scope or deferred decisions.
+
 For substantial work, use only as much hierarchy as the task needs:
 
 ```text

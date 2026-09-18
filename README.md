@@ -16,15 +16,15 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 ## Current Milestone
 
-`M0 - Repository and Hello Service`
+`M2 - Core Inventory Domain`
 
-The first milestone proves the basic delivery path:
+The active milestone builds the first production-shaped inventory domain:
 
-- a minimal ASP.NET Core service
-- Docker support
-- GitHub Actions CI
-- local Kubernetes manifests
-- documentation for running the service locally
+- vendors, products, sales channels, and stock items
+- PostgreSQL persistence through EF Core
+- CQRS command/query handlers through MediatR
+- Minimal API endpoints that dispatch application requests
+- risk-appropriate tests for contract behavior and persistence
 
 ## Local Run
 

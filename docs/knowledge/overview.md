@@ -19,9 +19,13 @@ M0, Repository and Hello Service, is complete: repository skeleton, minimal API,
 
 M1, Spec-First Workflow, is complete: GitHub status workflow, repo knowledge enforcement, OpenAPI style guidance, AI feature workflow guidance, the first inventory OpenAPI contract, and the M1 report exist.
 
-M2, Core Inventory Domain, is the next milestone and should start from the reviewed inventory contract and spec-first workflow.
+M2, Core Inventory Domain, is the active milestone and starts from the reviewed inventory contract and spec-first workflow. Its milestone plan is `docs/plans/m2-core-inventory-domain.md`.
 
 M2 must introduce EF Core through a CQRS application layer using MediatR. API endpoints should dispatch commands and queries; EF Core access belongs behind handlers, not inside route bodies. M3 reservation work should use the same MediatR/CQRS shape for concurrency-sensitive reservation and availability behavior. M4 event-driven synchronization should publish events from application handlers or an outbox-style boundary after successful state changes, not directly from controllers.
+
+For M2, keep the implementation in the existing `Inventory.Api` project with clear `Domain`, `Application`, `Infrastructure`, and `Api` folders. Use EF Core with the Npgsql PostgreSQL provider, MediatR for commands and queries, Minimal API route groups for contract endpoints, and `ProblemDetails` for validation, not-found, and conflict responses. `availableQuantity` equals `onHandQuantity` until M3 adds reservation-aware availability.
+
+M2 foundation work has started: `Inventory.Api` now references MediatR, EF Core Design, and `Npgsql.EntityFrameworkCore.PostgreSQL`; registers MediatR and inventory persistence at startup; defines domain entities for vendors, products, sales channels, and stock items; adds `InventoryDbContext`; and includes an initial PostgreSQL migration for the inventory schema. A classic `MarketplaceInventoryPlatform.sln` exists for CI compatibility alongside the existing `.slnx`.
 
 ## Architecture Direction
 
