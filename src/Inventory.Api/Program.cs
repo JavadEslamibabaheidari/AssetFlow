@@ -1,5 +1,6 @@
 using Inventory.Api.Api.Channels;
 using Inventory.Api.Api.Products;
+using Inventory.Api.Api.StockItems;
 using Inventory.Api.Api.Vendors;
 using Inventory.Api.Infrastructure;
 
@@ -29,6 +30,7 @@ app.MapGet("/health", () => Results.Ok(new
 app.MapVendorEndpoints();
 app.MapProductEndpoints();
 app.MapChannelEndpoints();
+app.MapStockItemEndpoints();
 
 app.Run();
 
