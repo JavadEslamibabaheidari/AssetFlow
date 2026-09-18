@@ -27,6 +27,8 @@ For M2, keep the implementation in the existing `Inventory.Api` project with cle
 
 M2 foundation work has started: `Inventory.Api` now references MediatR, EF Core Design, and `Npgsql.EntityFrameworkCore.PostgreSQL`; registers MediatR and inventory persistence at startup; defines domain entities for vendors, products, sales channels, and stock items; adds `InventoryDbContext`; and includes an initial PostgreSQL migration for the inventory schema. A classic `MarketplaceInventoryPlatform.sln` exists for CI compatibility alongside the existing `.slnx`.
 
+Vendor endpoints are implemented as the first M2 vertical slice: `POST /vendors`, `GET /vendors`, and `GET /vendors/{vendorId}` dispatch MediatR requests, use EF Core through handlers, return contract-shaped `{ vendor: ... }` and `{ items: ... }` responses, and map validation, duplicate-name conflict, and not-found results to `ProblemDetails`.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, and event-driven synchronization when the product need justifies it.
