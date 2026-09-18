@@ -107,7 +107,8 @@ Open questions:
 - #24 Implement vendor endpoints: implemented on branch `codex/24-vendor-endpoints`.
 - #23 Implement product endpoints: implemented on branch `codex/23-product-endpoints`.
 - #22 Implement channel endpoints: implemented on branch `codex/22-channel-endpoints`.
-- #27 Implement stock item endpoints: next.
+- #27 Implement stock item endpoints: implemented on branch `codex/27-stock-item-endpoints`.
+- #26 Complete M2 validation and docs: next.
 
 ## GitHub Tracking
 
