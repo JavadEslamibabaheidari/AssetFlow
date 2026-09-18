@@ -105,7 +105,8 @@ Open questions:
 
 - #25 Add inventory persistence and CQRS foundation: implemented on branch `codex/25-inventory-cqrs-foundation`.
 - #24 Implement vendor endpoints: implemented on branch `codex/24-vendor-endpoints`.
-- #23 Implement product endpoints: next.
+- #23 Implement product endpoints: implemented on branch `codex/23-product-endpoints`.
+- #22 Implement channel endpoints: next.
 
 ## GitHub Tracking
 
