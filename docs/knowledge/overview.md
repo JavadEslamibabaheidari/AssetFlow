@@ -31,6 +31,8 @@ Vendor endpoints are implemented as the first M2 vertical slice: `POST /vendors`
 
 Product endpoints are implemented as the second M2 vertical slice: `POST /products`, `GET /products`, and `GET /products/{productId}` dispatch MediatR requests, validate vendor references, enforce duplicate SKU conflicts per vendor, support optional `vendorId` list filtering, and map validation, vendor/product not-found, and conflict outcomes to `ProblemDetails`.
 
+Channel endpoints are implemented as the third M2 vertical slice: `POST /channels` and `GET /channels` dispatch MediatR requests, enforce duplicate channel-code conflicts, return contract-shaped channel responses, and map validation and conflict outcomes to `ProblemDetails`.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, and event-driven synchronization when the product need justifies it.
