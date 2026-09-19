@@ -262,6 +262,102 @@ public sealed class ReservationEndpointTests
         Assert.Equal("Active", secondReservation.Status);
     }
 
+    [Fact]
+    public async Task ExpireReservations_WhenReservationIsDue_ReturnsExpiredReservation()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-111", "FLASH", 5);
+        var expiresAtUtc = DateTimeOffset.UtcNow.AddMinutes(10);
+        var created = await CreateReservationAsync(client, stockItem.Id, 2, expiresAtUtc);
+
+        var response = await client.PostAsJsonAsync(
+            "/reservations/expire",
+            new ExpireReservationsRequest(expiresAtUtc.AddMinutes(1)));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<ExpireReservationsResponse>();
+
+        Assert.NotNull(body);
+        Assert.Equal(1, body.ExpiredCount);
+        var expired = Assert.Single(body.Items);
+        Assert.Equal(created.Id, expired.Id);
+        Assert.Equal("Expired", expired.Status);
+        Assert.NotNull(expired.ExpiredAtUtc);
+        Assert.Null(expired.ReleasedAtUtc);
+    }
+
+    [Fact]
+    public async Task ExpireReservations_WithoutBody_ReturnsOk()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+
+        var response = await client.PostAsync("/reservations/expire", content: null);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<ExpireReservationsResponse>();
+
+        Assert.NotNull(body);
+        Assert.Equal(0, body.ExpiredCount);
+        Assert.Empty(body.Items);
+    }
+
+    [Fact]
+    public async Task ExpireReservations_SkipsNotDueReleasedAndAlreadyExpiredReservations()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-112", "SLOW", 10);
+        var cutoffUtc = DateTimeOffset.UtcNow.AddMinutes(10);
+        var notDue = await CreateReservationAsync(client, stockItem.Id, 2, cutoffUtc.AddMinutes(5));
+        var released = await CreateReservationAsync(client, stockItem.Id, 2, cutoffUtc.AddMinutes(5));
+        var expired = await CreateReservationAsync(client, stockItem.Id, 2, cutoffUtc.AddMinutes(5));
+        var releaseResponse = await client.PostAsync($"/reservations/{released.Id}/release", content: null);
+        releaseResponse.EnsureSuccessStatusCode();
+        await ExpireReservationAsync(factory, expired.Id);
+
+        var response = await client.PostAsJsonAsync(
+            "/reservations/expire",
+            new ExpireReservationsRequest(cutoffUtc));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<ExpireReservationsResponse>();
+
+        Assert.NotNull(body);
+        Assert.Equal(0, body.ExpiredCount);
+        Assert.Empty(body.Items);
+
+        var notDueResponse = await client.GetAsync($"/reservations/{notDue.Id}");
+        var notDueBody = await notDueResponse.Content.ReadFromJsonAsync<ReservationResponse>();
+        Assert.NotNull(notDueBody);
+        Assert.Equal("Active", notDueBody.Reservation.Status);
+    }
+
+    [Fact]
+    public async Task CreateReservation_AfterExpiration_CanReuseAvailability()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-113", "CLEARANCE", 3);
+        var expiresAtUtc = DateTimeOffset.UtcNow.AddMinutes(10);
+        await CreateReservationAsync(client, stockItem.Id, 3, expiresAtUtc);
+
+        var expireResponse = await client.PostAsJsonAsync(
+            "/reservations/expire",
+            new ExpireReservationsRequest(expiresAtUtc.AddMinutes(1)));
+        expireResponse.EnsureSuccessStatusCode();
+
+        var secondReservation = await CreateReservationAsync(client, stockItem.Id, 3);
+
+        Assert.Equal(stockItem.Id, secondReservation.StockItemId);
+        Assert.Equal(3, secondReservation.Quantity);
+        Assert.Equal("Active", secondReservation.Status);
+    }
+
     private static async Task<StockItemDto> CreateStockItemWithProductAndChannelAsync(
         HttpClient client,
         string sku,
@@ -332,11 +428,12 @@ public sealed class ReservationEndpointTests
     private static async Task<ReservationDto> CreateReservationAsync(
         HttpClient client,
         Guid stockItemId,
-        int quantity)
+        int quantity,
+        DateTimeOffset? expiresAtUtc = null)
     {
         var response = await client.PostAsJsonAsync(
             "/reservations",
-            new CreateReservationRequest(stockItemId, quantity, DateTimeOffset.UtcNow.AddHours(1)));
+            new CreateReservationRequest(stockItemId, quantity, expiresAtUtc ?? DateTimeOffset.UtcNow.AddHours(1)));
         response.EnsureSuccessStatusCode();
 
         var body = await response.Content.ReadFromJsonAsync<ReservationResponse>();
@@ -402,9 +499,15 @@ public sealed class ReservationEndpointTests
         int Quantity,
         DateTimeOffset ExpiresAtUtc);
 
+    private sealed record ExpireReservationsRequest(DateTimeOffset? ExpiresBeforeUtc);
+
     private sealed record ReservationResponse(ReservationDto Reservation);
 
     private sealed record ReservationListResponse(IReadOnlyList<ReservationDto> Items);
+
+    private sealed record ExpireReservationsResponse(
+        int ExpiredCount,
+        IReadOnlyList<ReservationDto> Items);
 
     private sealed record ReservationDto(
         Guid Id,

@@ -1,5 +1,6 @@
 using Inventory.Api.Api.Common;
 using Inventory.Api.Application.Reservations.CreateReservation;
+using Inventory.Api.Application.Reservations.ExpireReservations;
 using Inventory.Api.Application.Reservations.GetReservation;
 using Inventory.Api.Application.Reservations.ListReservations;
 using Inventory.Api.Application.Reservations.ReleaseReservation;
@@ -39,6 +40,19 @@ public static class ReservationEndpoints
                 Results.Created($"/reservations/{reservation.Id}", new ReservationResponse(reservation)));
         })
         .WithName("CreateReservation");
+
+        group.MapPost("/expire", async (
+            ExpireReservationsRequest? request,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ExpireReservationsCommand(request?.ExpiresBeforeUtc),
+                cancellationToken);
+
+            return Results.Ok(new ExpireReservationsResponse(result.ExpiredCount, result.Items));
+        })
+        .WithName("ExpireReservations");
 
         group.MapGet("/{reservationId:guid}", async (
             Guid reservationId,

@@ -10,3 +10,9 @@ public sealed record CreateReservationRequest(
 public sealed record ReservationResponse(ReservationDto Reservation);
 
 public sealed record ReservationListResponse(IReadOnlyList<ReservationDto> Items);
+
+public sealed record ExpireReservationsRequest(DateTimeOffset? ExpiresBeforeUtc);
+
+public sealed record ExpireReservationsResponse(
+    int ExpiredCount,
+    IReadOnlyList<ReservationDto> Items);
