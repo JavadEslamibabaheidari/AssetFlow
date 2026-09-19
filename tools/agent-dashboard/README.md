@@ -16,9 +16,16 @@ tools/agent-dashboard/dist/index.html
 
 Open that file in a browser to review the first screen and navigation model.
 
+To verify degraded rendering without GitHub reads:
+
+```bash
+ASSETFLOW_DASHBOARD_DISABLE_GITHUB=1 ./tools/agent-dashboard/generate.sh /tmp/assetflow-dashboard-no-github
+```
+
 ## Scope
 
 - This is local workflow tooling, not the M5 production frontend application.
-- The generator reads local Git metadata and curated repository paths.
-- Later M4 tasks will add richer GitHub/local status views and workflow launch behavior.
+- The generator reads local Git metadata, curated repository paths, and read-only GitHub issue/milestone/PR status when `gh` is authenticated.
+- Project-board status is shown as unverified when the current GitHub token cannot read project fields.
+- Later M4 tasks will add richer workflow launch behavior.
 - Generated output is ignored by Git and can be safely deleted.
