@@ -119,6 +119,7 @@ Open questions:
 
 - Planning started on branch `codex/m3-reservations-planning`.
 - Issue #34 contract slice implemented on branch `codex/34-reservation-availability-contract`: `contracts/openapi/inventory-api.yaml` now defines reservation create/list/get/release/expire operations, stock item availability reads, M3 reservation/availability schemas, examples, and validation/not-found/conflict responses.
+- Issue #39 persistence foundation implemented on branch `codex/39-reservation-persistence-foundation`: reservation domain/status model, DTO/mapping, availability calculation helper, EF Core mapping, PostgreSQL migration, and focused availability/status-transition tests are in place.
 
 ## GitHub Tracking
 

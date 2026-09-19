@@ -14,6 +14,8 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
 
     public DbSet<StockItem> StockItems => Set<StockItem>();
 
+    public DbSet<Reservation> Reservations => Set<Reservation>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Vendor>(builder =>
@@ -147,6 +149,75 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
                 table.HasCheckConstraint(
                     "ck_stock_items_available_quantity_not_above_on_hand",
                     "available_quantity <= on_hand_quantity");
+            });
+        });
+
+        modelBuilder.Entity<Reservation>(builder =>
+        {
+            builder.ToTable("reservations");
+
+            builder.HasKey(reservation => reservation.Id);
+
+            builder.Property(reservation => reservation.Id)
+                .HasColumnName("id");
+
+            builder.Property(reservation => reservation.StockItemId)
+                .HasColumnName("stock_item_id");
+
+            builder.Property(reservation => reservation.Quantity)
+                .HasColumnName("quantity")
+                .IsRequired();
+
+            builder.Property(reservation => reservation.Status)
+                .HasColumnName("status")
+                .HasConversion<string>()
+                .HasMaxLength(32)
+                .IsRequired();
+
+            builder.Property(reservation => reservation.ExpiresAtUtc)
+                .HasColumnName("expires_at_utc")
+                .IsRequired();
+
+            builder.Property(reservation => reservation.CreatedAtUtc)
+                .HasColumnName("created_at_utc")
+                .IsRequired();
+
+            builder.Property(reservation => reservation.UpdatedAtUtc)
+                .HasColumnName("updated_at_utc")
+                .IsRequired();
+
+            builder.Property(reservation => reservation.ReleasedAtUtc)
+                .HasColumnName("released_at_utc");
+
+            builder.Property(reservation => reservation.ExpiredAtUtc)
+                .HasColumnName("expired_at_utc");
+
+            builder.HasIndex(reservation => reservation.StockItemId);
+
+            builder.HasIndex(reservation => new { reservation.StockItemId, reservation.Status, reservation.ExpiresAtUtc });
+
+            builder.HasIndex(reservation => new { reservation.Status, reservation.ExpiresAtUtc });
+
+            builder.HasOne(reservation => reservation.StockItem)
+                .WithMany()
+                .HasForeignKey(reservation => reservation.StockItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.ToTable(table =>
+            {
+                table.HasCheckConstraint("ck_reservations_quantity_positive", "quantity > 0");
+                table.HasCheckConstraint(
+                    "ck_reservations_status_valid",
+                    "status IN ('Active', 'Released', 'Expired')");
+                table.HasCheckConstraint(
+                    "ck_reservations_expires_after_created",
+                    "expires_at_utc > created_at_utc");
+                table.HasCheckConstraint(
+                    "ck_reservations_released_at_matches_status",
+                    "(status = 'Released' AND released_at_utc IS NOT NULL) OR (status <> 'Released' AND released_at_utc IS NULL)");
+                table.HasCheckConstraint(
+                    "ck_reservations_expired_at_matches_status",
+                    "(status = 'Expired' AND expired_at_utc IS NOT NULL) OR (status <> 'Expired' AND expired_at_utc IS NULL)");
             });
         });
     }
