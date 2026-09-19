@@ -68,14 +68,14 @@ Open questions:
 
 ## Acceptance Criteria
 
-- [ ] The user can open one dashboard and understand the current milestone, active task, and next planned work.
-- [ ] The dashboard links to the relevant roadmap, milestone plan, knowledge overview, GitHub milestone, and active issues.
-- [ ] The dashboard exposes common workflow actions or launch points without requiring the user to remember every command or skill name.
-- [ ] The dashboard clearly distinguishes read-only status from actions that mutate GitHub, docs, code, or project state.
-- [ ] The dashboard handles missing GitHub authentication or project-board access with an explicit degraded state.
-- [ ] The dashboard avoids storing sensitive external credentials or personal workspace data in the repository.
-- [ ] The MVP leaves full frontend application buildout, memory, external automations, and deep resource accounting as explicit later follow-ups.
-- [ ] The dashboard can be run and verified locally from documented commands.
+- [x] The user can open one dashboard and understand the current milestone, active task, and next planned work.
+- [x] The dashboard links to the relevant roadmap, milestone plan, knowledge overview, GitHub milestone, and active issues.
+- [x] The dashboard exposes common workflow actions or launch points without requiring the user to remember every command or skill name.
+- [x] The dashboard clearly distinguishes read-only status from actions that mutate GitHub, docs, code, or project state.
+- [x] The dashboard handles missing GitHub authentication or project-board access with an explicit degraded state.
+- [x] The dashboard avoids storing sensitive external credentials or personal workspace data in the repository.
+- [x] The MVP leaves full frontend application buildout, memory, external automations, and deep resource accounting as explicit later follow-ups.
+- [x] The dashboard can be run and verified locally from documented commands.
 
 ## Task Breakdown
 
@@ -107,8 +107,8 @@ Open questions:
 ## GitHub Tracking
 
 - Milestone: `M4 - Agentic Control Dashboard MVP`
-- Issues: #49, #50, #51, #52, #53.
-- Project board: project-board access is not verified from this environment; keep each active task isolated to one branch and pull request unless explicitly combined, and record board sync gaps until access is available.
+- Issues: #49, #50, #51, #52 are closed; #53 closes with final validation/docs.
+- Project board: project-board item/column mapping is not implemented in M4; the dashboard reports board state as unverified/not mapped instead of claiming synchronization.
 
 ## Previous Milestone Closure
 
@@ -126,4 +126,13 @@ Open questions:
 - [x] GitHub tracking matches this plan.
 - [x] Knowledge docs capture durable planned behavior.
 
-Status: Ready to start
+Status: Complete after #53 merges
+
+## Final Validation
+
+- Report: `docs/milestone-4-report.md`
+- Dashboard tool: `tools/agent-dashboard/generate.sh`
+- Run docs: `tools/agent-dashboard/README.md`
+- Knowledge/docs: M4 durable facts are captured in `docs/knowledge/overview.md`.
+- GitHub status: M4 issues #49, #50, #51, and #52 are closed; #53 closes with final validation/docs.
+- Result: Complete after #53 merges.
