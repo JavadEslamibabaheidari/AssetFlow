@@ -37,6 +37,11 @@ public sealed class CreateReservationCommandHandler(InventoryDbContext dbContext
                 "Reservation expiration must be in the future.");
         }
 
+        await using var stockItemLock = await StockItemLockTransaction.BeginAsync(
+            dbContext,
+            [request.StockItemId],
+            cancellationToken);
+
         var stockItem = await dbContext.StockItems
             .AsNoTracking()
             .SingleOrDefaultAsync(stockItem => stockItem.Id == request.StockItemId, cancellationToken);
@@ -86,6 +91,7 @@ public sealed class CreateReservationCommandHandler(InventoryDbContext dbContext
             nowUtc,
             cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
+        await stockItemLock.CommitAsync(cancellationToken);
 
         return ApplicationResult<ReservationDto>.Success(reservation.ToDto());
     }

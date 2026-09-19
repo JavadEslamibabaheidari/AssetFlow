@@ -22,6 +22,11 @@ public sealed class ExpireReservationsCommandHandler(InventoryDbContext dbContex
             .OrderBy(reservation => reservation.ExpiresAtUtc)
             .ToArrayAsync(cancellationToken);
 
+        await using var stockItemLock = await StockItemLockTransaction.BeginAsync(
+            dbContext,
+            dueReservations.Select(reservation => reservation.StockItemId),
+            cancellationToken);
+
         foreach (var reservation in dueReservations)
         {
             reservation.Expire(cutoffUtc);
@@ -42,6 +47,8 @@ public sealed class ExpireReservationsCommandHandler(InventoryDbContext dbContex
 
             await dbContext.SaveChangesAsync(cancellationToken);
         }
+
+        await stockItemLock.CommitAsync(cancellationToken);
 
         return new ExpireReservationsDto(
             dueReservations.Length,

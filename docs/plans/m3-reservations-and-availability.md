@@ -69,18 +69,18 @@ Open questions:
 
 ## Acceptance Criteria
 
-- [ ] `POST /reservations` creates an active reservation when enough stock is available.
-- [ ] `POST /reservations` returns `409` without creating a reservation when the request would oversell a stock item.
-- [ ] `GET /reservations` lists reservations and supports optional `stockItemId` and `status` filters.
-- [ ] `GET /reservations/{reservationId}` returns a reservation or `404`.
-- [ ] `POST /reservations/{reservationId}/release` releases active reservations and restores availability.
-- [ ] `POST /reservations/expire` expires due active reservations and restores availability.
-- [ ] `GET /stock-items/{stockItemId}/availability` returns on-hand, reserved, available, and next-expiration values.
-- [ ] Stock item get/list responses return reservation-aware `availableQuantity`.
-- [ ] Reservation commands use MediatR and keep EF Core access inside handlers.
-- [ ] PostgreSQL persistence includes constraints/indexes that support reservation lookup and conflict handling.
-- [ ] Tests cover validation, missing stock items/reservations, oversell conflicts, release, expiration, and availability calculations.
-- [ ] Full build, test, review, docs, and GitHub status checks pass.
+- [x] `POST /reservations` creates an active reservation when enough stock is available.
+- [x] `POST /reservations` returns `409` without creating a reservation when the request would oversell a stock item.
+- [x] `GET /reservations` lists reservations and supports optional `stockItemId` and `status` filters.
+- [x] `GET /reservations/{reservationId}` returns a reservation or `404`.
+- [x] `POST /reservations/{reservationId}/release` releases active reservations and restores availability.
+- [x] `POST /reservations/expire` expires due active reservations and restores availability.
+- [x] `GET /stock-items/{stockItemId}/availability` returns on-hand, reserved, available, and next-expiration values.
+- [x] Stock item get/list responses return reservation-aware `availableQuantity`.
+- [x] Reservation commands use MediatR and keep EF Core access inside handlers.
+- [x] PostgreSQL persistence includes constraints/indexes that support reservation lookup and conflict handling.
+- [x] Tests cover validation, missing stock items/reservations, oversell conflicts, release, expiration, and availability calculations.
+- [x] Full build, test, review, docs, and GitHub status checks pass.
 
 ## Task Breakdown
 
@@ -124,6 +124,17 @@ Open questions:
 - Issue #38 release slice implemented on branch `codex/38-reservation-release`: reservation release command/endpoint, idempotent already-released behavior, expired conflict handling, missing reservation handling, and availability reuse after release are covered by endpoint tests.
 - Issue #37 expiration slice implemented on branch `codex/37-reservation-expiration`: explicit reservation expiration command/endpoint, due expiration, optional server-current cutoff, skipping not-due/released/already-expired reservations, response counts, and availability reuse after expiration are covered by endpoint tests.
 - Issue #36 availability slice implemented on branch `codex/36-availability-reads`: stock item availability endpoint, reservation-aware stock item get/list responses, and stored availability recalculation after reservation create/release/expire are covered by endpoint tests.
+- Issue #35 validation/docs slice implemented on branch `codex/35-m3-validation-docs`: planned-state validation, milestone report, final docs updates, contract review, full build/test, and GitHub status review are complete.
+
+## Planned-State Validation
+
+- Contract: `contracts/openapi/inventory-api.yaml` defines reservation create/list/get/release/expire operations and stock item availability reads with validation, not-found, and conflict responses.
+- Persistence: `reservations` has stock item reference, quantity/status/timestamp columns, status and timestamp consistency checks, lookup indexes, and due-expiration indexes.
+- Application: reservation create/read/release/expire and stock item availability use MediatR; EF Core access remains in handlers.
+- Availability: active, unexpired reservations reduce availability; released and expired reservations do not; stock item get/list and availability responses recalculate from reservation rows.
+- Consistency: reservation create, release, and expiration recalculate stored `stock_items.available_quantity`; Npgsql execution takes row-level stock item locks with `FOR UPDATE` around reservation state changes.
+- Verification: OpenAPI YAML parse and internal `$ref` checks pass; `dotnet build MarketplaceInventoryPlatform.sln --configuration Release` and `dotnet test MarketplaceInventoryPlatform.sln --configuration Release --no-build` pass with 59 tests.
+- GitHub: #34, #39, #40, #38, #37, and #36 are closed; #35 is the final validation issue and closes with this slice.
 
 ## GitHub Tracking
 
