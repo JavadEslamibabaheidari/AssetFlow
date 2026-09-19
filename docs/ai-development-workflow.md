@@ -44,6 +44,24 @@ Then delete the remote branch and prune local stale branch/worktree state when s
 
 Do not delete release branches, hotfix branches still in use, long-running integration branches explicitly kept alive, branches with open pull requests, branches needed by dependent work, or branches with unmerged local-only commits.
 
+## Milestone Tagging Hook
+
+After a milestone is closed, create an annotated Git tag on `main` so the completed milestone has a durable audit and deployment reference.
+
+Before tagging:
+
+- verify all milestone PRs are merged into `main`
+- verify CI/checks passed on the final milestone state
+- verify milestone docs, `docs/knowledge/`, GitHub issues, GitHub milestone status, and project board status are synchronized
+- verify the local checkout is on up-to-date `main`
+- verify the tag name does not already exist locally or remotely
+
+Use annotated milestone tags named `v0.<milestone-number>.0`, such as `v0.3.0` for M3 and `v0.4.0` for M4. The annotation message should name the milestone and summarize the completed scope.
+
+Push the tag to GitHub after creation. When container images are published, tag service images with both immutable commit tags such as `sha-<short-sha>` and milestone tags such as `v0.3.0` for deployable milestone releases.
+
+Do not create milestone tags for incomplete milestones, failed validation, unmerged work, or commits that do not represent the synchronized milestone state.
+
 ## Milestone Start Gate
 
 Milestone work must not start from roadmap bullets alone. Before opening implementation branches or moving milestone issues into active work, run this start gate:

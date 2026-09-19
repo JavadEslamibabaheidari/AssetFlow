@@ -35,6 +35,19 @@ Before cleanup, confirm:
 
 Keep release branches, active hotfix branches, explicitly approved long-running integration branches, branches with open PRs, and branches needed by dependent work.
 
+## Milestone Tagging Rule
+
+After a milestone is closed and synchronized, create an annotated Git tag on `main`.
+
+Tag format:
+
+- `v0.<milestone-number>.0`
+- examples: `v0.3.0` for M3, `v0.4.0` for M4
+
+Before tagging, verify that all milestone work is merged, CI passed, local docs and knowledge are current, GitHub issues and milestone status are synchronized, and the tag does not already exist.
+
+Git tags mark source history. Service image tags should be created later from the same milestone commit when images are published, using both immutable commit tags and milestone version tags.
+
 ## Previous Milestone Closure Rule
 
 Before planning a new milestone or creating new milestone issues, verify that the previous milestone is documented well enough to be trusted as the first read path for future work.

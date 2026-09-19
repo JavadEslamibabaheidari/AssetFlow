@@ -40,6 +40,22 @@ After a pull request is merged, clean up its branch when the work is genuinely c
 
 Do not delete release branches, active hotfix branches, explicitly retained integration branches, branches with open pull requests, branches needed by dependent work, or branches with unmerged local-only commits.
 
+## Milestone Tagging Hook
+
+After a milestone is closed and synchronized, create an annotated Git tag on `main`:
+
+- verify all milestone PRs are merged
+- verify CI/checks passed on the final milestone state
+- verify local docs, `docs/knowledge/`, GitHub issues, milestones, and project board status are synchronized
+- verify the checkout is on up-to-date `main`
+- verify the tag does not already exist locally or remotely
+- create an annotated tag named `v0.<milestone-number>.0`
+- push the tag to GitHub
+
+Git tags identify source commits. When service images are published, use matching milestone image tags plus immutable commit tags such as `sha-<short-sha>`.
+
+Do not tag incomplete milestones, unsynchronized milestone states, or branches that have not been merged to `main`.
+
 ## Access
 
 Use the best available GitHub access path in the current environment:

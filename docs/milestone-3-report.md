@@ -59,4 +59,4 @@ M3 is complete. The milestone added reservation-aware availability to the Invent
 
 ## Next
 
-M4 can start from the completed reservation-aware inventory API and should focus on event-driven synchronization: event contracts, publication boundaries, outbox/channel synchronization decisions, and marketplace availability update flow.
+M4 can start from the completed reservation-aware inventory API and should focus on the Agentic Control Dashboard MVP. Event-driven synchronization remains deferred to M7 after the frontend foundation and inventory parity milestones.
