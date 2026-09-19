@@ -13,6 +13,8 @@ The product domain naturally fits an event-driven distributed system because sto
 The target direction is:
 
 - services own their data
+- services are split by real bounded contexts and operational ownership rather than by premature technical layering
+- dependency injection keeps application behavior explicit and testable inside each service
 - service APIs are documented with OpenAPI
 - API endpoints delegate application behavior to CQRS command/query handlers through MediatR
 - EF Core is used behind application handlers for relational persistence when the core inventory domain starts
@@ -20,6 +22,10 @@ The target direction is:
 - business events are published through Kafka
 - read models and dashboards consume event streams where useful
 - metrics, logs, and traces are available from the beginning
+
+AssetFlow should not permanently concentrate all business behavior in one service. The first repository and `Inventory.Api` service are a controlled starting point. As the product reaches clearer bounded contexts, new deployable services can be introduced in separate repositories or workspaces and deployed together through Kubernetes, with each service owning its API, data, dependency-injection composition root, tests, and runtime configuration.
+
+Early service splits should be justified by ownership, scaling, data boundaries, integration needs, or operational independence. Candidate future services include reservation, channel integration, pricing, catalog/assets, notification/synchronization workers, and frontend/backend-for-frontend surfaces if the product needs them.
 
 ## Application Architecture Rule
 
@@ -33,7 +39,15 @@ When AssetFlow introduces core inventory persistence, use CQRS with MediatR as t
 
 Use this same shape for M3 reservation workflows so concurrency-sensitive behavior is isolated in command handlers and tested at the application boundary.
 
-For M4 event-driven synchronization, publish domain/integration events from application handlers or a clear outbox-style boundary after successful state changes. Do not publish marketplace synchronization events directly from controllers.
+For M7 event-driven synchronization, publish domain/integration events from application handlers or a clear outbox-style boundary after successful state changes. Do not publish marketplace synchronization events directly from controllers.
+
+## Frontend Architecture Direction
+
+M5 introduces the frontend application foundation after the M4 dashboard MVP. The frontend should use a modern, strongly typed, component-driven architecture with clear boundaries between route/page composition, reusable UI components, API clients, and workflow-specific view models.
+
+Frontend work must stay contract-aligned with backend services through OpenAPI-generated or OpenAPI-validated clients where practical. Backend services remain the source of truth for business rules; the frontend should focus on user workflows, accessibility, state presentation, and clear handling of backend validation, conflict, not-found, and success responses.
+
+M6 brings the frontend to parity with the backend state reached by M3, covering vendors, products, sales channels, stock items, reservations, and reservation-aware availability. Browser end-to-end coverage should start small and high-value, then expand as product workflows stabilize.
 
 ## Event-Driven vs Event Sourcing
 

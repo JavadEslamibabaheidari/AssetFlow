@@ -12,7 +12,7 @@ The engineering goal is to build the platform through a disciplined AI developme
 - Docker-based local development
 - GitHub Actions CI/CD
 - local Kubernetes deployment for learning
-- future event-driven architecture with Kafka, observability, and dashboards
+- future event-driven architecture with Kafka, observability, and an early Agentic Control Dashboard
 
 ## Current Milestone
 

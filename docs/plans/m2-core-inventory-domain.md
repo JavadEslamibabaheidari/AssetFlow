@@ -18,7 +18,7 @@ In scope:
 Out of scope:
 
 - Reservations, allocation, stock holds, expiration, and oversell prevention. These start in M3.
-- Kafka, outbox, event publication, channel workers, and marketplace synchronization. These start in M4.
+- Kafka, outbox, event publication, channel workers, and marketplace synchronization. These start in M7 after the frontend foundation and inventory parity milestones.
 - Authentication, authorization, tenant isolation, and admin UI.
 - Update/delete endpoints. The M1 contract only includes create, get, and list operations.
 - Advanced filtering, pagination, sorting options, or search beyond the filters already in the contract.

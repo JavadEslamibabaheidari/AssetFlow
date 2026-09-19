@@ -56,8 +56,12 @@ Recommended GitHub setup:
 - `M1 - Spec-First Workflow`
 - `M2 - Core Inventory Domain`
 - `M3 - Reservations and Availability`
-- `M4 - Event-Driven Synchronization`
-- `M5 - Observability and AI Monitoring`
+- `M4 - Agentic Control Dashboard MVP`
+- `M5 - Frontend Application Foundation`
+- `M6 - Frontend Inventory Parity`
+- `M7 - Event-Driven Synchronization`
+- `M8 - Observability and Monitoring`
+- `M9 - Agentic OS Expansion`
 
 ## Label Set
 
