@@ -33,6 +33,14 @@ Out of scope:
 - Design for operational workflows: dense, scannable, accessible, responsive, and efficient for repeated use.
 - Document decisions well enough that future frontend work can be done consistently by someone without prior frontend background.
 
+## Architecture Decision
+
+M5 will add a first-party frontend workspace under `src/AssetFlow.Web` using React, TypeScript, Vite, React Router, TanStack Query, Vitest, Testing Library, Playwright, ESLint, and Prettier. Package management will use npm to keep the host and CI requirements familiar and avoid introducing a monorepo package manager before the repository needs one.
+
+The frontend will remain in this repository so backend contracts, Docker Compose, CI, and milestone documentation can evolve together. It will consume the checked-in OpenAPI contract from `contracts/openapi/inventory-api.yaml` through a typed generated client or generated TypeScript types plus a small hand-written fetch wrapper. Runtime API base URLs will come from explicit environment variables, not committed secrets.
+
+The app shell will be operational-tooling-first: dense, scannable, responsive, accessible, and built around routes, navigation, loading/error states, and placeholder product areas. M5 may include non-functional placeholders for inventory areas, but full vendor/product/channel/stock/reservation workflows remain M6.
+
 ## Deliverables
 
 - Final frontend architecture decision and milestone start-gate update.
@@ -61,13 +69,23 @@ Out of scope:
 
 | Order | Task | Objective | Depends on | Verification | GitHub issue |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Define frontend architecture | Select stack, repo shape, API-client strategy, testing approach, and design-system rules. | M4 closure | Reviewed plan and architecture decision | To create after M4 |
-| 2 | Scaffold frontend app | Create the repo/workspace, build tooling, local scripts, routing, and app shell. | Task 1 | Local run, lint/type-check, smoke render | To create after M4 |
-| 3 | Add design system foundation | Add tokens, layout primitives, base components, icon approach, and accessibility conventions. | Task 2 | Component review and responsive checks | To create after M4 |
-| 4 | Add API client foundation | Wire typed API access to the OpenAPI contract and environment configuration. | Tasks 1-2 | Generated/validated client and basic backend connectivity check | To create after M4 |
-| 5 | Add frontend quality gates | Add unit/component testing and Playwright smoke-test foundation. | Tasks 2-4 | Quality commands pass locally and in CI where available | To create after M4 |
-| 6 | Add Compose verification path | Build and run the frontend foundation with relevant backend services through Docker Compose. | Tasks 2-5 | `docker compose up --build` and smoke checks | To create after M4 |
-| 7 | Complete M5 validation and docs | Verify implementation against the plan and update knowledge. | Tasks 1-6 | Planned-state validation and docs update | To create after M4 |
+| 1 | Define frontend architecture | Select stack, repo shape, API-client strategy, testing approach, and design-system rules. | M4 closure | Reviewed plan and architecture decision | #60 |
+| 2 | Scaffold frontend app | Create the repo/workspace, build tooling, local scripts, routing, and app shell. | Task 1 | Local run, lint/type-check, smoke render | #61 |
+| 3 | Add design system foundation | Add tokens, layout primitives, base components, icon approach, and accessibility conventions. | Task 2 | Component review and responsive checks | #62 |
+| 4 | Add API client foundation | Wire typed API access to the OpenAPI contract and environment configuration. | Tasks 1-2 | Generated/validated client and basic backend connectivity check | #63 |
+| 5 | Add frontend quality gates | Add unit/component testing and Playwright smoke-test foundation. | Tasks 2-4 | Quality commands pass locally and in CI where available | #64 |
+| 6 | Add Compose verification path | Build and run the frontend foundation with relevant backend services through Docker Compose. | Tasks 2-5 | `docker compose up --build` and smoke checks | #65 |
+| 7 | Complete M5 validation and docs | Verify implementation against the plan and update knowledge. | Tasks 1-6 | Planned-state validation and docs update | #66 |
+
+## Prioritized Execution
+
+1. Critical prerequisite: #60 defines and records the architecture decision so all later branches share the same stack and boundaries.
+2. High implementation: #61 creates the frontend workspace, scripts, routing, app shell, and basic run path.
+3. High implementation: #62 adds design tokens and starter UI primitives before feature screens multiply.
+4. High integration: #63 wires typed OpenAPI-aligned API access and environment configuration.
+5. High verification: #64 adds frontend linting, formatting, type checks, unit/component tests, and Playwright smoke tests.
+6. Medium integration: #65 adds the Docker Compose frontend/backend verification path after the app and checks exist.
+7. Critical validation: #66 compares the final implementation against this plan, updates knowledge, and closes M5 tracking.
 
 ## Risks and Mitigations
 
@@ -87,23 +105,23 @@ Out of scope:
 ## GitHub Tracking
 
 - Milestone: `M5 - Frontend Application Foundation`
-- Issues: create after M4 closure and detailed M5 planning.
-- Project board: keep each active task isolated to one branch and pull request unless explicitly combined.
+- Issues: #60 through #66.
+- Project board: keep each active task isolated to one branch and pull request unless explicitly combined. Project-board field access is not yet verified from this environment and must be recorded as a sync gap if it remains unavailable.
 
 ## Previous Milestone Closure
 
-- Report: M4 report must exist before M5 implementation starts.
-- Knowledge/docs: M4 durable facts must be captured in `docs/knowledge/`.
-- GitHub status: M4 issues and milestone state must match the completed implementation.
-- Result: Pending M4 completion.
+- Report: `docs/milestone-4-report.md` exists and records planned-state validation.
+- Knowledge/docs: M4 durable facts are captured in `docs/knowledge/overview.md`.
+- GitHub status: M4 milestone #5 is closed and issues #49 through #53 are closed.
+- Result: Passed.
 
 ## Start Gate Result
 
-- [ ] Previous milestone report exists or was not required.
-- [ ] Previous milestone durable facts are captured in docs/knowledge.
-- [ ] Plan is complete enough to implement.
-- [ ] No implementation-blocking decisions remain undecided.
-- [ ] GitHub tracking matches this plan.
-- [ ] Knowledge docs capture durable planned behavior.
+- [x] Previous milestone report exists or was not required.
+- [x] Previous milestone durable facts are captured in docs/knowledge.
+- [x] Plan is complete enough to implement.
+- [x] No implementation-blocking decisions remain undecided.
+- [x] GitHub tracking matches this plan.
+- [x] Knowledge docs capture durable planned behavior.
 
-Status: Not ready
+Status: Ready to start
