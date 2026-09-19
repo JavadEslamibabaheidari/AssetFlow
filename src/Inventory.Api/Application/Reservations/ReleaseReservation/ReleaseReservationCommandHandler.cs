@@ -1,3 +1,4 @@
+using Inventory.Api.Application.Availability;
 using Inventory.Api.Application.Common;
 using Inventory.Api.Domain.Entities;
 using Inventory.Api.Infrastructure.Persistence;
@@ -30,12 +31,25 @@ public sealed class ReleaseReservationCommandHandler(InventoryDbContext dbContex
                 "Expired reservations cannot be released.");
         }
 
+        await using var stockItemLock = await StockItemLockTransaction.BeginAsync(
+            dbContext,
+            [reservation.StockItemId],
+            cancellationToken);
+
         var changed = reservation.Release(DateTimeOffset.UtcNow);
 
         if (changed)
         {
             await dbContext.SaveChangesAsync(cancellationToken);
+            await StockItemAvailabilityStore.RecalculateAsync(
+                dbContext,
+                reservation.StockItemId,
+                DateTimeOffset.UtcNow,
+                cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
+
+        await stockItemLock.CommitAsync(cancellationToken);
 
         return ApplicationResult<ReservationDto>.Success(reservation.ToDto());
     }

@@ -1,3 +1,4 @@
+using Inventory.Api.Application.Availability;
 using Inventory.Api.Domain.Entities;
 using Inventory.Api.Infrastructure.Persistence;
 using MediatR;
@@ -21,6 +22,11 @@ public sealed class ExpireReservationsCommandHandler(InventoryDbContext dbContex
             .OrderBy(reservation => reservation.ExpiresAtUtc)
             .ToArrayAsync(cancellationToken);
 
+        await using var stockItemLock = await StockItemLockTransaction.BeginAsync(
+            dbContext,
+            dueReservations.Select(reservation => reservation.StockItemId),
+            cancellationToken);
+
         foreach (var reservation in dueReservations)
         {
             reservation.Expire(cutoffUtc);
@@ -29,7 +35,20 @@ public sealed class ExpireReservationsCommandHandler(InventoryDbContext dbContex
         if (dueReservations.Length > 0)
         {
             await dbContext.SaveChangesAsync(cancellationToken);
+
+            foreach (var stockItemId in dueReservations.Select(reservation => reservation.StockItemId).Distinct())
+            {
+                await StockItemAvailabilityStore.RecalculateAsync(
+                    dbContext,
+                    stockItemId,
+                    cutoffUtc,
+                    cancellationToken);
+            }
+
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
+
+        await stockItemLock.CommitAsync(cancellationToken);
 
         return new ExpireReservationsDto(
             dueReservations.Length,

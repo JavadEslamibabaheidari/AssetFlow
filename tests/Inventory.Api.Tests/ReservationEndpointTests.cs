@@ -358,6 +358,74 @@ public sealed class ReservationEndpointTests
         Assert.Equal("Active", secondReservation.Status);
     }
 
+    [Fact]
+    public async Task StockItemAvailability_ChangesAfterReservationCreateReleaseAndExpire()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-114", "AVAILABILITY", 5);
+
+        var initialAvailability = await GetAvailabilityAsync(client, stockItem.Id);
+        Assert.Equal(5, initialAvailability.OnHandQuantity);
+        Assert.Equal(0, initialAvailability.ReservedQuantity);
+        Assert.Equal(5, initialAvailability.AvailableQuantity);
+        Assert.Null(initialAvailability.NextExpirationUtc);
+
+        var firstExpiresAtUtc = DateTimeOffset.UtcNow.AddMinutes(30);
+        var firstReservation = await CreateReservationAsync(client, stockItem.Id, 2, firstExpiresAtUtc);
+
+        var afterCreateAvailability = await GetAvailabilityAsync(client, stockItem.Id);
+        Assert.Equal(2, afterCreateAvailability.ReservedQuantity);
+        Assert.Equal(3, afterCreateAvailability.AvailableQuantity);
+        Assert.Equal(firstExpiresAtUtc, afterCreateAvailability.NextExpirationUtc);
+
+        var getStockItemResponse = await client.GetAsync($"/stock-items/{stockItem.Id}");
+        getStockItemResponse.EnsureSuccessStatusCode();
+        var getStockItemBody = await getStockItemResponse.Content.ReadFromJsonAsync<StockItemResponse>();
+        Assert.NotNull(getStockItemBody);
+        Assert.Equal(3, getStockItemBody.StockItem.AvailableQuantity);
+
+        var listStockItemsResponse = await client.GetAsync("/stock-items");
+        listStockItemsResponse.EnsureSuccessStatusCode();
+        var listStockItemsBody = await listStockItemsResponse.Content.ReadFromJsonAsync<StockItemListResponse>();
+        Assert.NotNull(listStockItemsBody);
+        Assert.Contains(
+            listStockItemsBody.Items,
+            item => item.Id == stockItem.Id && item.AvailableQuantity == 3);
+
+        var releaseResponse = await client.PostAsync($"/reservations/{firstReservation.Id}/release", content: null);
+        releaseResponse.EnsureSuccessStatusCode();
+
+        var afterReleaseAvailability = await GetAvailabilityAsync(client, stockItem.Id);
+        Assert.Equal(0, afterReleaseAvailability.ReservedQuantity);
+        Assert.Equal(5, afterReleaseAvailability.AvailableQuantity);
+        Assert.Null(afterReleaseAvailability.NextExpirationUtc);
+
+        var secondExpiresAtUtc = DateTimeOffset.UtcNow.AddMinutes(30);
+        await CreateReservationAsync(client, stockItem.Id, 5, secondExpiresAtUtc);
+        var expireResponse = await client.PostAsJsonAsync(
+            "/reservations/expire",
+            new ExpireReservationsRequest(secondExpiresAtUtc.AddMinutes(1)));
+        expireResponse.EnsureSuccessStatusCode();
+
+        var afterExpireAvailability = await GetAvailabilityAsync(client, stockItem.Id);
+        Assert.Equal(0, afterExpireAvailability.ReservedQuantity);
+        Assert.Equal(5, afterExpireAvailability.AvailableQuantity);
+        Assert.Null(afterExpireAvailability.NextExpirationUtc);
+    }
+
+    [Fact]
+    public async Task GetStockItemAvailability_WhenMissing_ReturnsNotFoundProblem()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync($"/stock-items/{Guid.NewGuid()}/availability");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        await AssertProblemCodeAsync(response, "stockItem.notFound");
+    }
+
     private static async Task<StockItemDto> CreateStockItemWithProductAndChannelAsync(
         HttpClient client,
         string sku,
@@ -449,6 +517,19 @@ public sealed class ReservationEndpointTests
         Assert.Equal(expectedCode, document.RootElement.GetProperty("code").GetString());
     }
 
+    private static async Task<StockItemAvailabilityDto> GetAvailabilityAsync(
+        HttpClient client,
+        Guid stockItemId)
+    {
+        var response = await client.GetAsync($"/stock-items/{stockItemId}/availability");
+        response.EnsureSuccessStatusCode();
+
+        var body = await response.Content.ReadFromJsonAsync<StockItemAvailabilityResponse>();
+
+        Assert.NotNull(body);
+        return body.Availability;
+    }
+
     private static async Task ExpireReservationAsync(TestInventoryApiFactory factory, Guid reservationId)
     {
         using var scope = factory.Services.CreateScope();
@@ -486,6 +567,8 @@ public sealed class ReservationEndpointTests
 
     private sealed record StockItemResponse(StockItemDto StockItem);
 
+    private sealed record StockItemListResponse(IReadOnlyList<StockItemDto> Items);
+
     private sealed record StockItemDto(
         Guid Id,
         Guid ProductId,
@@ -493,6 +576,15 @@ public sealed class ReservationEndpointTests
         int OnHandQuantity,
         int AvailableQuantity,
         DateTimeOffset UpdatedAtUtc);
+
+    private sealed record StockItemAvailabilityResponse(StockItemAvailabilityDto Availability);
+
+    private sealed record StockItemAvailabilityDto(
+        Guid StockItemId,
+        int OnHandQuantity,
+        int ReservedQuantity,
+        int AvailableQuantity,
+        DateTimeOffset? NextExpirationUtc);
 
     private sealed record CreateReservationRequest(
         Guid StockItemId,
