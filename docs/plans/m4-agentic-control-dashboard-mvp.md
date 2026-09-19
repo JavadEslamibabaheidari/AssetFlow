@@ -59,6 +59,7 @@ Open questions:
 ## Deliverables
 
 - A first usable dashboard surface for current project state and workflow control.
+- Dashboard MVP spec and data contract in `docs/specs/m4-agentic-control-dashboard-mvp.md`.
 - Links or controls for local docs, GitHub milestones/issues, agents, skills, and workflow commands.
 - Read-only status views for M4 milestone/issues, local branch state, key docs, and recent completed work.
 - Lightweight activity or usage summary where practical.
@@ -80,7 +81,7 @@ Open questions:
 
 | Order | Task | Objective | Depends on | Verification | GitHub issue |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Define dashboard MVP spec and data contract | Write the focused UX/data-source/security spec and dashboard data model before implementation. | M3 closure | Spec review against this plan and issue acceptance criteria | #49 |
+| 1 | Define dashboard MVP spec and data contract | Write the focused UX/data-source/security spec and dashboard data model in `docs/specs/m4-agentic-control-dashboard-mvp.md` before implementation. | M3 closure | Spec review against this plan and issue acceptance criteria | #49 |
 | 2 | Build repo-local dashboard foundation | Implement the local dashboard surface, navigation model, and run command without creating the M5 frontend foundation. | Task 1 | Local run, build/lint where applicable, and UI review | #50 |
 | 3 | Add GitHub and local status views | Surface milestone, issue, branch, docs, and recent activity status from approved sources with degraded states. | Task 2 | Compare dashboard output against `git`, local docs, and GitHub milestone/issues | #51 |
 | 4 | Add workflow launch points | Add explicit read/write-separated controls for status, planning, implementation, testing, review, knowledge update, GitHub sync, and post-merge cleanup workflows. | Tasks 2-3 | Manual workflow checks and no accidental mutations from page load | #52 |
