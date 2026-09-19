@@ -1,5 +1,6 @@
 using Inventory.Api.Api.Channels;
 using Inventory.Api.Api.Products;
+using Inventory.Api.Api.Reservations;
 using Inventory.Api.Api.StockItems;
 using Inventory.Api.Api.Vendors;
 using Inventory.Api.Infrastructure;
@@ -31,6 +32,7 @@ app.MapVendorEndpoints();
 app.MapProductEndpoints();
 app.MapChannelEndpoints();
 app.MapStockItemEndpoints();
+app.MapReservationEndpoints();
 
 app.Run();
 
