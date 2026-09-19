@@ -62,6 +62,24 @@ Push the tag to GitHub after creation. When container images are published, tag 
 
 Do not create milestone tags for incomplete milestones, failed validation, unmerged work, or commits that do not represent the synchronized milestone state.
 
+## Release Decision Hook
+
+After creating a milestone tag, decide whether the tag should also become a GitHub Release.
+
+Create a GitHub Release when the milestone is a meaningful human-readable checkpoint, deployment candidate, demo baseline, external handoff, artifact boundary, or major product/backend/frontend/infrastructure capability. Also create a release when service images or other artifacts are published from the tag, or when the project owner explicitly asks for one.
+
+Use tag-only when the milestone or tag is only an internal workflow/documentation checkpoint, tiny maintenance marker, intermediate technical cleanup, or experimental snapshot without a useful release narrative.
+
+When creating a release, include:
+
+- milestone name and tag
+- summary of completed capability
+- verification performed
+- known gaps or deferred work
+- deployment, image, or artifact notes when applicable
+
+When skipping a release, record the decision as `tag-only; no GitHub Release` in the milestone report, plan, issue comment, or final response.
+
 ## Milestone Start Gate
 
 Milestone work must not start from roadmap bullets alone. Before opening implementation branches or moving milestone issues into active work, run this start gate:

@@ -48,6 +48,14 @@ Before tagging, verify that all milestone work is merged, CI passed, local docs 
 
 Git tags mark source history. Service image tags should be created later from the same milestone commit when images are published, using both immutable commit tags and milestone version tags.
 
+## Release Decision Rule
+
+After creating a milestone tag, decide whether to create a GitHub Release for that tag.
+
+Create a release for meaningful product, backend, frontend, infrastructure, deployment, demo, artifact, or external handoff checkpoints. Skip the release and keep only the tag for internal-only workflow/documentation checkpoints, tiny maintenance markers, or intermediate technical cleanup.
+
+Release notes should summarize completed capability, verification, known gaps, and deployment/artifact notes when relevant. If no release is created, record that it was intentionally tag-only.
+
 ## Previous Milestone Closure Rule
 
 Before planning a new milestone or creating new milestone issues, verify that the previous milestone is documented well enough to be trusted as the first read path for future work.

@@ -56,6 +56,18 @@ Git tags identify source commits. When service images are published, use matchin
 
 Do not tag incomplete milestones, unsynchronized milestone states, or branches that have not been merged to `main`.
 
+## Release Decision Hook
+
+After creating a milestone tag, decide whether to create a GitHub Release:
+
+- create a release for meaningful product capability, backend/frontend/infrastructure milestones, deployment or demo baselines, external handoffs, artifact boundaries, or user-requested release records
+- create a release when service images or other artifacts are published from the tag
+- use tag-only for internal workflow/documentation checkpoints, tiny maintenance markers, intermediate technical cleanup, or experimental snapshots
+
+Release notes should include the milestone name/tag, completed capability, verification, known gaps/deferred work, and deployment/artifact notes when relevant.
+
+If skipping the release, record `tag-only; no GitHub Release` in the milestone report, relevant issue/comment, or final response.
+
 ## Access
 
 Use the best available GitHub access path in the current environment:
