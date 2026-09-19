@@ -47,6 +47,8 @@ Reservation create/read endpoints are implemented for the M3 create/read slice: 
 
 Reservation release is implemented: `POST /reservations/{reservationId}/release` dispatches a MediatR command, releases active reservations, returns already released reservations idempotently, returns `404` for missing reservations, and returns `409` for expired reservations. Released reservations no longer count against availability because create availability checks only active, unexpired reservation rows.
 
+Reservation expiration is implemented through `POST /reservations/expire`. The endpoint dispatches a MediatR command that expires active reservations whose `ExpiresAtUtc` is at or before an optional cutoff, or server current time when omitted. Not-due, released, and already expired reservations are skipped; the response reports `expiredCount` and the expired reservation items. Expired reservations no longer count against availability because create availability checks only active, unexpired reservation rows.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, and event-driven synchronization when the product need justifies it.
