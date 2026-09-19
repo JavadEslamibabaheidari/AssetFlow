@@ -80,6 +80,13 @@ public sealed class CreateReservationCommandHandler(InventoryDbContext dbContext
         dbContext.Reservations.Add(reservation);
         await dbContext.SaveChangesAsync(cancellationToken);
 
+        await StockItemAvailabilityStore.RecalculateAsync(
+            dbContext,
+            request.StockItemId,
+            nowUtc,
+            cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
         return ApplicationResult<ReservationDto>.Success(reservation.ToDto());
     }
 }

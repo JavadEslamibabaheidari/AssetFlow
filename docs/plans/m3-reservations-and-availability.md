@@ -123,6 +123,7 @@ Open questions:
 - Issue #40 create/read slice implemented on branch `codex/40-reservation-create-read`: reservation create/list/get MediatR requests, handlers, endpoints, validation, not-found, oversell conflict behavior, and endpoint tests are in place.
 - Issue #38 release slice implemented on branch `codex/38-reservation-release`: reservation release command/endpoint, idempotent already-released behavior, expired conflict handling, missing reservation handling, and availability reuse after release are covered by endpoint tests.
 - Issue #37 expiration slice implemented on branch `codex/37-reservation-expiration`: explicit reservation expiration command/endpoint, due expiration, optional server-current cutoff, skipping not-due/released/already-expired reservations, response counts, and availability reuse after expiration are covered by endpoint tests.
+- Issue #36 availability slice implemented on branch `codex/36-availability-reads`: stock item availability endpoint, reservation-aware stock item get/list responses, and stored availability recalculation after reservation create/release/expire are covered by endpoint tests.
 
 ## GitHub Tracking
 

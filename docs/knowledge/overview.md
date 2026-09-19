@@ -49,6 +49,8 @@ Reservation release is implemented: `POST /reservations/{reservationId}/release`
 
 Reservation expiration is implemented through `POST /reservations/expire`. The endpoint dispatches a MediatR command that expires active reservations whose `ExpiresAtUtc` is at or before an optional cutoff, or server current time when omitted. Not-due, released, and already expired reservations are skipped; the response reports `expiredCount` and the expired reservation items. Expired reservations no longer count against availability because create availability checks only active, unexpired reservation rows.
 
+Stock item availability reads are implemented through `GET /stock-items/{stockItemId}/availability`, which returns on-hand, reserved, available, and next-expiration values calculated from active, unexpired reservations. `GET /stock-items/{stockItemId}` and `GET /stock-items` return reservation-aware `availableQuantity` values. Reservation create, release, and expiration handlers recalculate the stored `stock_items.available_quantity` compatibility field after state changes.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, and event-driven synchronization when the product need justifies it.

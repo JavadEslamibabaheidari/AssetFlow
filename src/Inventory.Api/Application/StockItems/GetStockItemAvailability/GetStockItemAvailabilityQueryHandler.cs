@@ -1,26 +1,25 @@
-using Inventory.Api.Application.Common;
 using Inventory.Api.Application.Availability;
+using Inventory.Api.Application.Common;
 using Inventory.Api.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Inventory.Api.Application.StockItems.GetStockItem;
+namespace Inventory.Api.Application.StockItems.GetStockItemAvailability;
 
-public sealed class GetStockItemQueryHandler(InventoryDbContext dbContext)
-    : IRequestHandler<GetStockItemQuery, ApplicationResult<StockItemDto>>
+public sealed class GetStockItemAvailabilityQueryHandler(InventoryDbContext dbContext)
+    : IRequestHandler<GetStockItemAvailabilityQuery, ApplicationResult<StockItemAvailabilityDto>>
 {
-    public async Task<ApplicationResult<StockItemDto>> Handle(
-        GetStockItemQuery request,
+    public async Task<ApplicationResult<StockItemAvailabilityDto>> Handle(
+        GetStockItemAvailabilityQuery request,
         CancellationToken cancellationToken)
     {
         var stockItem = await dbContext.StockItems
             .AsNoTracking()
-            .Where(stockItem => stockItem.Id == request.StockItemId)
-            .SingleOrDefaultAsync(cancellationToken);
+            .SingleOrDefaultAsync(stockItem => stockItem.Id == request.StockItemId, cancellationToken);
 
         if (stockItem is null)
         {
-            return ApplicationResult<StockItemDto>.NotFound(
+            return ApplicationResult<StockItemAvailabilityDto>.NotFound(
                 "stockItem.notFound",
                 "Stock item was not found.");
         }
@@ -40,6 +39,6 @@ public sealed class GetStockItemQueryHandler(InventoryDbContext dbContext)
             reservations,
             DateTimeOffset.UtcNow);
 
-        return ApplicationResult<StockItemDto>.Success(stockItem.ToDto(availability.AvailableQuantity));
+        return ApplicationResult<StockItemAvailabilityDto>.Success(availability);
     }
 }

@@ -1,6 +1,7 @@
 using Inventory.Api.Api.Common;
 using Inventory.Api.Application.StockItems.CreateStockItem;
 using Inventory.Api.Application.StockItems.GetStockItem;
+using Inventory.Api.Application.StockItems.GetStockItemAvailability;
 using Inventory.Api.Application.StockItems.ListStockItems;
 using MediatR;
 
@@ -49,6 +50,17 @@ public static class StockItemEndpoints
             return result.ToHttpResult(stockItem => Results.Ok(new StockItemResponse(stockItem)));
         })
         .WithName("GetStockItem");
+
+        group.MapGet("/{stockItemId:guid}/availability", async (
+            Guid stockItemId,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetStockItemAvailabilityQuery(stockItemId), cancellationToken);
+
+            return result.ToHttpResult(availability => Results.Ok(new StockItemAvailabilityResponse(availability)));
+        })
+        .WithName("GetStockItemAvailability");
 
         return endpoints;
     }
