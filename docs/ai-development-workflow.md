@@ -29,6 +29,21 @@ When a plan changes:
 
 A plan update is not done if it exists only in local files, only in a branch, or only in GitHub. The local repository, remote repository/PR, and GitHub tracking must agree, or the mismatch must be explicitly documented as a temporary blocker.
 
+## Post-Merge Cleanup Hook
+
+After a pull request is merged into `main`, clean up the completed branch once the merge is verified.
+
+Before deleting a branch:
+
+- verify the pull request is merged and CI/checks passed
+- verify `main` contains the expected merge result
+- verify local docs, `docs/knowledge/`, GitHub issues, milestones, and project board status are synchronized for the completed work
+- verify no dependent open pull request, active task, or unmerged local-only commit still needs the branch
+
+Then delete the remote branch and prune local stale branch/worktree state when safe.
+
+Do not delete release branches, hotfix branches still in use, long-running integration branches explicitly kept alive, branches with open pull requests, branches needed by dependent work, or branches with unmerged local-only commits.
+
 ## Milestone Start Gate
 
 Milestone work must not start from roadmap bullets alone. Before opening implementation branches or moving milestone issues into active work, run this start gate:

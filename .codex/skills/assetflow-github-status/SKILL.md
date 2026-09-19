@@ -27,6 +27,19 @@ Create or rename GitHub milestones when local roadmap milestones change. Create 
 
 If project-board access is unavailable, record that as a sync gap rather than claiming the board is synchronized. If GitHub access is unavailable, clearly state exactly what local changes still need remote/GitHub synchronization.
 
+## Post-Merge Cleanup Hook
+
+After a pull request is merged, clean up its branch when the work is genuinely complete:
+
+- confirm the PR is merged into `main`
+- confirm required checks passed
+- confirm `main` contains the expected merge result
+- confirm issues, milestones, project board status, local docs, and `docs/knowledge/` are synchronized
+- confirm no dependent open PR, active task, or unmerged local-only commit still needs the branch
+- delete the merged remote branch and prune local stale branch/worktree state when safe
+
+Do not delete release branches, active hotfix branches, explicitly retained integration branches, branches with open pull requests, branches needed by dependent work, or branches with unmerged local-only commits.
+
 ## Access
 
 Use the best available GitHub access path in the current environment:

@@ -22,6 +22,19 @@ Future milestones may have GitHub milestones without detailed issues until their
 
 If GitHub access or project board access is unavailable, record the exact sync gap in the plan or final status instead of treating the update as complete.
 
+## Post-Merge Cleanup Rule
+
+After a task branch is merged into `main`, delete the merged remote branch and prune stale local branch/worktree state once the merge is verified and the work is complete.
+
+Before cleanup, confirm:
+
+- the PR is merged into `main`
+- CI/checks passed
+- docs, knowledge, issues, milestones, and project board status are synchronized
+- no open PR, active task, dependency, or unmerged local-only commit still needs the branch
+
+Keep release branches, active hotfix branches, explicitly approved long-running integration branches, branches with open PRs, and branches needed by dependent work.
+
 ## Previous Milestone Closure Rule
 
 Before planning a new milestone or creating new milestone issues, verify that the previous milestone is documented well enough to be trusted as the first read path for future work.
