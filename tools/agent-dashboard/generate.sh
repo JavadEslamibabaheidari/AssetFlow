@@ -31,6 +31,41 @@ file_state() {
   fi
 }
 
+append_degraded_state() {
+  local source="$1"
+  local reason="$2"
+  local impact="$3"
+
+  degraded_states_html+="
+          <div class=\"card\">
+            <strong>$(html_escape "${source}")</strong>
+            <span class=\"badge badge-warn\">Unverified</span>
+            <span>$(html_escape "${reason}")</span>
+            <span>$(html_escape "${impact}")</span>
+          </div>"
+}
+
+issue_title_for_number() {
+  case "$1" in
+    49) printf 'Define dashboard MVP spec and data contract' ;;
+    50) printf 'Build repo-local dashboard foundation' ;;
+    51) printf 'Add GitHub and local status views' ;;
+    52) printf 'Add workflow launch points' ;;
+    53) printf 'Complete M4 validation and docs' ;;
+    *) printf 'Unknown task' ;;
+  esac
+}
+
+next_issue_for_number() {
+  case "$1" in
+    49) printf '50' ;;
+    50) printf '51' ;;
+    51) printf '52' ;;
+    52) printf '53' ;;
+    *) printf '' ;;
+  esac
+}
+
 branch="$(run_git branch --show-current)"
 if [[ -z "${branch}" ]]; then
   branch="detached"
@@ -54,6 +89,143 @@ else
 fi
 
 generated_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+active_issue_number=""
+if [[ "${branch}" =~ (^|/)([0-9]+)- ]]; then
+  active_issue_number="${BASH_REMATCH[2]}"
+fi
+
+if [[ -z "${active_issue_number}" ]]; then
+  active_issue_number="51"
+fi
+
+active_issue_title="$(issue_title_for_number "${active_issue_number}")"
+next_issue_number="$(next_issue_for_number "${active_issue_number}")"
+if [[ -n "${next_issue_number}" ]]; then
+  next_issue_title="$(issue_title_for_number "${next_issue_number}")"
+  next_issue_html="<a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/$(html_escape "${next_issue_number}")\">#$(html_escape "${next_issue_number}") $(html_escape "${next_issue_title}")</a>"
+else
+  next_issue_html="No later M4 implementation issue detected"
+fi
+
+milestone_state="unverified"
+milestone_open_issues="unverified"
+milestone_closed_issues="unverified"
+milestone_url="https://github.com/JavadEslamibabaheidari/AssetFlow/milestone/5"
+issues_html=""
+activity_html=""
+degraded_states_html=""
+project_board_html="
+          <div class=\"card\">
+            <strong>GitHub project board</strong>
+            <span class=\"badge badge-warn\">Unverified</span>
+            <span>GitHub status has not been checked yet.</span>
+            <span>Issue and milestone status may still be available separately.</span>
+          </div>"
+github_available="false"
+
+if [[ "${ASSETFLOW_DASHBOARD_DISABLE_GITHUB:-}" == "1" ]]; then
+  append_degraded_state "GitHub status" "GitHub reads disabled by ASSETFLOW_DASHBOARD_DISABLE_GITHUB=1." "Local Git and curated repository links are still shown."
+  project_board_html="
+          <div class=\"card\">
+            <strong>GitHub project board</strong>
+            <span class=\"badge badge-warn\">Unverified</span>
+            <span>GitHub reads disabled by ASSETFLOW_DASHBOARD_DISABLE_GITHUB=1.</span>
+            <span>Board column status is unavailable in this degraded run.</span>
+          </div>"
+elif ! command -v gh >/dev/null 2>&1; then
+  append_degraded_state "GitHub CLI" "The gh CLI was not found on PATH." "Milestone, issue, PR, and project-board status are unavailable."
+  project_board_html="
+          <div class=\"card\">
+            <strong>GitHub project board</strong>
+            <span class=\"badge badge-warn\">Unverified</span>
+            <span>The gh CLI was not found on PATH.</span>
+            <span>Board column status is unavailable.</span>
+          </div>"
+else
+  github_available="true"
+
+  milestone_line="$(gh api repos/:owner/:repo/milestones/5 --jq '[.state, .open_issues, .closed_issues, .html_url] | @tsv' 2>/dev/null || true)"
+  if [[ -n "${milestone_line}" ]]; then
+    IFS=$'\t' read -r milestone_state milestone_open_issues milestone_closed_issues milestone_url <<< "${milestone_line}"
+  else
+    append_degraded_state "GitHub milestone" "Could not read M4 milestone through gh api." "Milestone counts are unavailable, but static milestone links remain."
+  fi
+
+  issues_tsv="$(gh issue list --milestone 'M4 - Agentic Control Dashboard MVP' --state all --limit 20 --json number,title,state,url,labels --jq 'sort_by(.number)[] | [.number, .title, .state, .url, ([.labels[].name] | join(", "))] | @tsv' 2>/dev/null || true)"
+  if [[ -n "${issues_tsv}" ]]; then
+    while IFS=$'\t' read -r issue_number issue_title issue_state issue_url issue_labels; do
+      [[ -z "${issue_number}" ]] && continue
+      issues_html+="
+          <div class=\"card\">
+            <strong><a href=\"$(html_escape "${issue_url}")\">#$(html_escape "${issue_number}") $(html_escape "${issue_title}")</a></strong>
+            <span><span class=\"badge $(if [[ "${issue_state}" == "CLOSED" ]]; then printf 'badge-ok'; else printf 'badge-warn'; fi)\">$(html_escape "${issue_state}")</span></span>
+            <span>$(html_escape "${issue_labels}")</span>
+          </div>"
+    done <<< "${issues_tsv}"
+  else
+    append_degraded_state "GitHub issues" "Could not read M4 issues through gh issue list." "The dashboard falls back to static issue sequence links."
+  fi
+
+  pr_tsv="$(gh pr list --state merged --limit 5 --json number,title,url,mergedAt --jq '.[] | [.number, .title, .url, .mergedAt] | @tsv' 2>/dev/null || true)"
+  if [[ -n "${pr_tsv}" ]]; then
+    while IFS=$'\t' read -r pr_number pr_title pr_url pr_merged_at; do
+      [[ -z "${pr_number}" ]] && continue
+      activity_html+="
+          <div class=\"card\">
+            <strong><a href=\"$(html_escape "${pr_url}")\">#$(html_escape "${pr_number}") $(html_escape "${pr_title}")</a></strong>
+            <span>Merged $(html_escape "${pr_merged_at}")</span>
+          </div>"
+    done <<< "${pr_tsv}"
+  fi
+
+  if gh api graphql -f query='query { viewer { projectsV2(first: 1) { totalCount } } }' >/dev/null 2>&1; then
+    project_board_html="
+          <div class=\"card\">
+            <strong>GitHub project board</strong>
+            <span class=\"badge badge-warn\">Not mapped</span>
+            <span>GitHub project APIs are readable, but this MVP does not yet map AssetFlow board items or columns.</span>
+            <span>Issue and milestone status are shown; board column status remains unverified.</span>
+          </div>"
+  else
+    project_board_html="
+          <div class=\"card\">
+            <strong>GitHub project board</strong>
+            <span class=\"badge badge-warn\">Unverified</span>
+            <span>Project-board access is unavailable, likely because the token lacks read:project.</span>
+            <span>Issue and milestone status are available; board column status is not verified.</span>
+          </div>"
+  fi
+fi
+
+if [[ -z "${issues_html}" ]]; then
+  issues_html="
+          <div class=\"card\">
+            <strong>M4 issue sequence</strong>
+            <span><a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/49\">#49 Spec</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/50\">#50 Foundation</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/51\">#51 Status views</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/52\">#52 Workflow launch points</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/53\">#53 Validation and docs</a></span>
+          </div>"
+fi
+
+if [[ -z "${activity_html}" ]]; then
+  commit_tsv="$(run_git log --oneline -5)"
+  while IFS= read -r commit_line; do
+    [[ -z "${commit_line}" ]] && continue
+    activity_html+="
+          <div class=\"card\">
+            <strong>Local commit</strong>
+            <span><code>$(html_escape "${commit_line}")</code></span>
+          </div>"
+  done <<< "${commit_tsv}"
+fi
+
+if [[ -z "${degraded_states_html}" ]]; then
+  degraded_states_html="
+          <div class=\"card\">
+            <strong>Status sources</strong>
+            <span class=\"badge badge-ok\">Available</span>
+            <span>GitHub issue, milestone, and recent PR status were read successfully. Project-board access is shown separately when unavailable.</span>
+          </div>"
+fi
 
 cat > "${output_file}" <<HTML
 <!doctype html>
@@ -302,11 +474,11 @@ cat > "${output_file}" <<HTML
           </div>
           <div class="metric">
             <span class="label">Active task</span>
-            <span class="value"><a href="https://github.com/JavadEslamibabaheidari/AssetFlow/issues/50">#50 Build repo-local dashboard foundation</a></span>
+            <span class="value"><a href="https://github.com/JavadEslamibabaheidari/AssetFlow/issues/$(html_escape "${active_issue_number}")">#$(html_escape "${active_issue_number}") $(html_escape "${active_issue_title}")</a></span>
           </div>
           <div class="metric">
             <span class="label">Next planned task</span>
-            <span class="value"><a href="https://github.com/JavadEslamibabaheidari/AssetFlow/issues/51">#51 Add GitHub and local status views</a></span>
+            <span class="value">${next_issue_html}</span>
           </div>
         </div>
       </section>
@@ -339,16 +511,14 @@ cat > "${output_file}" <<HTML
 
       <section id="tracking" class="span-12">
         <h2>Tracking</h2>
-        <p class="help">GitHub remains the source of truth. This foundation links to current M4 tracking; issue #51 will add richer read-only status mapping.</p>
+        <p class="help">GitHub remains the source of truth. These are read-only milestone and issue views from approved local and GitHub sources.</p>
         <div class="link-list">
           <div class="card">
-            <strong><a href="https://github.com/JavadEslamibabaheidari/AssetFlow/milestone/5">M4 GitHub milestone</a></strong>
-            <span>Open implementation milestone for the dashboard MVP.</span>
+            <strong><a href="$(html_escape "${milestone_url}")">M4 GitHub milestone</a></strong>
+            <span><span class="badge $(if [[ "${milestone_state}" == "open" ]]; then printf 'badge-warn'; elif [[ "${milestone_state}" == "closed" ]]; then printf 'badge-ok'; else printf 'badge-warn'; fi)">$(html_escape "${milestone_state}")</span></span>
+            <span>Open issues: $(html_escape "${milestone_open_issues}") | Closed issues: $(html_escape "${milestone_closed_issues}")</span>
           </div>
-          <div class="card">
-            <strong>M4 issue sequence</strong>
-            <span><a href="https://github.com/JavadEslamibabaheidari/AssetFlow/issues/49">#49 Spec</a> -> <a href="https://github.com/JavadEslamibabaheidari/AssetFlow/issues/50">#50 Foundation</a> -> <a href="https://github.com/JavadEslamibabaheidari/AssetFlow/issues/51">#51 Status views</a> -> <a href="https://github.com/JavadEslamibabaheidari/AssetFlow/issues/52">#52 Workflow launch points</a> -> <a href="https://github.com/JavadEslamibabaheidari/AssetFlow/issues/53">#53 Validation and docs</a></span>
-          </div>
+${issues_html}
         </div>
       </section>
 
@@ -401,15 +571,9 @@ cat > "${output_file}" <<HTML
       <section id="activity" class="span-4">
         <h2>Activity And Gaps</h2>
         <div class="link-list">
-          <div class="card">
-            <strong>Recent activity</strong>
-            <span>Issue #51 will add read-only GitHub/local activity mapping. This foundation keeps the section and navigation ready.</span>
-          </div>
-          <div class="card">
-            <strong>Project board</strong>
-            <span class="badge badge-warn">Unverified</span>
-            <span>Current token may lack <code>read:project</code>; dashboard implementation must label board state honestly.</span>
-          </div>
+${activity_html}
+${project_board_html}
+${degraded_states_html}
           <div class="card">
             <strong>Generated output</strong>
             <span>This file is generated locally and ignored by Git.</span>
