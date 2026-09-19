@@ -15,6 +15,18 @@ GitHub is the work-tracking source of truth for active issues, tasks, milestones
 
 When GitHub and local docs disagree, inspect the repository and GitHub history before deciding which is stale. Do not silently prefer a local checklist over an open GitHub issue.
 
+## Plan Change Synchronization Hook
+
+Whenever roadmap, milestone, plan, scope, priority, or task breakdown changes are made, synchronize all affected tracking surfaces before calling the work complete:
+
+- local repo docs: roadmap, project-management docs, milestone plans, milestone reports, and `docs/knowledge/`
+- remote repo state: pushed branch, pull request, or merged `main` containing the same docs
+- GitHub tracking: milestones, current-milestone issues, labels, and project board fields/items when accessible
+
+Create or rename GitHub milestones when local roadmap milestones change. Create or update detailed GitHub issues for the current implementation milestone. Future milestones may remain milestone records without detailed issues until their start gate, but their titles/order must still match the roadmap.
+
+If project-board access is unavailable, record that as a sync gap rather than claiming the board is synchronized. If GitHub access is unavailable, clearly state exactly what local changes still need remote/GitHub synchronization.
+
 ## Access
 
 Use the best available GitHub access path in the current environment:
@@ -33,6 +45,7 @@ Before substantial implementation or planning work:
 - confirm the requested work maps to an existing issue or identify that a new issue/task is needed
 - check dependencies, acceptance criteria, and current board column before changing code
 - note any mismatch between GitHub and local docs
+- for plan changes, identify the affected milestones/issues/project items that must be updated before completion
 - plan to handle tasks one by one, with each tracked task isolated to its own branch and pull request unless the user explicitly requests a combined PR
 
 For tiny local-only fixes, keep this lightweight, but still mention when no GitHub issue was found or updated.
@@ -49,6 +62,7 @@ When scope changes, dependencies appear, or acceptance criteria need clarificati
 
 - update the issue/task description or comments when GitHub access is available
 - adjust labels, milestone, or board status when the meaning of the work changes
+- update GitHub milestone titles/descriptions when roadmap milestone names, order, or goals change
 - keep implementation plans in `docs/plans/` synchronized for substantial work
 
 Do not create unrelated GitHub churn. Update only the items touched by the current work.
@@ -62,6 +76,7 @@ Before calling work complete:
 - close the issue only when its acceptance criteria are actually met
 - update milestone status if the work changes milestone progress
 - update local status docs when they are now stale
+- confirm the remote branch/PR or merged `main` contains the same plan docs as GitHub tracking
 
 If verification could not run, record that clearly in GitHub and in the final response.
 

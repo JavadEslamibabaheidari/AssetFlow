@@ -12,6 +12,23 @@ Requirement Intake -> Feature Spec -> Task Breakdown -> Implementation -> Verifi
 
 For tracked GitHub work, keep one task per branch and pull request unless the user explicitly asks to combine tasks.
 
+## Plan Change Synchronization Hook
+
+Any roadmap, milestone, plan, scope, priority, or task breakdown change must be synchronized across local docs, the remote repository, and GitHub tracking before the change is considered complete.
+
+When a plan changes:
+
+- update the relevant local docs, such as `docs/roadmap.md`, `docs/project-management.md`, `docs/plans/`, milestone reports, and `docs/knowledge/`
+- update GitHub milestones, issues, labels, and project board items that represent the changed plan
+- create missing GitHub milestones or issues when the local plan now depends on them
+- rename, reorder, reopen, close, or comment on GitHub items when the plan meaning changed
+- keep the planning rule intact: detailed GitHub issues are required for the current implementation milestone, while future milestones may stay as roadmap/milestone records until their start gate
+- commit and push the local docs, then open or update the pull request that carries the plan change
+- verify that GitHub `main` or the active PR visibly contains the same plan state as the GitHub milestones/issues/project board
+- record any intentional mismatch in the relevant plan or final response, including what remains to synchronize and why
+
+A plan update is not done if it exists only in local files, only in a branch, or only in GitHub. The local repository, remote repository/PR, and GitHub tracking must agree, or the mismatch must be explicitly documented as a temporary blocker.
+
 ## Milestone Start Gate
 
 Milestone work must not start from roadmap bullets alone. Before opening implementation branches or moving milestone issues into active work, run this start gate:
@@ -23,6 +40,7 @@ Milestone work must not start from roadmap bullets alone. Before opening impleme
 - The plan has no unresolved placeholders such as `TBD`, `TODO`, `unknown`, `undecided`, or open questions that affect implementation order, public contracts, persistence, concurrency, security, deployment, or verification.
 - The task breakdown is small enough to execute one tracked task per branch and pull request unless a combined PR is deliberately justified.
 - GitHub milestones and issues match the local plan before implementation begins.
+- The GitHub project board state matches the local plan for all current-milestone issues when project-board access is available.
 - `docs/knowledge/` captures any durable planned behavior that future implementation and review must compare against.
 
 If the gate fails, stay in planning mode. Do not begin implementation until the undecided items are resolved or moved out of scope.
@@ -38,6 +56,7 @@ Check whether these artifacts already exist and are current:
 - a report such as `docs/milestone-<n>-report.md` that summarizes what was implemented, what changed from the plan, verification performed, known gaps, and the next milestone handoff
 - `docs/knowledge/` entries that capture durable facts from the completed milestone well enough that future agents should start by reading the docs, then verify important claims against code
 - local plans, roadmap/status docs, and GitHub issue/milestone state that match the completed implementation
+- GitHub project board state that matches the completed milestone when project-board access is available
 
 If all of those already exist and match the repository, record that the hook passed and continue to the new milestone plan. If any are missing, stale, or too thin to be trusted, update them before writing the new milestone plan or creating new milestone issues.
 

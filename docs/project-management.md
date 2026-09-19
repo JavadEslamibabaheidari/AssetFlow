@@ -8,6 +8,20 @@ Keep the full roadmap visible, but only create detailed GitHub issues for the cu
 
 This keeps the project focused while still showing the future direction.
 
+## Plan Synchronization Rule
+
+Every meaningful plan change must be synchronized in all three places before it is called done:
+
+- local repository docs
+- remote repository state through a pushed branch, pull request, or merged `main`
+- GitHub tracking, including milestones, current-milestone issues, labels, and project board state when accessible
+
+Examples of meaningful plan changes include adding, renaming, reordering, splitting, or removing milestones; changing milestone scope; changing task breakdowns; changing dependencies; or changing the definition of done for a feature.
+
+Future milestones may have GitHub milestones without detailed issues until their start gate. The current implementation milestone should have detailed GitHub issues and project board status aligned with the local plan.
+
+If GitHub access or project board access is unavailable, record the exact sync gap in the plan or final status instead of treating the update as complete.
+
 ## Previous Milestone Closure Rule
 
 Before planning a new milestone or creating new milestone issues, verify that the previous milestone is documented well enough to be trusted as the first read path for future work.
@@ -28,6 +42,7 @@ Before implementation begins:
 - move any deliberately deferred questions out of scope
 - verify there are no unresolved `TBD`, `TODO`, `unknown`, `undecided`, or blocking open-question entries
 - align GitHub milestone/issues/project status with the local plan
+- verify the plan synchronization rule has passed for the milestone
 
 If any blocking decision remains unresolved, keep the milestone in planning. Implementation starts only after the plan says `Status: Ready to start`.
 
