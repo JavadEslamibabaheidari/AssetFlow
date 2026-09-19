@@ -36,4 +36,10 @@ public sealed class StockItem
     public Product Product { get; private set; } = null!;
 
     public SalesChannel Channel { get; private set; } = null!;
+
+    public void UpdateAvailableQuantity(int availableQuantity, DateTimeOffset updatedAtUtc)
+    {
+        AvailableQuantity = availableQuantity;
+        UpdatedAtUtc = updatedAtUtc;
+    }
 }

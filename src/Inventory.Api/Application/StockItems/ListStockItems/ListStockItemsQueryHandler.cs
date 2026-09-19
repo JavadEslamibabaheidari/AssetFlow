@@ -1,3 +1,4 @@
+using Inventory.Api.Application.Availability;
 using Inventory.Api.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,9 +24,49 @@ public sealed class ListStockItemsQueryHandler(InventoryDbContext dbContext)
             stockItems = stockItems.Where(stockItem => stockItem.ChannelId == channelId);
         }
 
-        return await stockItems
+        var items = await stockItems
             .OrderByDescending(stockItem => stockItem.UpdatedAtUtc)
-            .Select(stockItem => stockItem.ToDto())
             .ToListAsync(cancellationToken);
+
+        if (items.Count == 0)
+        {
+            return [];
+        }
+
+        var stockItemIds = items.Select(stockItem => stockItem.Id).ToArray();
+        var reservations = await dbContext.Reservations
+            .AsNoTracking()
+            .Where(reservation => stockItemIds.Contains(reservation.StockItemId))
+            .Select(reservation => new
+            {
+                reservation.StockItemId,
+                Input = new ReservationAvailabilityInput(
+                    reservation.Quantity,
+                    reservation.Status,
+                    reservation.ExpiresAtUtc)
+            })
+            .ToArrayAsync(cancellationToken);
+
+        var reservationsByStockItemId = reservations
+            .GroupBy(reservation => reservation.StockItemId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(reservation => reservation.Input).ToArray());
+
+        var nowUtc = DateTimeOffset.UtcNow;
+
+        return items
+            .Select(stockItem =>
+            {
+                reservationsByStockItemId.TryGetValue(stockItem.Id, out var stockItemReservations);
+                var availability = StockItemAvailabilityCalculator.Calculate(
+                    stockItem.Id,
+                    stockItem.OnHandQuantity,
+                    stockItemReservations ?? [],
+                    nowUtc);
+
+                return stockItem.ToDto(availability.AvailableQuantity);
+            })
+            .ToArray();
     }
 }
