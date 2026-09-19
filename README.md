@@ -16,15 +16,15 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 ## Current Milestone
 
-`M2 - Core Inventory Domain`
+`M3 - Reservations and Availability`
 
-The active milestone builds the first production-shaped inventory domain:
+M2 is complete. The next milestone will add reservation and availability behavior on top of the core inventory domain:
 
-- vendors, products, sales channels, and stock items
-- PostgreSQL persistence through EF Core
-- CQRS command/query handlers through MediatR
-- Minimal API endpoints that dispatch application requests
-- risk-appropriate tests for contract behavior and persistence
+- reservation workflow
+- reservation expiration
+- availability calculation
+- concurrency handling to prevent overselling
+- MediatR command/query handlers for reservation and availability use cases
 
 ## Local Run
 

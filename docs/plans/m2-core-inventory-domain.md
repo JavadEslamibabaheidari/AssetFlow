@@ -59,16 +59,16 @@ Open questions:
 
 ## Acceptance Criteria
 
-- [ ] `POST /vendors`, `GET /vendors`, and `GET /vendors/{vendorId}` match the contract behavior.
-- [ ] `POST /products`, `GET /products`, and `GET /products/{productId}` match the contract behavior, including vendor filtering.
-- [ ] `POST /channels` and `GET /channels` match the contract behavior.
-- [ ] `POST /stock-items`, `GET /stock-items`, and `GET /stock-items/{stockItemId}` match the contract behavior, including product/channel filtering.
-- [ ] Duplicate vendor names, duplicate product SKUs per vendor, duplicate channel codes, and duplicate stock item product/channel pairs return `409`.
-- [ ] Missing referenced vendors, products, channels, and stock items return `404`.
-- [ ] Invalid request bodies and negative quantities return `400`.
-- [ ] API endpoints dispatch MediatR commands/queries and do not access EF Core directly.
-- [ ] EF Core persistence is backed by PostgreSQL provider configuration and migrations.
-- [ ] Tests and CI pass.
+- [x] `POST /vendors`, `GET /vendors`, and `GET /vendors/{vendorId}` match the contract behavior.
+- [x] `POST /products`, `GET /products`, and `GET /products/{productId}` match the contract behavior, including vendor filtering.
+- [x] `POST /channels` and `GET /channels` match the contract behavior.
+- [x] `POST /stock-items`, `GET /stock-items`, and `GET /stock-items/{stockItemId}` match the contract behavior, including product/channel filtering.
+- [x] Duplicate vendor names, duplicate product SKUs per vendor, duplicate channel codes, and duplicate stock item product/channel pairs return `409`.
+- [x] Missing referenced vendors, products, channels, and stock items return `404`.
+- [x] Invalid request bodies and negative quantities return `400`.
+- [x] API endpoints dispatch MediatR commands/queries and do not access EF Core directly.
+- [x] EF Core persistence is backed by PostgreSQL provider configuration and migrations.
+- [x] Tests and CI pass.
 
 ## Task Breakdown
 
@@ -108,7 +108,7 @@ Open questions:
 - #23 Implement product endpoints: implemented on branch `codex/23-product-endpoints`.
 - #22 Implement channel endpoints: implemented on branch `codex/22-channel-endpoints`.
 - #27 Implement stock item endpoints: implemented on branch `codex/27-stock-item-endpoints`.
-- #26 Complete M2 validation and docs: next.
+- #26 Complete M2 validation and docs: implemented on branch `codex/26-m2-validation-docs`.
 
 ## GitHub Tracking
 
@@ -123,4 +123,4 @@ Open questions:
 - [x] GitHub tracking matches this plan.
 - [x] Knowledge docs capture durable planned behavior.
 
-Status: Ready to start
+Status: Complete

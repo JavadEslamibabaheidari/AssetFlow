@@ -19,7 +19,7 @@ M0, Repository and Hello Service, is complete: repository skeleton, minimal API,
 
 M1, Spec-First Workflow, is complete: GitHub status workflow, repo knowledge enforcement, OpenAPI style guidance, AI feature workflow guidance, the first inventory OpenAPI contract, and the M1 report exist.
 
-M2, Core Inventory Domain, is the active milestone and starts from the reviewed inventory contract and spec-first workflow. Its milestone plan is `docs/plans/m2-core-inventory-domain.md`.
+M2, Core Inventory Domain, is complete. It started from the reviewed inventory contract and spec-first workflow, and its milestone plan is `docs/plans/m2-core-inventory-domain.md`.
 
 M2 must introduce EF Core through a CQRS application layer using MediatR. API endpoints should dispatch commands and queries; EF Core access belongs behind handlers, not inside route bodies. M3 reservation work should use the same MediatR/CQRS shape for concurrency-sensitive reservation and availability behavior. M4 event-driven synchronization should publish events from application handlers or an outbox-style boundary after successful state changes, not directly from controllers.
 
@@ -34,6 +34,8 @@ Product endpoints are implemented as the second M2 vertical slice: `POST /produc
 Channel endpoints are implemented as the third M2 vertical slice: `POST /channels` and `GET /channels` dispatch MediatR requests, enforce duplicate channel-code conflicts, return contract-shaped channel responses, and map validation and conflict outcomes to `ProblemDetails`.
 
 Stock item endpoints are implemented as the fourth M2 vertical slice: `POST /stock-items`, `GET /stock-items`, and `GET /stock-items/{stockItemId}` dispatch MediatR requests, validate product and channel references, enforce one stock item per product/channel pair, support optional `productId` and `channelId` list filters, keep `availableQuantity` equal to `onHandQuantity`, and map validation, not-found, and conflict outcomes to `ProblemDetails`.
+
+M3, Reservations and Availability, is the next milestone. It should build on the same MediatR/CQRS application shape and introduce reservation-aware availability, expiration, and concurrency behavior.
 
 ## Architecture Direction
 
