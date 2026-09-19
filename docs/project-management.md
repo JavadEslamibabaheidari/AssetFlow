@@ -8,12 +8,21 @@ Keep the full roadmap visible, but only create detailed GitHub issues for the cu
 
 This keeps the project focused while still showing the future direction.
 
+## Previous Milestone Closure Rule
+
+Before planning a new milestone or creating new milestone issues, verify that the previous milestone is documented well enough to be trusted as the first read path for future work.
+
+If the previous milestone already has a current implementation report, synchronized `docs/knowledge/` entries, and matching GitHub status, do not duplicate those artifacts. Record that the closure check passed and continue.
+
+If any of those artifacts are missing, stale, or too thin, update them before creating the new milestone plan or issues.
+
 ## Milestone Start Rule
 
 A milestone may start only after its plan passes the start gate in `docs/ai-development-workflow.md`.
 
 Before implementation begins:
 
+- confirm the previous milestone closure rule has passed
 - create or update the milestone plan in `docs/plans/`
 - decide every implementation-blocking product, API, data, infrastructure, testing, rollout, and GitHub-tracking question
 - move any deliberately deferred questions out of scope

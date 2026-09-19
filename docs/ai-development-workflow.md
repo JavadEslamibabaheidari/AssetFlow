@@ -16,6 +16,8 @@ For tracked GitHub work, keep one task per branch and pull request unless the us
 
 Milestone work must not start from roadmap bullets alone. Before opening implementation branches or moving milestone issues into active work, run this start gate:
 
+- The previous milestone has a current implementation report, unless no previous milestone exists.
+- The previous milestone's durable implementation facts are captured in `docs/knowledge/` and any relevant docs, unless they already exist and match the completed code.
 - A milestone plan exists in `docs/plans/` and names the milestone, goal, scope, non-goals, deliverables, acceptance criteria, task breakdown, dependencies, risks, testing strategy, and GitHub tracking.
 - Every product, architecture, data, API, infrastructure, rollout, and testing decision needed to start the milestone is either decided in the plan or explicitly deferred out of scope.
 - The plan has no unresolved placeholders such as `TBD`, `TODO`, `unknown`, `undecided`, or open questions that affect implementation order, public contracts, persistence, concurrency, security, deployment, or verification.
@@ -26,6 +28,20 @@ Milestone work must not start from roadmap bullets alone. Before opening impleme
 If the gate fails, stay in planning mode. Do not begin implementation until the undecided items are resolved or moved out of scope.
 
 When the gate passes, mark the milestone as ready to start in the plan and begin with the first prioritized task.
+
+## Previous Milestone Closure Hook
+
+Before planning a new milestone or creating its GitHub issues, first close the previous milestone's knowledge loop.
+
+Check whether these artifacts already exist and are current:
+
+- a report such as `docs/milestone-<n>-report.md` that summarizes what was implemented, what changed from the plan, verification performed, known gaps, and the next milestone handoff
+- `docs/knowledge/` entries that capture durable facts from the completed milestone well enough that future agents should start by reading the docs, then verify important claims against code
+- local plans, roadmap/status docs, and GitHub issue/milestone state that match the completed implementation
+
+If all of those already exist and match the repository, record that the hook passed and continue to the new milestone plan. If any are missing, stale, or too thin to be trusted, update them before writing the new milestone plan or creating new milestone issues.
+
+The docs are allowed to be the first read path for future work, but they are not allowed to become unquestioned truth. Future agents should read the maintained docs first, then verify important implementation facts against code, tests, configuration, and GitHub before relying on them.
 
 ## Milestone Plan Template
 
@@ -93,8 +109,17 @@ Open questions:
 - Issues:
 - Project board:
 
+## Previous Milestone Closure
+
+- Report:
+- Knowledge/docs:
+- GitHub status:
+- Result:
+
 ## Start Gate Result
 
+- [ ] Previous milestone report exists or was not required.
+- [ ] Previous milestone durable facts are captured in docs/knowledge.
 - [ ] Plan is complete enough to implement.
 - [ ] No implementation-blocking decisions remain undecided.
 - [ ] GitHub tracking matches this plan.

@@ -57,10 +57,21 @@ After finishing a milestone, large issue, or feature, perform a mandatory planne
 
 This checkpoint is a hook in the workflow: do not skip it for milestones, big issues, or features.
 
+## Previous Milestone Closure Hook
+
+Before planning a new milestone or creating its GitHub issues, verify the previous milestone is closed well enough for future agents to start from maintained docs:
+
+- an implementation report exists for the previous milestone, unless there is no previous milestone
+- `docs/knowledge/` captures durable facts from the completed milestone and does not contradict code, tests, configuration, or GitHub state
+- local status docs, plans, reports, and GitHub tracking match the completed implementation
+
+If those artifacts already exist and are current, record that the closure hook passed and avoid duplicating them. If any are missing, stale, or too thin, update them before the next milestone plan or issues are created.
+
 ## Milestone Start Gate
 
 Before starting milestone implementation, perform a mandatory start-gate check:
 
+- verify the previous milestone closure hook passed
 - identify the milestone plan in `docs/plans/`, the GitHub milestone, related issues, and any contract/spec docs
 - verify the plan defines the milestone goal, scope, non-goals, deliverables, acceptance criteria, task breakdown, dependencies, risks, testing strategy, and tracking
 - verify every implementation-blocking decision is decided, or explicitly deferred out of scope
