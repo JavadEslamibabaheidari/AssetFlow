@@ -28,6 +28,8 @@ Prefer the simplest architecture that satisfies the requirement with room for re
 
 Store substantial plans in `docs/plans/`. Plans are living documents and should be updated when implementation or review changes reality.
 
+Before planning a new milestone or creating its GitHub issues, run the previous milestone closure hook from `docs/ai-development-workflow.md`. Check whether the previous milestone already has a current implementation report, synchronized `docs/knowledge/`, and matching GitHub status. If those artifacts already exist and match reality, record that the hook passed and continue. If they are missing, stale, or too thin to be trusted as the first read path, update them before writing the new milestone plan or issues.
+
 Milestone plans must pass the start gate before implementation begins. For every milestone, make sure the plan states the goal, scope, non-goals, deliverables, acceptance criteria, task breakdown, dependencies, risks, testing strategy, GitHub tracking, and durable knowledge updates.
 
 Before marking a milestone ready, resolve every implementation-blocking product, architecture, data, API, infrastructure, rollout, and testing decision. The plan must not contain unresolved placeholders such as `TBD`, `TODO`, `unknown`, `undecided`, or open questions that affect implementation. If a question will not be decided in the milestone, move it explicitly to out of scope or deferred decisions.

@@ -35,7 +35,11 @@ Channel endpoints are implemented as the third M2 vertical slice: `POST /channel
 
 Stock item endpoints are implemented as the fourth M2 vertical slice: `POST /stock-items`, `GET /stock-items`, and `GET /stock-items/{stockItemId}` dispatch MediatR requests, validate product and channel references, enforce one stock item per product/channel pair, support optional `productId` and `channelId` list filters, keep `availableQuantity` equal to `onHandQuantity`, and map validation, not-found, and conflict outcomes to `ProblemDetails`.
 
-M3, Reservations and Availability, is the next milestone. It should build on the same MediatR/CQRS application shape and introduce reservation-aware availability, expiration, and concurrency behavior.
+M3, Reservations and Availability, is the active planning milestone. Its milestone plan is `docs/plans/m3-reservations-and-availability.md`. M3 should build on the same MediatR/CQRS application shape and introduce reservation-aware availability, expiration, and concurrency behavior.
+
+Planned M3 behavior: reservations belong to a stock item, have a positive quantity, and move through `Active`, `Released`, and `Expired` states. Active, unexpired reservations reduce availability; released and expired reservations do not. Availability is calculated as `stockItem.OnHandQuantity - activeUnexpiredReservedQuantity`, and reservation creation is rejected with `409 Conflict` when it would oversell. M3 uses explicit API commands for release and expiration; automatic background expiration and event publication are deferred.
+
+M3 contract work has started in `contracts/openapi/inventory-api.yaml`: the contract now defines reservation create/list/get/release/expire operations, a stock item availability read operation, reservation and availability schemas, and validation/not-found/conflict response expectations for the remaining implementation slices.
 
 ## Architecture Direction
 

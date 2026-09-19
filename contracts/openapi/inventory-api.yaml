@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: AssetFlow Inventory API
-  version: 0.1.0
-  summary: Core inventory contract for vendors, products, sales channels, and stock items.
+  version: 0.2.0
+  summary: Core inventory contract for vendors, products, sales channels, stock items, reservations, and availability.
   description: >
     Contract-first design for the first real Inventory API. This contract is
     design input only; implementation follows after review.
@@ -18,6 +18,8 @@ tags:
     description: Marketplace or sales channels where products can be listed.
   - name: StockItems
     description: Physical or logical inventory quantities for products.
+  - name: Reservations
+    description: Temporary stock holds that reduce availability until released or expired.
 paths:
   /vendors:
     get:
@@ -248,6 +250,161 @@ paths:
                 $ref: "#/components/schemas/StockItemResponse"
         "404":
           $ref: "#/components/responses/NotFound"
+  /stock-items/{stockItemId}/availability:
+    parameters:
+      - $ref: "#/components/parameters/StockItemId"
+    get:
+      tags:
+        - StockItems
+      operationId: getStockItemAvailability
+      summary: Get stock item availability.
+      description: Returns on-hand quantity, active unexpired reservation quantity, available quantity, and the next active reservation expiration.
+      responses:
+        "200":
+          description: Stock item availability returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockItemAvailabilityResponse"
+              examples:
+                reservedAvailability:
+                  $ref: "#/components/examples/StockItemAvailabilityExample"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /reservations:
+    get:
+      tags:
+        - Reservations
+      operationId: listReservations
+      summary: List reservations.
+      description: Returns reservations, optionally filtered by stock item or status.
+      parameters:
+        - name: stockItemId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/ReservationStatus"
+      responses:
+        "200":
+          description: Reservations returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationListResponse"
+              examples:
+                reservations:
+                  $ref: "#/components/examples/ReservationListExample"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    post:
+      tags:
+        - Reservations
+      operationId: createReservation
+      summary: Create a reservation.
+      description: Creates an active reservation when the stock item has enough current availability.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReservationRequest"
+            examples:
+              reserveBatteryPack:
+                $ref: "#/components/examples/CreateReservationRequestExample"
+      responses:
+        "201":
+          description: Reservation created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationResponse"
+              examples:
+                activeReservation:
+                  $ref: "#/components/examples/ReservationResponseExample"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /reservations/expire:
+    post:
+      tags:
+        - Reservations
+      operationId: expireReservations
+      summary: Expire due reservations.
+      description: Expires active reservations whose expiration time is at or before the supplied cutoff, or server current time when omitted.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpireReservationsRequest"
+            examples:
+              expireDueReservations:
+                $ref: "#/components/examples/ExpireReservationsRequestExample"
+      responses:
+        "200":
+          description: Due reservations expired.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExpireReservationsResponse"
+              examples:
+                expiredReservations:
+                  $ref: "#/components/examples/ExpireReservationsResponseExample"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /reservations/{reservationId}:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    get:
+      tags:
+        - Reservations
+      operationId: getReservation
+      summary: Get a reservation.
+      description: Returns one reservation by identifier.
+      responses:
+        "200":
+          description: Reservation found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationResponse"
+              examples:
+                activeReservation:
+                  $ref: "#/components/examples/ReservationResponseExample"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /reservations/{reservationId}/release:
+    parameters:
+      - $ref: "#/components/parameters/ReservationId"
+    post:
+      tags:
+        - Reservations
+      operationId: releaseReservation
+      summary: Release a reservation.
+      description: Releases an active reservation, leaves an already released reservation unchanged, and rejects an already expired reservation.
+      responses:
+        "200":
+          description: Reservation released or already released.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationResponse"
+              examples:
+                releasedReservation:
+                  $ref: "#/components/examples/ReleasedReservationResponseExample"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
 components:
   parameters:
     VendorId:
@@ -266,6 +423,13 @@ components:
         format: uuid
     StockItemId:
       name: stockItemId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ReservationId:
+      name: reservationId
       in: path
       required: true
       schema:
@@ -505,6 +669,138 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/StockItem"
+    ReservationStatus:
+      type: string
+      enum:
+        - Active
+        - Released
+        - Expired
+    Reservation:
+      type: object
+      required:
+        - id
+        - stockItemId
+        - quantity
+        - status
+        - expiresAtUtc
+        - createdAtUtc
+        - updatedAtUtc
+      properties:
+        id:
+          type: string
+          format: uuid
+        stockItemId:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+        status:
+          $ref: "#/components/schemas/ReservationStatus"
+        expiresAtUtc:
+          type: string
+          format: date-time
+        createdAtUtc:
+          type: string
+          format: date-time
+        updatedAtUtc:
+          type: string
+          format: date-time
+        releasedAtUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+        expiredAtUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+    CreateReservationRequest:
+      type: object
+      required:
+        - stockItemId
+        - quantity
+        - expiresAtUtc
+      properties:
+        stockItemId:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+        expiresAtUtc:
+          type: string
+          format: date-time
+    ReservationResponse:
+      type: object
+      required:
+        - reservation
+      properties:
+        reservation:
+          $ref: "#/components/schemas/Reservation"
+    ReservationListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reservation"
+    ExpireReservationsRequest:
+      type: object
+      properties:
+        expiresBeforeUtc:
+          type: string
+          format: date-time
+          description: Expire active reservations whose expiration time is at or before this cutoff. When omitted, the server current time is used.
+    ExpireReservationsResponse:
+      type: object
+      required:
+        - expiredCount
+        - items
+      properties:
+        expiredCount:
+          type: integer
+          minimum: 0
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reservation"
+    StockItemAvailability:
+      type: object
+      required:
+        - stockItemId
+        - onHandQuantity
+        - reservedQuantity
+        - availableQuantity
+        - nextExpirationUtc
+      properties:
+        stockItemId:
+          type: string
+          format: uuid
+        onHandQuantity:
+          type: integer
+          minimum: 0
+        reservedQuantity:
+          type: integer
+          minimum: 0
+        availableQuantity:
+          type: integer
+          minimum: 0
+        nextExpirationUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+    StockItemAvailabilityResponse:
+      type: object
+      required:
+        - availability
+      properties:
+        availability:
+          $ref: "#/components/schemas/StockItemAvailability"
     ProblemDetails:
       type: object
       required:
@@ -533,6 +829,78 @@ components:
           - id: "2d7f8df9-71df-47ef-992a-25a684f17d6a"
             name: "Northwind Supply"
             createdAtUtc: "2026-09-17T12:00:00Z"
+    CreateReservationRequestExample:
+      summary: Reserve two battery packs
+      value:
+        stockItemId: "0b8f2e32-2335-4e20-b5ce-6ab7df8f05ad"
+        quantity: 2
+        expiresAtUtc: "2026-09-19T15:30:00Z"
+    ReservationResponseExample:
+      summary: Active reservation
+      value:
+        reservation:
+          id: "9f8e6d4c-313f-40f6-a5a3-f5744df73461"
+          stockItemId: "0b8f2e32-2335-4e20-b5ce-6ab7df8f05ad"
+          quantity: 2
+          status: Active
+          expiresAtUtc: "2026-09-19T15:30:00Z"
+          createdAtUtc: "2026-09-19T15:00:00Z"
+          updatedAtUtc: "2026-09-19T15:00:00Z"
+          releasedAtUtc: null
+          expiredAtUtc: null
+    ReleasedReservationResponseExample:
+      summary: Released reservation
+      value:
+        reservation:
+          id: "9f8e6d4c-313f-40f6-a5a3-f5744df73461"
+          stockItemId: "0b8f2e32-2335-4e20-b5ce-6ab7df8f05ad"
+          quantity: 2
+          status: Released
+          expiresAtUtc: "2026-09-19T15:30:00Z"
+          createdAtUtc: "2026-09-19T15:00:00Z"
+          updatedAtUtc: "2026-09-19T15:10:00Z"
+          releasedAtUtc: "2026-09-19T15:10:00Z"
+          expiredAtUtc: null
+    ReservationListExample:
+      summary: Reservation list
+      value:
+        items:
+          - id: "9f8e6d4c-313f-40f6-a5a3-f5744df73461"
+            stockItemId: "0b8f2e32-2335-4e20-b5ce-6ab7df8f05ad"
+            quantity: 2
+            status: Active
+            expiresAtUtc: "2026-09-19T15:30:00Z"
+            createdAtUtc: "2026-09-19T15:00:00Z"
+            updatedAtUtc: "2026-09-19T15:00:00Z"
+            releasedAtUtc: null
+            expiredAtUtc: null
+    ExpireReservationsRequestExample:
+      summary: Expire reservations due by a cutoff
+      value:
+        expiresBeforeUtc: "2026-09-19T16:00:00Z"
+    ExpireReservationsResponseExample:
+      summary: Expired reservations
+      value:
+        expiredCount: 1
+        items:
+          - id: "36842c0d-ae02-4a8e-9a30-91b6aa2805f0"
+            stockItemId: "0b8f2e32-2335-4e20-b5ce-6ab7df8f05ad"
+            quantity: 1
+            status: Expired
+            expiresAtUtc: "2026-09-19T15:45:00Z"
+            createdAtUtc: "2026-09-19T15:20:00Z"
+            updatedAtUtc: "2026-09-19T16:00:00Z"
+            releasedAtUtc: null
+            expiredAtUtc: "2026-09-19T16:00:00Z"
+    StockItemAvailabilityExample:
+      summary: Stock item availability with active reservations
+      value:
+        availability:
+          stockItemId: "0b8f2e32-2335-4e20-b5ce-6ab7df8f05ad"
+          onHandQuantity: 10
+          reservedQuantity: 2
+          availableQuantity: 8
+          nextExpirationUtc: "2026-09-19T15:30:00Z"
 x-edge-cases:
   - Duplicate vendor names should return 409 Conflict.
   - Duplicate product SKUs for the same vendor should return 409 Conflict.
@@ -541,13 +909,21 @@ x-edge-cases:
   - Stock item creation with an unknown product or channel should return 404 Not Found.
   - Negative stock quantities should return 400 Bad Request.
   - Available quantity must not exceed on-hand quantity.
+  - Reservation creation with a non-positive quantity or non-future expiration should return 400 Bad Request.
+  - Reservation creation with an unknown stock item should return 404 Not Found.
+  - Reservation creation that would oversell a stock item should return 409 Conflict.
+  - Releasing an already released reservation should return 200 OK with the released reservation.
+  - Releasing an expired reservation should return 409 Conflict.
+  - Expired or released reservations should not reduce stock item availability.
 x-test-plan:
   contract:
     - Validate the OpenAPI document parses before implementation.
     - Review operation IDs, schemas, errors, and examples against the OpenAPI style guide.
+    - Compare reservation and availability operations against M3 issue #34 acceptance criteria.
   implementation:
     - Add endpoint tests for each success path.
     - Add validation tests for required fields and invalid quantities.
-    - Add conflict tests for duplicate vendor names, duplicate SKUs, and duplicate channel codes.
+    - Add conflict tests for duplicate vendor names, duplicate SKUs, duplicate channel codes, oversell attempts, and invalid reservation state transitions.
     - Add not-found tests for missing vendor, product, channel, and stock item references.
+    - Add availability tests for active, released, and expired reservations.
     - Add persistence tests once PostgreSQL schema work begins.
