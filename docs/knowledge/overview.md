@@ -41,6 +41,8 @@ Planned M3 behavior: reservations belong to a stock item, have a positive quanti
 
 M3 contract work has started in `contracts/openapi/inventory-api.yaml`: the contract now defines reservation create/list/get/release/expire operations, a stock item availability read operation, reservation and availability schemas, and validation/not-found/conflict response expectations for the remaining implementation slices.
 
+M3 persistence foundation work has started: `Inventory.Api` includes a `Reservation` domain entity and `ReservationStatus` enum, application DTO/mapping types, a `StockItemAvailabilityCalculator`, EF Core reservation mapping, and a PostgreSQL migration for the `reservations` table. The table stores stock item reference, positive quantity, string status, expiration/created/updated timestamps, optional release/expiration timestamps, a restricted stock item foreign key, check constraints for status/timestamp consistency, and indexes for stock item availability lookups plus due-expiration scans.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, and event-driven synchronization when the product need justifies it.
