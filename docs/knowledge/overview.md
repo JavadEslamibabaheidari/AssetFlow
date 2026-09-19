@@ -21,7 +21,7 @@ M1, Spec-First Workflow, is complete: GitHub status workflow, repo knowledge enf
 
 M2, Core Inventory Domain, is complete. It started from the reviewed inventory contract and spec-first workflow, and its milestone plan is `docs/plans/m2-core-inventory-domain.md`.
 
-M2 must introduce EF Core through a CQRS application layer using MediatR. API endpoints should dispatch commands and queries; EF Core access belongs behind handlers, not inside route bodies. M3 reservation work should use the same MediatR/CQRS shape for concurrency-sensitive reservation and availability behavior. M4 event-driven synchronization should publish events from application handlers or an outbox-style boundary after successful state changes, not directly from controllers.
+M2 must introduce EF Core through a CQRS application layer using MediatR. API endpoints should dispatch commands and queries; EF Core access belongs behind handlers, not inside route bodies. M3 reservation work should use the same MediatR/CQRS shape for concurrency-sensitive reservation and availability behavior. M7 event-driven synchronization should publish events from application handlers or an outbox-style boundary after successful state changes, not directly from controllers.
 
 For M2, keep the implementation in the existing `Inventory.Api` project with clear `Domain`, `Application`, `Infrastructure`, and `Api` folders. Use EF Core with the Npgsql PostgreSQL provider, MediatR for commands and queries, Minimal API route groups for contract endpoints, and `ProblemDetails` for validation, not-found, and conflict responses. `availableQuantity` equals `onHandQuantity` until M3 adds reservation-aware availability.
 
@@ -41,9 +41,19 @@ Planned M3 behavior: reservations belong to a stock item, have a positive quanti
 
 M3 contract work has started in `contracts/openapi/inventory-api.yaml`: the contract now defines reservation create/list/get/release/expire operations, a stock item availability read operation, reservation and availability schemas, and validation/not-found/conflict response expectations for the remaining implementation slices.
 
+After M3, the roadmap pulls an early control surface forward as M4, Agentic Control Dashboard MVP. M4 should give the user a dashboard for current milestone state, GitHub/local tracking links, reachable agents and skills, common workflow buttons, and lightweight AI-assisted activity or usage signals. It is deliberately narrower than the later Agentic OS expansion: memory-system selection, external workspace automation, research notebooks, and deep per-skill/per-agent resource accounting are deferred to M9.
+
+M5, Frontend Application Foundation, should establish the modern frontend repository or workspace, app shell, routing, design-system foundation, OpenAPI-aligned API-client strategy, frontend quality gates, Docker Compose build/run path, and a small Playwright smoke-test foundation. It should make frontend work understandable and maintainable for contributors without deep frontend background.
+
+M6, Frontend Inventory Parity, should bring the frontend product surface to the backend state reached at the end of M3. It should cover vendors, products, sales channels, stock items, reservations, and reservation-aware availability, including loading, empty, validation, conflict, not-found, success, responsive, and containerized frontend/backend verification states. Browser end-to-end tests should expand around these critical workflows in M6 rather than becoming a large suite before the frontend exists.
+
 ## Architecture Direction
 
-The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, and event-driven synchronization when the product need justifies it.
+The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, dependency-injected application boundaries inside each service, and event-driven synchronization when the product need justifies it.
+
+AssetFlow should evolve toward multiple deployable services when bounded contexts and operational needs justify the split. Candidate future services include inventory, reservation, channel integration, pricing, catalog/assets, notification/synchronization workers, and frontend-facing surfaces. New services may live in separate repositories or workspaces while still belonging to the same overall app and Kubernetes deployment landscape.
+
+Docker Compose is the local end-to-end verification path for meaningful feature work once the feature spans deployable services, frontend/backend integration, persistence, or infrastructure. As frontend and new services appear, keep Compose aligned with the deployable app shape so integrated behavior can be tested locally before completion.
 
 Kafka, gRPC, SignalR, event sourcing, projections, and channel workers are future options, not current commitments. Add them only when a milestone or issue creates a concrete need.
 

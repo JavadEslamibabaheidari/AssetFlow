@@ -293,6 +293,7 @@ Use this checklist before merging meaningful work.
 - Data changes are safe, reversible where practical, and tested.
 - Error handling follows the project style.
 - Tests cover the risk level of the change.
+- End-to-end feature work has been validated through the local Docker Compose path when the feature spans deployable services, frontend/backend integration, persistence, or infrastructure.
 - CI passes.
 - Docs and `docs/knowledge/` are updated when durable facts changed.
 - The PR is focused on one task.

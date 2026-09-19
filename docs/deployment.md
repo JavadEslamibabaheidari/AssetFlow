@@ -14,6 +14,10 @@ Run with Docker:
 docker compose up --build
 ```
 
+For meaningful feature work, Docker Compose is the local end-to-end verification path. After a feature is developed and lower-level tests pass, build and run the relevant images and containers with `docker-compose.yml`/`docker compose` so the integrated service behavior is checked in a containerized environment before the work is considered complete.
+
+As the frontend and additional services are introduced, keep Compose aligned with the app's deployable shape so backend services, frontend surfaces, databases, and supporting infrastructure can be validated together locally.
+
 ## Local Kubernetes
 
 GitHub does not host Kubernetes applications directly. GitHub Actions can build, test, publish images, and deploy to a Kubernetes cluster.

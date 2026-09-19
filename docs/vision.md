@@ -26,7 +26,9 @@ The project should demonstrate:
 - Docker and local Kubernetes
 - CI/CD with GitHub Actions
 - observability through logs, metrics, traces, Prometheus, and Grafana
-- AI usage monitoring for quality, efficiency, and cost
+- an early Agentic Control Dashboard for project status, workflow launch points, agents, skills, and planning visibility
+- a modern frontend application that exposes backend capabilities through clear, accessible, efficient product workflows
+- workflow usage monitoring for quality, efficiency, and cost
 
 ## North Star Architecture
 
@@ -38,12 +40,13 @@ The long-term system may include:
 - Pricing service
 - Asset/catalog service
 - Notification/synchronization workers
+- Frontend web application
 - PostgreSQL for relational data
 - Blob storage for product/media assets
 - Kafka for events
 - gRPC for service-to-service calls
 - REST APIs documented with OpenAPI
 - Prometheus and Grafana for operational visibility
+- Agentic Control Dashboard for human-plus-AI workflow visibility and control
 
 The first implementation will stay small and build toward this vision step by step.
-

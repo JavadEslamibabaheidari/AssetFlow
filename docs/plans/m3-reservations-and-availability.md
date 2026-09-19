@@ -18,7 +18,7 @@ In scope:
 
 Out of scope:
 
-- Marketplace event publication, Kafka, outbox, and channel synchronization. These start in M4.
+- Marketplace event publication, Kafka, outbox, and channel synchronization. These start in M7 after the frontend foundation and inventory parity milestones.
 - Payment, checkout, order fulfillment, shipment, or customer identity workflows.
 - Authentication, authorization, tenant isolation, and reservation ownership permissions.
 - Partial reservation fulfillment or allocation across multiple stock items.
