@@ -16,15 +16,14 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 ## Current Milestone
 
-`M3 - Reservations and Availability`
+`M4 - Event-Driven Synchronization`
 
-M2 is complete. The next milestone will add reservation and availability behavior on top of the core inventory domain:
+M3 is complete. The next milestone will add event-driven synchronization on top of the reservation-aware inventory domain:
 
-- reservation workflow
-- reservation expiration
-- availability calculation
-- concurrency handling to prevent overselling
-- MediatR command/query handlers for reservation and availability use cases
+- event publication after inventory and reservation changes
+- event contracts for stock and reservation changes
+- outbox/channel synchronization decisions
+- marketplace availability update flow
 
 ## Local Run
 
