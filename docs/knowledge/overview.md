@@ -45,6 +45,8 @@ M3 persistence foundation work has started: `Inventory.Api` includes a `Reservat
 
 Reservation create/read endpoints are implemented for the M3 create/read slice: `POST /reservations` validates stock item id, positive quantity, and future expiration, returns `404` for missing stock items, calculates active unexpired reserved quantity from reservation rows, and returns `409` when a create request would exceed current availability. `GET /reservations` supports optional `stockItemId` and `status` filters, and `GET /reservations/{reservationId}` returns a reservation or `404`. Endpoints dispatch MediatR requests; EF Core access remains inside handlers.
 
+Reservation release is implemented: `POST /reservations/{reservationId}/release` dispatches a MediatR command, releases active reservations, returns already released reservations idempotently, returns `404` for missing reservations, and returns `409` for expired reservations. Released reservations no longer count against availability because create availability checks only active, unexpired reservation rows.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, and event-driven synchronization when the product need justifies it.

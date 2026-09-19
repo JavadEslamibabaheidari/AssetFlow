@@ -121,6 +121,7 @@ Open questions:
 - Issue #34 contract slice implemented on branch `codex/34-reservation-availability-contract`: `contracts/openapi/inventory-api.yaml` now defines reservation create/list/get/release/expire operations, stock item availability reads, M3 reservation/availability schemas, examples, and validation/not-found/conflict responses.
 - Issue #39 persistence foundation implemented on branch `codex/39-reservation-persistence-foundation`: reservation domain/status model, DTO/mapping, availability calculation helper, EF Core mapping, PostgreSQL migration, and focused availability/status-transition tests are in place.
 - Issue #40 create/read slice implemented on branch `codex/40-reservation-create-read`: reservation create/list/get MediatR requests, handlers, endpoints, validation, not-found, oversell conflict behavior, and endpoint tests are in place.
+- Issue #38 release slice implemented on branch `codex/38-reservation-release`: reservation release command/endpoint, idempotent already-released behavior, expired conflict handling, missing reservation handling, and availability reuse after release are covered by endpoint tests.
 
 ## GitHub Tracking
 
