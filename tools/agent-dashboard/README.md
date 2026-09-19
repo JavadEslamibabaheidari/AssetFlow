@@ -27,5 +27,6 @@ ASSETFLOW_DASHBOARD_DISABLE_GITHUB=1 ./tools/agent-dashboard/generate.sh /tmp/as
 - This is local workflow tooling, not the M5 production frontend application.
 - The generator reads local Git metadata, curated repository paths, and read-only GitHub issue/milestone/PR status when `gh` is authenticated.
 - Project-board status is shown as unverified when the current GitHub token cannot read project fields.
-- Later M4 tasks will add richer workflow launch behavior.
+- Workflow launch points are static prompts, links, and command text. The generated dashboard does not run mutating operations.
+- External workspace automation, memory migration, and deep resource accounting remain unavailable in M4.
 - Generated output is ignored by Git and can be safely deleted.

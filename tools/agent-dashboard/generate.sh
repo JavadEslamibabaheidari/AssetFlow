@@ -555,16 +555,77 @@ ${issues_html}
 
       <section id="workflow" class="span-8">
         <h2>Workflow Launch Points</h2>
-        <p class="help">These are explicit entry points, not automatic mutations. Issue #52 will add richer action behavior.</p>
+        <p class="help">These are explicit launch points, not automatic mutations. Use the prompt or command text intentionally in Codex or a shell.</p>
         <div class="action-list">
-          <div class="card"><strong>Status check</strong><span>Read-only: inspect GitHub/local status with <code>\$assetflow-github-status</code>.</span></div>
-          <div class="card"><strong>Planning</strong><span>Use <code>\$assetflow-planner</code> for milestone or feature planning.</span></div>
-          <div class="card"><strong>Prioritization</strong><span>Use <code>\$assetflow-prioritizer</code> to order tasks by dependency, risk, and value.</span></div>
-          <div class="card"><strong>Implementation</strong><span>Write action: use <code>\$assetflow-dotnet-implementer</code> only after issue scope is ready.</span></div>
-          <div class="card"><strong>Testing</strong><span>Use <code>\$assetflow-tester</code> for risk-based verification.</span></div>
-          <div class="card"><strong>Review</strong><span>Use <code>\$assetflow-reviewer</code> as the quality gate.</span></div>
-          <div class="card"><strong>Knowledge update</strong><span>Write action: use <code>\$assetflow-knowledge-keeper</code> when durable facts change.</span></div>
-          <div class="card"><strong>GitHub sync and cleanup</strong><span>Write action: use <code>\$assetflow-github-status</code> and the post-merge cleanup hook.</span></div>
+          <div class="card">
+            <strong>Status check</strong>
+            <span><span class="badge badge-ok">Read-only</span></span>
+            <span><code>\$assetflow-github-status</code></span>
+            <span>Inspect GitHub milestone/issues, PR state, local branch state, and tracking gaps.</span>
+            <span>Source: <a href="../../../.codex/skills/assetflow-github-status/SKILL.md">assetflow-github-status</a></span>
+          </div>
+          <div class="card">
+            <strong>Planning</strong>
+            <span><span class="badge badge-warn">Write action</span></span>
+            <span><code>\$assetflow-planner</code></span>
+            <span>Create or update milestone, feature, and task plans only after the user asks for planning work.</span>
+            <span>Source: <a href="../../../.codex/skills/assetflow-planner/SKILL.md">assetflow-planner</a></span>
+          </div>
+          <div class="card">
+            <strong>Prioritization</strong>
+            <span><span class="badge badge-warn">Write action</span></span>
+            <span><code>\$assetflow-prioritizer</code></span>
+            <span>Order ready tasks by dependency, risk, value, and feedback speed when the active plan needs sequencing.</span>
+            <span>Source: <a href="../../../.codex/skills/assetflow-prioritizer/SKILL.md">assetflow-prioritizer</a></span>
+          </div>
+          <div class="card">
+            <strong>Implementation</strong>
+            <span><span class="badge badge-warn">Write action</span></span>
+            <span><code>\$assetflow-dotnet-implementer</code></span>
+            <span>Implement a scoped issue after GitHub tracking, plan, and acceptance criteria are ready.</span>
+            <span>Source: <a href="../../../.codex/skills/assetflow-dotnet-implementer/SKILL.md">assetflow-dotnet-implementer</a></span>
+          </div>
+          <div class="card">
+            <strong>Testing</strong>
+            <span><span class="badge badge-ok">Read/check action</span></span>
+            <span><code>\$assetflow-tester</code></span>
+            <span>Run risk-based verification and add tests when the implementation risk calls for it.</span>
+            <span>Source: <a href="../../../.codex/skills/assetflow-tester/SKILL.md">assetflow-tester</a></span>
+          </div>
+          <div class="card">
+            <strong>Review</strong>
+            <span><span class="badge badge-ok">Read/check action</span></span>
+            <span><code>\$assetflow-reviewer</code></span>
+            <span>Review diffs for correctness, regressions, security, performance, tests, and maintainability.</span>
+            <span>Source: <a href="../../../.codex/skills/assetflow-reviewer/SKILL.md">assetflow-reviewer</a></span>
+          </div>
+          <div class="card">
+            <strong>Knowledge update</strong>
+            <span><span class="badge badge-warn">Write action</span></span>
+            <span><code>\$assetflow-knowledge-keeper</code></span>
+            <span>Update durable project knowledge when architecture, contracts, behavior, or milestone state changes.</span>
+            <span>Source: <a href="../../../.codex/skills/assetflow-knowledge-keeper/SKILL.md">assetflow-knowledge-keeper</a></span>
+          </div>
+          <div class="card">
+            <strong>GitHub sync</strong>
+            <span><span class="badge badge-warn">Write action</span></span>
+            <span><code>\$assetflow-github-status</code></span>
+            <span>Synchronize issues, milestones, labels, PRs, and status docs after plan or implementation changes.</span>
+            <span>Source: <a href="../../../docs/project-management.md">project management</a></span>
+          </div>
+          <div class="card">
+            <strong>Post-merge cleanup</strong>
+            <span><span class="badge badge-warn">Write action</span></span>
+            <span><code>Verify merge, CI, docs, issues, and branch dependencies before deleting merged branches.</code></span>
+            <span>Use only after a PR is merged and no dependent work still needs the branch.</span>
+            <span>Source: <a href="../../../docs/ai-development-workflow.md">AI development workflow</a></span>
+          </div>
+          <div class="card">
+            <strong>External workspace automation</strong>
+            <span><span class="badge badge-warn">Unavailable in M4</span></span>
+            <span>No command is provided because Google Workspace, Notion, research notebooks, memory migration, and deep automation are deferred.</span>
+            <span>Source: <a href="../../../docs/specs/m4-agentic-control-dashboard-mvp.md">M4 dashboard spec</a></span>
+          </div>
         </div>
       </section>
 
