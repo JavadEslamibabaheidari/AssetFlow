@@ -1,6 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Inventory.Api.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Inventory.Api.Tests;
 
@@ -167,6 +170,98 @@ public sealed class ReservationEndpointTests
         await AssertProblemCodeAsync(response, "reservation.notFound");
     }
 
+    [Fact]
+    public async Task ReleaseReservation_WhenActive_ReturnsReleasedReservation()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-107", "DIRECT", 5);
+        var created = await CreateReservationAsync(client, stockItem.Id, 2);
+
+        var response = await client.PostAsync($"/reservations/{created.Id}/release", content: null);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<ReservationResponse>();
+
+        Assert.NotNull(body);
+        Assert.Equal(created.Id, body.Reservation.Id);
+        Assert.Equal("Released", body.Reservation.Status);
+        Assert.NotNull(body.Reservation.ReleasedAtUtc);
+        Assert.Null(body.Reservation.ExpiredAtUtc);
+    }
+
+    [Fact]
+    public async Task ReleaseReservation_WhenAlreadyReleased_IsIdempotent()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-108", "WHOLESALE", 5);
+        var created = await CreateReservationAsync(client, stockItem.Id, 2);
+
+        var firstResponse = await client.PostAsync($"/reservations/{created.Id}/release", content: null);
+        firstResponse.EnsureSuccessStatusCode();
+        var firstBody = await firstResponse.Content.ReadFromJsonAsync<ReservationResponse>();
+        Assert.NotNull(firstBody);
+
+        var secondResponse = await client.PostAsync($"/reservations/{created.Id}/release", content: null);
+
+        Assert.Equal(HttpStatusCode.OK, secondResponse.StatusCode);
+
+        var secondBody = await secondResponse.Content.ReadFromJsonAsync<ReservationResponse>();
+
+        Assert.NotNull(secondBody);
+        Assert.Equal("Released", secondBody.Reservation.Status);
+        Assert.Equal(firstBody.Reservation.ReleasedAtUtc, secondBody.Reservation.ReleasedAtUtc);
+        Assert.Equal(firstBody.Reservation.UpdatedAtUtc, secondBody.Reservation.UpdatedAtUtc);
+    }
+
+    [Fact]
+    public async Task ReleaseReservation_WhenExpired_ReturnsConflictProblem()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-109", "PARTNER", 5);
+        var created = await CreateReservationAsync(client, stockItem.Id, 2);
+        await ExpireReservationAsync(factory, created.Id);
+
+        var response = await client.PostAsync($"/reservations/{created.Id}/release", content: null);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        await AssertProblemCodeAsync(response, "reservation.alreadyExpired");
+    }
+
+    [Fact]
+    public async Task ReleaseReservation_WhenMissing_ReturnsNotFoundProblem()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+
+        var response = await client.PostAsync($"/reservations/{Guid.NewGuid()}/release", content: null);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        await AssertProblemCodeAsync(response, "reservation.notFound");
+    }
+
+    [Fact]
+    public async Task CreateReservation_AfterRelease_CanReuseAvailability()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-110", "OUTLET", 3);
+        var created = await CreateReservationAsync(client, stockItem.Id, 3);
+
+        var releaseResponse = await client.PostAsync($"/reservations/{created.Id}/release", content: null);
+        releaseResponse.EnsureSuccessStatusCode();
+
+        var secondReservation = await CreateReservationAsync(client, stockItem.Id, 3);
+
+        Assert.NotEqual(created.Id, secondReservation.Id);
+        Assert.Equal(stockItem.Id, secondReservation.StockItemId);
+        Assert.Equal(3, secondReservation.Quantity);
+        Assert.Equal("Active", secondReservation.Status);
+    }
+
     private static async Task<StockItemDto> CreateStockItemWithProductAndChannelAsync(
         HttpClient client,
         string sku,
@@ -255,6 +350,16 @@ public sealed class ReservationEndpointTests
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
         Assert.Equal(expectedCode, document.RootElement.GetProperty("code").GetString());
+    }
+
+    private static async Task ExpireReservationAsync(TestInventoryApiFactory factory, Guid reservationId)
+    {
+        using var scope = factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+        var reservation = await dbContext.Reservations.SingleAsync(reservation => reservation.Id == reservationId);
+
+        reservation.Expire(DateTimeOffset.UtcNow);
+        await dbContext.SaveChangesAsync();
     }
 
     private sealed record CreateVendorRequest(string Name);

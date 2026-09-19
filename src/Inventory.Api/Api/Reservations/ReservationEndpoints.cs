@@ -2,6 +2,7 @@ using Inventory.Api.Api.Common;
 using Inventory.Api.Application.Reservations.CreateReservation;
 using Inventory.Api.Application.Reservations.GetReservation;
 using Inventory.Api.Application.Reservations.ListReservations;
+using Inventory.Api.Application.Reservations.ReleaseReservation;
 using MediatR;
 
 namespace Inventory.Api.Api.Reservations;
@@ -49,6 +50,17 @@ public static class ReservationEndpoints
             return result.ToHttpResult(reservation => Results.Ok(new ReservationResponse(reservation)));
         })
         .WithName("GetReservation");
+
+        group.MapPost("/{reservationId:guid}/release", async (
+            Guid reservationId,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ReleaseReservationCommand(reservationId), cancellationToken);
+
+            return result.ToHttpResult(reservation => Results.Ok(new ReservationResponse(reservation)));
+        })
+        .WithName("ReleaseReservation");
 
         return endpoints;
     }
