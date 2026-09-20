@@ -71,6 +71,8 @@ M5 issue #63 added the frontend API-client foundation under `src/AssetFlow.Web/s
 
 M5 issue #64 added frontend quality gates for `src/AssetFlow.Web`: Prettier format checks, ESLint, TypeScript type checks, Vitest/Testing Library unit and component tests, and Playwright smoke tests. CI installs Node 20, runs the frontend checks, builds the frontend, installs Chromium for Playwright, and runs the app-shell smoke tests before Docker image build/publish steps.
 
+M5 issue #65 added the frontend Docker Compose verification path. `src/AssetFlow.Web/Dockerfile` builds the Vite app with Node 20 and serves static output with Nginx on container port 8080. `docker-compose.yml` now runs `inventory-api` on host port 8080 and `assetflow-web` on host port 5173, with the frontend build configured to call the browser-facing API base URL `http://localhost:8080`.
+
 M6, Frontend Inventory Parity, should bring the frontend product surface to the backend state reached at the end of M3. It should cover vendors, products, sales channels, stock items, reservations, and reservation-aware availability, including loading, empty, validation, conflict, not-found, success, responsive, and containerized frontend/backend verification states. Browser end-to-end tests should expand around these critical workflows in M6 rather than becoming a large suite before the frontend exists.
 
 ## Architecture Direction
