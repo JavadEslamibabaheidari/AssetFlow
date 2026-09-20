@@ -270,6 +270,79 @@ a:focus-visible {
   overflow-wrap: anywhere;
 }
 
+.workflow-state,
+.workflow-feedback {
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-md);
+  background: var(--af-color-surface);
+}
+
+.workflow-state {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--af-space-4);
+  padding: var(--af-space-5);
+}
+
+.workflow-state:has(.workflow-state-mark) {
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+}
+
+.workflow-state h3,
+.workflow-feedback strong,
+.workflow-state p,
+.workflow-feedback p {
+  margin: 0;
+}
+
+.workflow-state p,
+.workflow-feedback p {
+  color: var(--af-color-text-subtle);
+  line-height: 1.5;
+}
+
+.workflow-state h3 {
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.workflow-state-mark {
+  width: 28px;
+  height: 28px;
+  border: 4px solid #d8dee5;
+  border-top-color: var(--af-color-accent);
+  border-radius: 50%;
+  animation: spin 900ms linear infinite;
+}
+
+.workflow-state-action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--af-space-2);
+}
+
+.workflow-feedback {
+  display: grid;
+  gap: 6px;
+  padding: var(--af-space-4);
+  border-left-width: 4px;
+}
+
+.workflow-feedback.success {
+  border-left-color: var(--af-color-accent);
+}
+
+.workflow-feedback.validation,
+.workflow-feedback.conflict {
+  border-left-color: #b7791f;
+}
+
+.workflow-feedback.notFound,
+.workflow-feedback.error {
+  border-left-color: var(--af-color-danger);
+}
+
 .loading-screen,
 .error-screen {
   display: grid;

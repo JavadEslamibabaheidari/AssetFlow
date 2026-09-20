@@ -1,6 +1,6 @@
 # AssetFlow Web
 
-AssetFlow Web is the M5 frontend foundation. It is a React, TypeScript, and Vite app shell for future inventory and reservation workflows.
+AssetFlow Web is the frontend foundation for AssetFlow inventory operations. It is a React, TypeScript, and Vite app shell that M6 turns into API-backed inventory and reservation workflows.
 
 ## Requirements
 
@@ -50,6 +50,8 @@ The frontend container listens on `http://localhost:5173` and serves `/health`. 
 
 Design tokens, starter primitives, icon guidance, and accessibility conventions live in `src/design-system/README.md`. Use those primitives for route headings, metric cards, panels, status labels, and definition-list settings before creating new page-specific patterns.
 
+Shared M6 workflow states live in `src/shared/workflowStates.tsx`. Use them for loading, empty, success, validation, conflict, not-found, and generic error states so feature slices present backend feedback consistently.
+
 ## API Client
 
 Typed Inventory API access lives in `src/api`. Regenerate OpenAPI types after contract changes:
@@ -60,6 +62,9 @@ npm run generate:api
 
 The generated file is `src/api/generated/inventory-api.ts`; do not edit it directly.
 
-## Scope
+## M6 Workflow Model
 
-This shell intentionally stops short of full product workflows. API-backed vendor, product, channel, stock item, reservation, and availability screens belong to M6 after the M5 foundation adds design-system, API-client, quality-gate, and Docker Compose slices.
+- Assets is the primary inventory workspace for vendors, products, stock items, and reservation-aware availability.
+- Reservations owns create, list, detail, release, expiration, and oversell-conflict workflows.
+- Markets owns sales-channel master data until event-driven channel synchronization is added later.
+- Keep planning and milestone status in docs and GitHub issues, not in the visible app UI.

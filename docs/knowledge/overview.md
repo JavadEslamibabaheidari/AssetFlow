@@ -83,6 +83,8 @@ M6 frontend workflow direction: keep the M5 app shell, turn Assets, Reservations
 
 M6 should also split CI into three focused workflows once frontend checks are meaningful: a backend pipeline for .NET/API tests/backend Docker image, a frontend pipeline for `src/AssetFlow.Web/**` lint/type/test/build/Playwright/frontend Docker image, and a shared/integration pipeline for changes to Compose, workflows, OpenAPI contracts, cross-cutting root config/docs, and manual dispatch. OpenAPI contract changes must run frontend checks as well as backend or integration checks so generated frontend types and backend behavior stay aligned.
 
+M6 issue #74 established the frontend UX/API foundation for implementation slices: `InventoryApiClient` now covers M2/M3 create, list, detail, release, expiration, and availability operations with generated request/response types; `src/shared/workflowStates.tsx` provides reusable loading, empty, success, validation, conflict, not-found, and generic error feedback components; and `src/AssetFlow.Web/README.md` records route ownership for Assets, Reservations, and Markets.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, dependency-injected application boundaries inside each service, and event-driven synchronization when the product need justifies it.

@@ -18,6 +18,13 @@ Starter primitives live in `primitives.tsx`:
 
 Keep components narrow, accessible, and easy to scan. Use semantic HTML first, then add classes for layout and visual treatment.
 
+Workflow state helpers for API-backed M6 screens live in `src/shared/workflowStates.tsx`:
+
+- `WorkflowLoadingState` for route or panel loading states
+- `WorkflowEmptyState` for empty lists with optional actions
+- `WorkflowFeedback` for success, validation, conflict, not-found, and generic error messages
+- `ApiErrorFeedback` for mapping `ApiError` instances into user-facing operational feedback
+
 ## Icons
 
 Use `lucide-react` for interface icons. Icons inside links, buttons, and navigation should be decorative unless they carry unique meaning; pair them with visible text and mark decorative icons with `aria-hidden`.
