@@ -16,9 +16,9 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 ## Current Milestone
 
-`M5 - Frontend Application Foundation`
+`M6 - Frontend Inventory Parity`
 
-M4 is complete. The current milestone establishes the production frontend foundation before full inventory workflows:
+M5 is complete. The repository now has the production frontend foundation needed before full inventory workflows:
 
 - React, TypeScript, and Vite frontend workspace
 - app shell with routing, navigation, loading, and error states
@@ -26,6 +26,8 @@ M4 is complete. The current milestone establishes the production frontend founda
 - OpenAPI-aligned frontend API client strategy
 - frontend quality gates and smoke-test foundation
 - Docker Compose frontend/backend verification path
+
+The next milestone connects this foundation to the backend inventory and reservation APIs.
 
 ## Local Run
 
