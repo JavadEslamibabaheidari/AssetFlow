@@ -14,7 +14,8 @@ Generated types are written to `src/api/generated/inventory-api.ts`. Do not edit
 ## Client Shape
 
 - `ApiHttpClient` owns base URL handling, JSON headers, query-string building, network errors, and Problem Details mapping.
-- `InventoryApiClient` exposes typed Inventory API methods using generated operation response types.
+- `InventoryApiClient` exposes typed Inventory API methods using generated operation request and response types.
+- `InventoryApiRequest` and `InventoryApiResponse` can be used by feature code when forms or TanStack Query hooks need contract-aligned request/response shapes.
 - `ApiError.kind` normalizes `400`, `404`, `409`, unexpected status codes, and network failures for UI code.
 
 Runtime configuration uses `VITE_ASSETFLOW_API_BASE_URL`, falling back to `http://localhost:8080`.
