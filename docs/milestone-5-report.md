@@ -2,7 +2,7 @@
 
 ## Status
 
-M5 is complete pending the merge of the final validation/docs slice. The milestone established the first production frontend foundation for AssetFlow without implementing the full inventory and reservation workflows reserved for M6.
+M5 is complete and closed. The milestone established the first production frontend foundation for AssetFlow without implementing the full inventory and reservation workflows reserved for M6.
 
 ## Implemented
 
@@ -57,9 +57,10 @@ Frontend package-script checks were verified by GitHub CI. The local shell used 
 
 ## GitHub Status
 
-- M5 milestone issues #60, #61, #62, #63, #64, and #65 are closed.
-- Issue #66 closes with this final validation/docs slice.
-- After #66 merges, the GitHub milestone `M5 - Frontend Application Foundation` can be closed.
+- M5 milestone issues #60 through #66 are closed.
+- PR #73 merged the final validation/docs slice.
+- The GitHub milestone `M5 - Frontend Application Foundation` is closed.
+- Tag `v0.5.0` and release `v0.5.0 - M5 Frontend Application Foundation` exist for the milestone source state.
 
 ## Next
 
