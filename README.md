@@ -16,14 +16,16 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 ## Current Milestone
 
-`M4 - Event-Driven Synchronization`
+`M5 - Frontend Application Foundation`
 
-M3 is complete. The next milestone will add event-driven synchronization on top of the reservation-aware inventory domain:
+M4 is complete. The current milestone establishes the production frontend foundation before full inventory workflows:
 
-- event publication after inventory and reservation changes
-- event contracts for stock and reservation changes
-- outbox/channel synchronization decisions
-- marketplace availability update flow
+- React, TypeScript, and Vite frontend workspace
+- app shell with routing, navigation, loading, and error states
+- design-system foundation
+- OpenAPI-aligned frontend API client strategy
+- frontend quality gates and smoke-test foundation
+- Docker Compose frontend/backend verification path
 
 ## Local Run
 
@@ -36,6 +38,16 @@ Then call:
 ```bash
 curl http://localhost:5000/health
 ```
+
+## Frontend Run
+
+```bash
+cd src/AssetFlow.Web
+npm install
+npm run dev
+```
+
+The frontend defaults to `http://localhost:5173` and reads the backend API base URL from `VITE_ASSETFLOW_API_BASE_URL`, falling back to `http://localhost:8080`.
 
 ## Documentation
 
