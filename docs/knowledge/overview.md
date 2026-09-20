@@ -67,6 +67,8 @@ M5 issue #61 started the frontend workspace at `src/AssetFlow.Web`. It contains 
 
 M5 issue #62 added the starter frontend design-system foundation under `src/AssetFlow.Web/src/design-system/`. The foundation defines named CSS tokens for AssetFlow colors, spacing, type, radii, shadows, and focus states; documents `lucide-react` as the icon strategy; and provides reusable primitives for page headers, metric cards, informational panels, status badges, and definition-list settings.
 
+M5 issue #63 added the frontend API-client foundation under `src/AssetFlow.Web/src/api/`. Contract types are generated from `contracts/openapi/inventory-api.yaml` with `npm run generate:api`, producing `src/api/generated/inventory-api.ts`. `ApiHttpClient` handles base URL configuration, JSON requests, query parameters, network errors, and Problem Details mapping; `InventoryApiClient` exposes typed read methods for vendors, products, channels, stock items, availability, and reservations.
+
 M6, Frontend Inventory Parity, should bring the frontend product surface to the backend state reached at the end of M3. It should cover vendors, products, sales channels, stock items, reservations, and reservation-aware availability, including loading, empty, validation, conflict, not-found, success, responsive, and containerized frontend/backend verification states. Browser end-to-end tests should expand around these critical workflows in M6 rather than becoming a large suite before the frontend exists.
 
 ## Architecture Direction

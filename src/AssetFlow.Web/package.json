@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -p tsconfig.json && vite build",
+    "generate:api": "openapi-typescript ../../contracts/openapi/inventory-api.yaml -o src/api/generated/inventory-api.ts",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --pretty false"
   },
@@ -20,6 +21,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "openapi-typescript": "^7.4.0",
     "typescript": "^5.6.2",
     "vite": "^5.4.0"
   }
