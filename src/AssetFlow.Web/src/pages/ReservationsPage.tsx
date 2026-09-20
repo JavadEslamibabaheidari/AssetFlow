@@ -1,24 +1,29 @@
+import { InfoPanel, PageHeader } from "../design-system";
+
 export function ReservationsPage() {
   return (
     <section className="page-section" aria-labelledby="reservations-title">
-      <div className="section-heading compact">
-        <div>
-          <p className="eyebrow">Reservations</p>
-          <h2 id="reservations-title">Availability protection</h2>
-        </div>
-        <p>
-          Reservation create, release, expiration, and availability views arrive after the API
-          client foundation is in place.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Reservations"
+        title="Reserved stock"
+        titleId="reservations-title"
+        description="See which items are held, when holds expire, and how reservations affect market availability."
+        compact
+      />
 
-      <div className="placeholder-panel">
-        <h3>Reservation-aware screens come next milestone</h3>
-        <p>
-          The shell is ready to host oversell-prevention workflows without duplicating backend
-          domain rules in the browser.
-        </p>
+      <div className="work-list">
+        <InfoPanel title="Active holds">
+          <p>Review stock currently protected from overselling while orders or holds complete.</p>
+        </InfoPanel>
+        <InfoPanel title="Expiring holds">
+          <p>Prioritize reservations that are close to returning stock to available inventory.</p>
+        </InfoPanel>
       </div>
+      <InfoPanel title="Availability impact">
+        <p>
+          Reservation-aware availability keeps marketplace quantities honest across channels.
+        </p>
+      </InfoPanel>
     </section>
   );
 }

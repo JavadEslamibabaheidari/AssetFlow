@@ -1,25 +1,22 @@
 import {
   Boxes,
-  Gauge,
   LayoutDashboard,
   PackageCheck,
   Settings,
+  Store,
   TimerReset
 } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
-import { getAppConfig } from "../shared/config";
 
 const navItems = [
   { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/inventory", label: "Inventory", icon: Boxes },
+  { to: "/inventory", label: "Assets", icon: Boxes },
   { to: "/reservations", label: "Reservations", icon: TimerReset },
-  { to: "/operations", label: "Operations", icon: Gauge },
+  { to: "/operations", label: "Markets", icon: Store },
   { to: "/settings", label: "Settings", icon: Settings }
 ];
 
 export function AppLayout() {
-  const config = getAppConfig();
-
   return (
     <div className="app-shell">
       <aside className="sidebar" aria-label="Primary navigation">
@@ -29,7 +26,7 @@ export function AppLayout() {
           </div>
           <div>
             <p>AssetFlow</p>
-            <span>Inventory operations</span>
+            <span>Marketplace inventory</span>
           </div>
         </div>
 
@@ -51,21 +48,13 @@ export function AppLayout() {
           })}
         </nav>
 
-        <div className="sidebar-meta">
-          <span>API base</span>
-          <strong>{config.apiBaseUrl}</strong>
-        </div>
       </aside>
 
       <div className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">M5 foundation</p>
-            <h1>Frontend workspace</h1>
-          </div>
-          <div className="status-strip" aria-label="Foundation status">
-            <span>Shell ready</span>
-            <span>Contracts next</span>
+            <p className="eyebrow">Operations</p>
+            <h1>Asset command center</h1>
           </div>
         </header>
 

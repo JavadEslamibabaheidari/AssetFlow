@@ -1,20 +1,4 @@
-:root {
-  color-scheme: light;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #17202a;
-  background: #f6f7f9;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  --surface: #ffffff;
-  --surface-muted: #eef2f5;
-  --text-subtle: #5c6975;
-  --line: #d8dee5;
-  --accent: #0f766e;
-  --danger: #b42318;
-  --shadow: 0 18px 45px rgba(23, 32, 42, 0.08);
-}
+@import "./design-system/tokens.css";
 
 * {
   box-sizing: border-box;
@@ -34,6 +18,7 @@ a {
 button:focus-visible,
 a:focus-visible {
   outline: 3px solid rgba(15, 118, 110, 0.35);
+  box-shadow: var(--af-focus-ring);
   outline-offset: 3px;
 }
 
@@ -46,16 +31,16 @@ a:focus-visible {
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 24px;
-  color: #f8fafc;
-  background: #202a32;
+  gap: var(--af-space-6);
+  padding: var(--af-space-6);
+  color: var(--af-color-sidebar-text);
+  background: var(--af-color-sidebar);
 }
 
 .brand-block {
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr);
-  gap: 12px;
+  gap: var(--af-space-3);
   align-items: center;
 }
 
@@ -65,8 +50,8 @@ a:focus-visible {
   height: 44px;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
-  background: var(--accent);
+  border-radius: var(--af-radius-md);
+  background: var(--af-color-accent);
 }
 
 .brand-block p,
@@ -74,7 +59,7 @@ a:focus-visible {
 .topbar h1,
 .section-heading h2,
 .work-list h3,
-.placeholder-panel h3 {
+.info-panel h3 {
   margin: 0;
 }
 
@@ -86,8 +71,8 @@ a:focus-visible {
 .brand-block span {
   display: block;
   margin-top: 2px;
-  color: #c8d1da;
-  font-size: 0.86rem;
+  color: var(--af-color-sidebar-muted);
+  font-size: var(--af-text-sm);
 }
 
 .nav-list {
@@ -104,7 +89,7 @@ a:focus-visible {
   padding: 10px 12px;
   color: #dbe4ed;
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: var(--af-radius-md);
 }
 
 .nav-link:hover,
@@ -115,9 +100,9 @@ a:focus-visible {
 
 .sidebar-meta {
   margin-top: auto;
-  padding: 12px;
+  padding: var(--af-space-3);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
+  border-radius: var(--af-radius-md);
   background: rgba(255, 255, 255, 0.06);
 }
 
@@ -125,8 +110,8 @@ a:focus-visible {
 .metric-grid span,
 .eyebrow {
   display: block;
-  color: var(--text-subtle);
-  font-size: 0.76rem;
+  color: var(--af-color-text-subtle);
+  font-size: var(--af-text-xs);
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -152,9 +137,9 @@ a:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  padding: 24px 32px;
-  border-bottom: 1px solid var(--line);
+  gap: var(--af-space-5);
+  padding: var(--af-space-6) var(--af-space-8);
+  border-bottom: 1px solid var(--af-color-line);
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(16px);
 }
@@ -171,30 +156,30 @@ a:focus-visible {
   justify-content: flex-end;
 }
 
-.status-strip span {
+.status-badge {
   padding: 7px 10px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--af-color-line);
   border-radius: 999px;
   color: #33404c;
-  background: #ffffff;
-  font-size: 0.86rem;
+  background: var(--af-color-surface);
+  font-size: var(--af-text-sm);
   white-space: nowrap;
 }
 
 .content {
-  padding: 32px;
+  padding: var(--af-space-8);
 }
 
 .page-section {
   display: grid;
-  gap: 24px;
+  gap: var(--af-space-6);
   max-width: 1120px;
 }
 
 .section-heading {
   display: grid;
   grid-template-columns: minmax(220px, 0.8fr) minmax(260px, 1fr);
-  gap: 24px;
+  gap: var(--af-space-6);
   align-items: end;
 }
 
@@ -210,7 +195,7 @@ a:focus-visible {
 
 .section-heading p {
   margin: 0;
-  color: var(--text-subtle);
+  color: var(--af-color-text-subtle);
   line-height: 1.6;
 }
 
@@ -220,21 +205,20 @@ a:focus-visible {
   gap: 14px;
 }
 
-.metric-grid article,
-.work-list article,
-.placeholder-panel,
+.metric-card,
+.info-panel,
 .settings-list div {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-md);
+  background: var(--af-color-surface);
+  box-shadow: var(--af-shadow-raised);
 }
 
-.metric-grid article {
+.metric-card {
   padding: 18px;
 }
 
-.metric-grid strong {
+.metric-card strong {
   display: block;
   margin-top: 10px;
   font-size: 2rem;
@@ -242,9 +226,9 @@ a:focus-visible {
 
 .metric-grid p,
 .work-list p,
-.placeholder-panel p {
+.info-panel p {
   margin: 8px 0 0;
-  color: var(--text-subtle);
+  color: var(--af-color-text-subtle);
   line-height: 1.5;
 }
 
@@ -254,13 +238,12 @@ a:focus-visible {
   gap: 14px;
 }
 
-.work-list article,
-.placeholder-panel {
+.info-panel {
   padding: 20px;
 }
 
 .work-list h3,
-.placeholder-panel h3 {
+.info-panel h3 {
   font-size: 1rem;
 }
 
@@ -278,7 +261,7 @@ a:focus-visible {
 }
 
 .settings-list dt {
-  color: var(--text-subtle);
+  color: var(--af-color-text-subtle);
   font-weight: 700;
 }
 
@@ -293,19 +276,19 @@ a:focus-visible {
   min-height: 100vh;
   place-items: center;
   padding: 24px;
-  background: #f6f7f9;
+  background: var(--af-color-canvas);
 }
 
 .loading-screen {
   gap: 14px;
-  color: var(--text-subtle);
+  color: var(--af-color-text-subtle);
 }
 
 .loading-mark {
   width: 34px;
   height: 34px;
   border: 4px solid #d8dee5;
-  border-top-color: var(--accent);
+  border-top-color: var(--af-color-accent);
   border-radius: 50%;
   animation: spin 900ms linear infinite;
 }
@@ -313,10 +296,10 @@ a:focus-visible {
 .error-screen > div {
   max-width: 540px;
   padding: 28px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-md);
+  background: var(--af-color-surface);
+  box-shadow: var(--af-shadow-raised);
 }
 
 .error-screen h1 {
@@ -324,7 +307,7 @@ a:focus-visible {
 }
 
 .error-screen p {
-  color: var(--text-subtle);
+  color: var(--af-color-text-subtle);
   line-height: 1.6;
 }
 
@@ -332,9 +315,9 @@ a:focus-visible {
   min-height: 42px;
   padding: 0 14px;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--af-radius-md);
   color: #ffffff;
-  background: var(--danger);
+  background: var(--af-color-danger);
   cursor: pointer;
 }
 

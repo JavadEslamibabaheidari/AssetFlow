@@ -1,48 +1,45 @@
-const foundationItems = [
-  ["App shell", "Routing, navigation, loading, and error boundaries are in place."],
-  ["Design system", "Tokens and reusable primitives are scheduled for the next slice."],
-  ["API client", "OpenAPI-aligned TypeScript access will wire into the checked-in contract."],
-  ["Quality gates", "Linting, type checks, component tests, and smoke tests follow this shell."]
+import { InfoPanel, MetricCard, PageHeader } from "../design-system";
+
+const operationsPanels = [
+  ["Marketplace channels", "Track sales channels, listing readiness, and availability sync."],
+  ["Warehouse stock", "Review on-hand quantities and where items are physically available."],
+  ["Product assets", "Organize sellable products, identifiers, and channel-ready catalog data."],
+  ["Reservations", "Protect availability when items are temporarily held or released."]
 ];
 
 export function OverviewPage() {
   return (
     <section className="page-section" aria-labelledby="overview-title">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">Foundation</p>
-          <h2 id="overview-title">Ready for product workflows</h2>
-        </div>
-        <p>
-          The first frontend surface gives AssetFlow a stable place for inventory and reservation
-          workflows without pulling M6 screens into the foundation milestone.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Overview"
+        title="Asset operations"
+        titleId="overview-title"
+        description="Manage market listings, warehouse stock, product assets, and reservation-aware availability from one workspace."
+      />
 
-      <div className="metric-grid" aria-label="Current foundation areas">
-        <article>
-          <span>Routes</span>
-          <strong>5</strong>
-          <p>Overview, inventory, reservations, operations, and settings.</p>
-        </article>
-        <article>
-          <span>Milestone</span>
-          <strong>M5</strong>
-          <p>Focused on shell, contracts, checks, and local run paths.</p>
-        </article>
-        <article>
-          <span>Backend</span>
-          <strong>8080</strong>
-          <p>Default API base URL for local development.</p>
-        </article>
+      <div className="metric-grid" aria-label="Current operation areas">
+        <MetricCard
+          label="Markets"
+          value="3"
+          description="Amazon, MediaWorld, and Unieuro channel coverage."
+        />
+        <MetricCard
+          label="Inventory"
+          value="Live"
+          description="Warehouse stock and channel availability stay connected."
+        />
+        <MetricCard
+          label="Reservations"
+          value="Guarded"
+          description="Held stock is separated from sellable availability."
+        />
       </div>
 
       <div className="work-list">
-        {foundationItems.map(([title, body]) => (
-          <article key={title}>
-            <h3>{title}</h3>
+        {operationsPanels.map(([title, body]) => (
+          <InfoPanel key={title} title={title}>
             <p>{body}</p>
-          </article>
+          </InfoPanel>
         ))}
       </div>
     </section>
