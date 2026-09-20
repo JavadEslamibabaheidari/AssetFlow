@@ -1,23 +1,29 @@
+import { InfoPanel, PageHeader } from "../design-system";
+
 export function OperationsPage() {
   return (
     <section className="page-section" aria-labelledby="operations-title">
-      <div className="section-heading compact">
-        <div>
-          <p className="eyebrow">Operations</p>
-          <h2 id="operations-title">Service and workflow status</h2>
-        </div>
-        <p>
-          This area will collect service health, synchronization, and operational status as the
-          platform expands.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Markets"
+        title="Marketplace channels"
+        titleId="operations-title"
+        description="Coordinate channel listings and availability signals across connected markets."
+        compact
+      />
 
-      <div className="placeholder-panel">
-        <h3>Operational status route</h3>
-        <p>
-          M5 keeps this lightweight: a route, stable layout, and space for future observability
-          without introducing monitoring scope early.
-        </p>
+      <div className="work-list">
+        <InfoPanel title="Amazon">
+          <p>Monitor listing availability and stock commitments for Amazon sales.</p>
+        </InfoPanel>
+        <InfoPanel title="MediaWorld">
+          <p>Keep channel quantities aligned with warehouse and reservation state.</p>
+        </InfoPanel>
+        <InfoPanel title="Unieuro">
+          <p>Prepare channel sync visibility for marketplace-specific operations.</p>
+        </InfoPanel>
+        <InfoPanel title="Sync health">
+          <p>Track whether channel availability is ready, delayed, or needs attention.</p>
+        </InfoPanel>
       </div>
     </section>
   );

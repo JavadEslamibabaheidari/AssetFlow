@@ -1,28 +1,24 @@
-import { getAppConfig } from "../shared/config";
+import { DefinitionList, PageHeader } from "../design-system";
 
 export function SettingsPage() {
-  const config = getAppConfig();
-
   return (
     <section className="page-section" aria-labelledby="settings-title">
-      <div className="section-heading compact">
-        <div>
-          <p className="eyebrow">Settings</p>
-          <h2 id="settings-title">Runtime configuration</h2>
-        </div>
-        <p>Environment-driven settings stay visible without committing local secrets.</p>
-      </div>
+      <PageHeader
+        eyebrow="Settings"
+        title="Workspace settings"
+        titleId="settings-title"
+        description="Keep channel, warehouse, and availability behavior visible for operators."
+        compact
+      />
 
-      <dl className="settings-list">
-        <div>
-          <dt>Inventory API base URL</dt>
-          <dd>{config.apiBaseUrl}</dd>
-        </div>
-        <div>
-          <dt>Environment variable</dt>
-          <dd>VITE_ASSETFLOW_API_BASE_URL</dd>
-        </div>
-      </dl>
+      <DefinitionList
+        items={[
+          { term: "Primary markets", description: "Amazon, MediaWorld, and Unieuro" },
+          { term: "Stock source", description: "Warehouse on-hand quantities" },
+          { term: "Availability rule", description: "Active reservations reduce sellable stock" },
+          { term: "Channel sync", description: "Market availability follows inventory state" }
+        ]}
+      />
     </section>
   );
 }

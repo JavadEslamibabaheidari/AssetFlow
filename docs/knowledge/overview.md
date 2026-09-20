@@ -65,6 +65,8 @@ M5 should establish the app shell, routing, responsive navigation, error/loading
 
 M5 issue #61 started the frontend workspace at `src/AssetFlow.Web`. It contains the Vite/React/TypeScript project shape, local setup documentation, environment-based API base URL configuration, a responsive app shell, React Router routes for overview, inventory, reservations, operations, and settings, global error/loading states, and placeholder product areas that deliberately leave full API-backed workflows for M6.
 
+M5 issue #62 added the starter frontend design-system foundation under `src/AssetFlow.Web/src/design-system/`. The foundation defines named CSS tokens for AssetFlow colors, spacing, type, radii, shadows, and focus states; documents `lucide-react` as the icon strategy; and provides reusable primitives for page headers, metric cards, informational panels, status badges, and definition-list settings.
+
 M6, Frontend Inventory Parity, should bring the frontend product surface to the backend state reached at the end of M3. It should cover vendors, products, sales channels, stock items, reservations, and reservation-aware availability, including loading, empty, validation, conflict, not-found, success, responsive, and containerized frontend/backend verification states. Browser end-to-end tests should expand around these critical workflows in M6 rather than becoming a large suite before the frontend exists.
 
 ## Architecture Direction
