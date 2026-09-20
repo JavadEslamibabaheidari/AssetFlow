@@ -20,9 +20,7 @@ export function ReservationsPage() {
         </InfoPanel>
       </div>
       <InfoPanel title="Availability impact">
-        <p>
-          Reservation-aware availability keeps marketplace quantities honest across channels.
-        </p>
+        <p>Reservation-aware availability keeps marketplace quantities honest across channels.</p>
       </InfoPanel>
     </section>
   );

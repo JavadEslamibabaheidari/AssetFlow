@@ -13,3 +13,5 @@ TestResults/
 tools/agent-dashboard/dist/
 src/AssetFlow.Web/dist/
 src/AssetFlow.Web/node_modules/
+src/AssetFlow.Web/playwright-report/
+src/AssetFlow.Web/test-results/

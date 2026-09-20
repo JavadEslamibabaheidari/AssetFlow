@@ -36,7 +36,10 @@ export class ApiHttpClient {
         signal: options.signal
       });
     } catch (error) {
-      throw new ApiError("network", error instanceof Error ? error.message : "Network request failed");
+      throw new ApiError(
+        "network",
+        error instanceof Error ? error.message : "Network request failed"
+      );
     }
 
     if (!response.ok) {
