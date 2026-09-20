@@ -1,12 +1,14 @@
 import type { operations } from "./generated/inventory-api";
 import { ApiHttpClient } from "./http";
 
-type JsonResponse<TOperation extends keyof operations, TStatus extends keyof operations[TOperation]["responses"]> =
-  operations[TOperation]["responses"][TStatus] extends {
-    content: { "application/json": infer TResponse };
-  }
-    ? TResponse
-    : never;
+type JsonResponse<
+  TOperation extends keyof operations,
+  TStatus extends keyof operations[TOperation]["responses"]
+> = operations[TOperation]["responses"][TStatus] extends {
+  content: { "application/json": infer TResponse };
+}
+  ? TResponse
+  : never;
 
 type ListProductsQuery = NonNullable<operations["listProducts"]["parameters"]["query"]>;
 type ListStockItemsQuery = NonNullable<operations["listStockItems"]["parameters"]["query"]>;

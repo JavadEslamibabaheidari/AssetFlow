@@ -60,6 +60,43 @@ jobs:
           curl --fail --silent http://127.0.0.1:8080/ | tee /tmp/assetflow-root.json
           grep -q "Marketplace inventory platform is running." /tmp/assetflow-root.json
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        working-directory: src/AssetFlow.Web
+        run: npm install
+
+      - name: Check frontend formatting
+        working-directory: src/AssetFlow.Web
+        run: npm run format:check
+
+      - name: Lint frontend
+        working-directory: src/AssetFlow.Web
+        run: npm run lint
+
+      - name: Type-check frontend
+        working-directory: src/AssetFlow.Web
+        run: npm run typecheck
+
+      - name: Test frontend
+        working-directory: src/AssetFlow.Web
+        run: npm run test
+
+      - name: Build frontend
+        working-directory: src/AssetFlow.Web
+        run: npm run build
+
+      - name: Install Playwright browser
+        working-directory: src/AssetFlow.Web
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke test frontend
+        working-directory: src/AssetFlow.Web
+        run: npm run test:e2e -- --project=chromium
+
       - name: Docker build
         run: docker build -t inventory-api:ci .
 

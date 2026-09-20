@@ -9,7 +9,12 @@ export class ApiError extends Error {
   public readonly status?: number;
   public readonly problem?: ProblemDetails;
 
-  public constructor(kind: ApiErrorKind, message: string, status?: number, problem?: ProblemDetails) {
+  public constructor(
+    kind: ApiErrorKind,
+    message: string,
+    status?: number,
+    problem?: ProblemDetails
+  ) {
     super(message);
     this.name = "ApiError";
     this.kind = kind;

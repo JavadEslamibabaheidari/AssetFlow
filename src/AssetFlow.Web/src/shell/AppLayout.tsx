@@ -1,11 +1,4 @@
-import {
-  Boxes,
-  LayoutDashboard,
-  PackageCheck,
-  Settings,
-  Store,
-  TimerReset
-} from "lucide-react";
+import { Boxes, LayoutDashboard, PackageCheck, Settings, Store, TimerReset } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const navItems = [
@@ -47,7 +40,6 @@ export function AppLayout() {
             );
           })}
         </nav>
-
       </aside>
 
       <div className="workspace">

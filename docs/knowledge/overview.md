@@ -69,6 +69,8 @@ M5 issue #62 added the starter frontend design-system foundation under `src/Asse
 
 M5 issue #63 added the frontend API-client foundation under `src/AssetFlow.Web/src/api/`. Contract types are generated from `contracts/openapi/inventory-api.yaml` with `npm run generate:api`, producing `src/api/generated/inventory-api.ts`. `ApiHttpClient` handles base URL configuration, JSON requests, query parameters, network errors, and Problem Details mapping; `InventoryApiClient` exposes typed read methods for vendors, products, channels, stock items, availability, and reservations.
 
+M5 issue #64 added frontend quality gates for `src/AssetFlow.Web`: Prettier format checks, ESLint, TypeScript type checks, Vitest/Testing Library unit and component tests, and Playwright smoke tests. CI installs Node 20, runs the frontend checks, builds the frontend, installs Chromium for Playwright, and runs the app-shell smoke tests before Docker image build/publish steps.
+
 M6, Frontend Inventory Parity, should bring the frontend product surface to the backend state reached at the end of M3. It should cover vendors, products, sales channels, stock items, reservations, and reservation-aware availability, including loading, empty, validation, conflict, not-found, success, responsive, and containerized frontend/backend verification states. Browser end-to-end tests should expand around these critical workflows in M6 rather than becoming a large suite before the frontend exists.
 
 ## Architecture Direction

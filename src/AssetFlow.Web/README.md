@@ -29,7 +29,11 @@ For local files, copy `.env.example` to `.env.local` and adjust the value withou
 
 - `npm run dev`: start the Vite dev server
 - `npm run build`: type-check and build the frontend
+- `npm run format:check`: verify Prettier formatting
+- `npm run lint`: run ESLint
 - `npm run preview`: preview the production build locally
+- `npm run test`: run Vitest component/unit tests
+- `npm run test:e2e`: run Playwright smoke tests
 - `npm run typecheck`: run TypeScript without emitting files
 
 ## Design System
