@@ -55,15 +55,15 @@ The app shell will be operational-tooling-first: dense, scannable, responsive, a
 
 ## Acceptance Criteria
 
-- [ ] A new developer can run the frontend locally from documented commands.
-- [ ] The app shell renders on desktop and mobile viewports without broken layout or overlapping UI.
-- [ ] Routing, navigation, global error handling, and loading states are present.
-- [ ] Shared UI primitives and design tokens exist and are documented.
-- [ ] Frontend API access is typed and traceable to the backend OpenAPI contract.
-- [ ] Lint, format, type-check, unit/component test, and Playwright smoke-test commands exist.
-- [ ] Docker Compose can build and run the frontend foundation with the relevant backend service configuration.
-- [ ] No secrets or environment-specific credentials are committed.
-- [ ] Knowledge docs describe the frontend foundation and how future screens should be built.
+- [x] A new developer can run the frontend locally from documented commands.
+- [x] The app shell renders on desktop and mobile viewports without broken layout or overlapping UI.
+- [x] Routing, navigation, global error handling, and loading states are present.
+- [x] Shared UI primitives and design tokens exist and are documented.
+- [x] Frontend API access is typed and traceable to the backend OpenAPI contract.
+- [x] Lint, format, type-check, unit/component test, and Playwright smoke-test commands exist.
+- [x] Docker Compose can build and run the frontend foundation with the relevant backend service configuration.
+- [x] No secrets or environment-specific credentials are committed.
+- [x] Knowledge docs describe the frontend foundation and how future screens should be built.
 
 ## Task Breakdown
 
@@ -124,4 +124,4 @@ The app shell will be operational-tooling-first: dense, scannable, responsive, a
 - [x] GitHub tracking matches this plan.
 - [x] Knowledge docs capture durable planned behavior.
 
-Status: Ready to start
+Status: Complete pending final validation/docs merge
