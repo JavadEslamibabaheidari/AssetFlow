@@ -49,6 +49,14 @@ npm run dev
 
 The frontend defaults to `http://localhost:5173` and reads the backend API base URL from `VITE_ASSETFLOW_API_BASE_URL`, falling back to `http://localhost:8080`.
 
+## Compose Run
+
+```bash
+docker compose up --build
+```
+
+Compose exposes the backend at `http://localhost:8080` and the frontend at `http://localhost:5173`. Set `ASSETFLOW_WEB_PORT=6173` before `docker compose up --build` if `5173` is already in use locally.
+
 ## Documentation
 
 - [Vision](docs/vision.md)

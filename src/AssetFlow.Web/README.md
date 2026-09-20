@@ -25,6 +25,16 @@ VITE_ASSETFLOW_API_BASE_URL=http://localhost:8080 npm run dev
 
 For local files, copy `.env.example` to `.env.local` and adjust the value without committing machine-specific settings.
 
+## Docker
+
+Build and run the frontend with the backend from the repository root:
+
+```bash
+docker compose up --build
+```
+
+The frontend container listens on `http://localhost:5173` and serves `/health`. If `5173` is already busy locally, run `ASSETFLOW_WEB_PORT=6173 docker compose up --build` to choose another host port. Its browser-facing API base URL is set at image build time through `VITE_ASSETFLOW_API_BASE_URL`, defaulting to `http://localhost:8080` in `docker-compose.yml`.
+
 ## Scripts
 
 - `npm run dev`: start the Vite dev server

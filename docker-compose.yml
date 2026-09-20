@@ -8,3 +8,13 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
 
+  assetflow-web:
+    build:
+      context: ./src/AssetFlow.Web
+      dockerfile: Dockerfile
+      args:
+        VITE_ASSETFLOW_API_BASE_URL: http://localhost:8080
+    depends_on:
+      - inventory-api
+    ports:
+      - "${ASSETFLOW_WEB_PORT:-5173}:8080"
