@@ -1,6 +1,6 @@
 # AssetFlow Web
 
-AssetFlow Web is the frontend foundation for AssetFlow inventory operations. It is a React, TypeScript, and Vite app shell that M6 turns into API-backed inventory and reservation workflows.
+AssetFlow Web is the frontend surface for AssetFlow inventory operations. It is a React, TypeScript, and Vite app with API-backed inventory and reservation workflows.
 
 ## Requirements
 

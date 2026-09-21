@@ -247,6 +247,178 @@ a:focus-visible {
   font-size: 1rem;
 }
 
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.workflow-panel {
+  display: grid;
+  gap: var(--af-space-4);
+  align-content: start;
+  padding: var(--af-space-5);
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-md);
+  background: var(--af-color-surface);
+  box-shadow: var(--af-shadow-raised);
+}
+
+.workflow-panel.full-span {
+  grid-column: 1 / -1;
+}
+
+.workflow-panel-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--af-space-4);
+}
+
+.workflow-panel-heading h3,
+.workflow-panel-heading p,
+.compact-list,
+.compact-list strong,
+.compact-list span {
+  margin: 0;
+}
+
+.workflow-panel-heading h3 {
+  font-size: 1rem;
+}
+
+.workflow-panel-heading p {
+  margin-top: 4px;
+  color: var(--af-color-text-subtle);
+  line-height: 1.5;
+}
+
+.workflow-form,
+.filter-row {
+  display: grid;
+  gap: var(--af-space-3);
+}
+
+.filter-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workflow-form label,
+.filter-row label {
+  display: grid;
+  gap: 6px;
+  color: var(--af-color-text-subtle);
+  font-size: var(--af-text-sm);
+  font-weight: 700;
+}
+
+.workflow-form input,
+.workflow-form select,
+.filter-row select {
+  min-height: 40px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-sm);
+  color: var(--af-color-text);
+  background: var(--af-color-surface);
+}
+
+.workflow-form button,
+.data-table button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--af-radius-sm);
+  color: #ffffff;
+  background: var(--af-color-accent);
+  cursor: pointer;
+}
+
+.workflow-form button:disabled,
+.data-table button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.compact-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.compact-list li {
+  display: grid;
+  gap: 2px;
+  padding: 10px;
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-sm);
+  background: var(--af-color-surface-muted);
+}
+
+.compact-list span {
+  color: var(--af-color-text-subtle);
+  font-size: var(--af-text-sm);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: var(--af-text-sm);
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--af-color-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.data-table th {
+  color: var(--af-color-text-subtle);
+  font-size: var(--af-text-xs);
+  text-transform: uppercase;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: var(--af-space-4);
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-md);
+  background: var(--af-color-surface-muted);
+}
+
+.detail-grid.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.detail-grid div {
+  display: grid;
+  gap: 4px;
+}
+
+.detail-grid span {
+  color: var(--af-color-text-subtle);
+  font-size: var(--af-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .settings-list {
   display: grid;
   gap: 12px;
@@ -459,8 +631,16 @@ a:focus-visible {
   }
 
   .metric-grid,
-  .work-list {
+  .work-list,
+  .workflow-grid,
+  .filter-row,
+  .detail-grid,
+  .detail-grid.compact {
     grid-template-columns: 1fr;
+  }
+
+  .workflow-panel-heading {
+    display: grid;
   }
 }
 

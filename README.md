@@ -18,16 +18,15 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 `M6 - Frontend Inventory Parity`
 
-M5 is complete. The repository now has the production frontend foundation needed before full inventory workflows:
+M6 is implemented in the current development branch. The frontend now reaches the backend inventory and reservation surface completed by M3:
 
-- React, TypeScript, and Vite frontend workspace
-- app shell with routing, navigation, loading, and error states
-- design-system foundation
-- OpenAPI-aligned frontend API client strategy
-- frontend quality gates and smoke-test foundation
-- Docker Compose frontend/backend verification path
+- API-backed vendor, product, sales-channel, stock-item, reservation, and availability workflows
+- reservation create, list, detail, release, expiration, and oversell-conflict feedback
+- operational loading, empty, validation, conflict, not-found, disabled, and success states
+- focused component tests and Playwright smoke coverage
+- split backend, frontend, and integration/Compose CI workflows
 
-The next milestone connects this foundation to the backend inventory and reservation APIs.
+The next milestone is M7, Event-Driven Synchronization, which should add event publication and channel synchronization behavior.
 
 ## Local Run
 

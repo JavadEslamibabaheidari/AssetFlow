@@ -1,0 +1,68 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/AssetFlow.Web/**"
+      - "contracts/openapi/**"
+      - ".github/workflows/frontend-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/AssetFlow.Web/**"
+      - "contracts/openapi/**"
+      - ".github/workflows/frontend-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Lint, test, build, and package frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: src/AssetFlow.Web
+        run: npm install
+
+      - name: Check formatting
+        working-directory: src/AssetFlow.Web
+        run: npm run format:check
+
+      - name: Lint
+        working-directory: src/AssetFlow.Web
+        run: npm run lint
+
+      - name: Type-check
+        working-directory: src/AssetFlow.Web
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: src/AssetFlow.Web
+        run: npm run test
+
+      - name: Build
+        working-directory: src/AssetFlow.Web
+        run: npm run build
+
+      - name: Install Playwright browser
+        working-directory: src/AssetFlow.Web
+        run: npx playwright install --with-deps chromium
+
+      - name: Playwright
+        working-directory: src/AssetFlow.Web
+        run: npm run test:e2e -- --project=chromium
+
+      - name: Docker build frontend
+        run: docker build -t assetflow-web:ci ./src/AssetFlow.Web
