@@ -1,17 +1,41 @@
-name: CI
+name: Backend CI
 
 on:
   push:
     branches: [main]
+    paths:
+      - "src/Inventory.Api/**"
+      - "tests/**"
+      - "contracts/openapi/**"
+      - "Dockerfile"
+      - "Directory.Build.props"
+      - "dotnet-tools.json"
+      - "global.json"
+      - "MarketplaceInventoryPlatform.sln"
+      - "MarketplaceInventoryPlatform.slnx"
+      - ".github/workflows/backend-ci.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "src/Inventory.Api/**"
+      - "tests/**"
+      - "contracts/openapi/**"
+      - "Dockerfile"
+      - "Directory.Build.props"
+      - "dotnet-tools.json"
+      - "global.json"
+      - "MarketplaceInventoryPlatform.sln"
+      - "MarketplaceInventoryPlatform.slnx"
+      - ".github/workflows/backend-ci.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  build-test:
+  backend:
+    name: Build, test, and package backend
     runs-on: ubuntu-latest
 
     steps:
@@ -59,90 +83,6 @@ jobs:
 
           curl --fail --silent http://127.0.0.1:8080/ | tee /tmp/assetflow-root.json
           grep -q "Marketplace inventory platform is running." /tmp/assetflow-root.json
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install frontend dependencies
-        working-directory: src/AssetFlow.Web
-        run: npm install
-
-      - name: Check frontend formatting
-        working-directory: src/AssetFlow.Web
-        run: npm run format:check
-
-      - name: Lint frontend
-        working-directory: src/AssetFlow.Web
-        run: npm run lint
-
-      - name: Type-check frontend
-        working-directory: src/AssetFlow.Web
-        run: npm run typecheck
-
-      - name: Test frontend
-        working-directory: src/AssetFlow.Web
-        run: npm run test
-
-      - name: Build frontend
-        working-directory: src/AssetFlow.Web
-        run: npm run build
-
-      - name: Install Playwright browser
-        working-directory: src/AssetFlow.Web
-        run: npx playwright install --with-deps chromium
-
-      - name: Smoke test frontend
-        working-directory: src/AssetFlow.Web
-        run: npm run test:e2e -- --project=chromium
-
-      - name: Docker Compose build
-        run: docker compose build
-
-      - name: Docker Compose smoke test
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          docker compose up -d
-
-          cleanup() {
-            docker compose down
-          }
-          trap cleanup EXIT
-
-          wait_for_url() {
-            local url="$1"
-
-            for attempt in {1..30}; do
-              if curl --fail --silent "$url" > /dev/null; then
-                return 0
-              fi
-
-              sleep 1
-            done
-
-            curl --fail --silent "$url" > /dev/null
-          }
-
-          wait_for_url http://127.0.0.1:8080/health
-          wait_for_url http://127.0.0.1:5173/health
-
-          if ! curl --fail --silent http://127.0.0.1:8080/health > /tmp/assetflow-compose-api-health.json; then
-            docker compose logs inventory-api
-            exit 1
-          fi
-
-          if ! curl --fail --silent http://127.0.0.1:5173/health > /tmp/assetflow-compose-web-health.txt; then
-            docker compose logs assetflow-web
-            exit 1
-          fi
-
-          if ! curl --fail --silent http://127.0.0.1:5173/ | grep -q "AssetFlow"; then
-            docker compose logs assetflow-web
-            exit 1
-          fi
 
       - name: Docker build
         run: docker build -t inventory-api:ci .

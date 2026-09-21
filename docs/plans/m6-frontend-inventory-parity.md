@@ -66,21 +66,21 @@ The M6 UI should feel like an operational inventory tool, not a landing page or 
 
 ## Acceptance Criteria
 
-- [ ] The frontend can create, list, and inspect vendors through backend APIs.
-- [ ] The frontend can create, list, and inspect products through backend APIs, including vendor selection.
-- [ ] The frontend can create and list sales channels through backend APIs.
-- [ ] The frontend can create, list, and inspect stock items through backend APIs, including product/channel selection.
-- [ ] The frontend can create reservations and show conflict feedback when a reservation would oversell stock.
-- [ ] The frontend can list and inspect reservations with stock item and status filtering where supported.
-- [ ] The frontend can show reservation-aware availability for a stock item.
-- [ ] The frontend can release reservations and show updated availability after release.
-- [ ] The frontend can trigger reservation expiration and show expiration results.
-- [ ] Major workflows have loading, empty, validation, not-found, conflict, disabled, and success states.
-- [ ] Critical workflows are covered by focused frontend tests and a small Playwright suite.
-- [ ] Docker Compose can build and run the frontend and backend together for end-to-end workflow checks.
-- [ ] CI has one backend pipeline for .NET/API tests/backend Docker, one frontend pipeline for `src/AssetFlow.Web/**`, and one shared/integration pipeline for Compose, workflow, OpenAPI, and cross-cutting changes.
-- [ ] OpenAPI contract changes run frontend checks as well as backend or integration checks.
-- [ ] Documentation explains how each screen maps to backend endpoints and contracts.
+- [x] The frontend can create, list, and inspect vendors through backend APIs.
+- [x] The frontend can create, list, and inspect products through backend APIs, including vendor selection.
+- [x] The frontend can create and list sales channels through backend APIs.
+- [x] The frontend can create, list, and inspect stock items through backend APIs, including product/channel selection.
+- [x] The frontend can create reservations and show conflict feedback when a reservation would oversell stock.
+- [x] The frontend can list and inspect reservations with stock item and status filtering where supported.
+- [x] The frontend can show reservation-aware availability for a stock item.
+- [x] The frontend can release reservations and show updated availability after release.
+- [x] The frontend can trigger reservation expiration and show expiration results.
+- [x] Major workflows have loading, empty, validation, not-found, conflict, disabled, and success states.
+- [x] Critical workflows are covered by focused frontend tests and a small Playwright suite.
+- [x] Docker Compose can build and run the frontend and backend together for end-to-end workflow checks.
+- [x] CI has one backend pipeline for .NET/API tests/backend Docker, one frontend pipeline for `src/AssetFlow.Web/**`, and one shared/integration pipeline for Compose, workflow, OpenAPI, and cross-cutting changes.
+- [x] OpenAPI contract changes run frontend checks as well as backend or integration checks.
+- [x] Documentation explains how each screen maps to backend endpoints and contracts.
 
 ## Task Breakdown
 
@@ -188,4 +188,4 @@ Created under the `M6 - Frontend Inventory Parity` milestone:
 - [x] GitHub issue tracking matches this plan.
 - [x] Knowledge docs capture durable planned behavior.
 
-Status: Ready to start.
+Status: Implemented pending PR merge and milestone closure.
