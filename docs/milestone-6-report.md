@@ -2,7 +2,7 @@
 
 ## Status
 
-M6 is implemented pending merge of the final inventory parity branch. The milestone turns the M5 frontend shell into API-backed inventory and reservation workflows aligned with the M2/M3 backend contract.
+M6 is complete, merged, tagged, released, and closed. The milestone turns the M5 frontend shell into API-backed inventory and reservation workflows aligned with the M2/M3 backend contract.
 
 ## Implemented
 
@@ -43,9 +43,9 @@ The local shell still does not expose `node` or `npm` on `PATH`; frontend verifi
 
 ## GitHub Status
 
-- M6 tracking issues: #74 through #81.
-- #74 was completed by PR #83.
-- Remaining issues close with the final M6 implementation PR after merge.
+- M6 tracking issues: #74 through #81 are closed.
+- M6 PRs #82, #83, and #84 are merged.
+- Tag and release `v0.6.0 - M6 Frontend Inventory Parity` exist.
 - Project-board item and column mapping remains unverified from this environment.
 
 ## Known Gaps
