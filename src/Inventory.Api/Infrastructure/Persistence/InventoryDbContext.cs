@@ -1,4 +1,5 @@
 using Inventory.Api.Domain.Entities;
+using Inventory.Api.Infrastructure.ChannelSync;
 using Inventory.Api.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,8 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
     public DbSet<Reservation> Reservations => Set<Reservation>();
 
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+
+    public DbSet<ChannelSyncState> ChannelSyncStates => Set<ChannelSyncState>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -295,6 +298,82 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
                 table.HasCheckConstraint(
                     "ck_outbox_messages_status_valid",
                     "status IN ('Pending', 'Processing', 'Published', 'Failed')");
+            });
+        });
+
+        modelBuilder.Entity<ChannelSyncState>(builder =>
+        {
+            builder.ToTable("channel_sync_states");
+
+            builder.HasKey(state => state.Id);
+
+            builder.Property(state => state.Id)
+                .HasColumnName("id");
+
+            builder.Property(state => state.ChannelId)
+                .HasColumnName("channel_id")
+                .IsRequired();
+
+            builder.Property(state => state.StockItemId)
+                .HasColumnName("stock_item_id")
+                .IsRequired();
+
+            builder.Property(state => state.SourceEventId)
+                .HasColumnName("source_event_id")
+                .IsRequired();
+
+            builder.Property(state => state.AvailableQuantity)
+                .HasColumnName("available_quantity")
+                .IsRequired();
+
+            builder.Property(state => state.Status)
+                .HasColumnName("status")
+                .HasConversion<string>()
+                .HasMaxLength(32)
+                .IsRequired();
+
+            builder.Property(state => state.AttemptCount)
+                .HasColumnName("attempt_count")
+                .IsRequired();
+
+            builder.Property(state => state.LastAttemptedAtUtc)
+                .HasColumnName("last_attempted_at_utc");
+
+            builder.Property(state => state.NextAttemptAtUtc)
+                .HasColumnName("next_attempt_at_utc");
+
+            builder.Property(state => state.LastSucceededAtUtc)
+                .HasColumnName("last_succeeded_at_utc");
+
+            builder.Property(state => state.LastError)
+                .HasColumnName("last_error")
+                .HasMaxLength(2000);
+
+            builder.Property(state => state.UpdatedAtUtc)
+                .HasColumnName("updated_at_utc")
+                .IsRequired();
+
+            builder.HasIndex(state => new { state.ChannelId, state.StockItemId })
+                .IsUnique();
+
+            builder.HasIndex(state => new { state.Status, state.NextAttemptAtUtc });
+
+            builder.HasOne<SalesChannel>()
+                .WithMany()
+                .HasForeignKey(state => state.ChannelId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne<StockItem>()
+                .WithMany()
+                .HasForeignKey(state => state.StockItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.ToTable(table =>
+            {
+                table.HasCheckConstraint("ck_channel_sync_states_attempt_count_non_negative", "attempt_count >= 0");
+                table.HasCheckConstraint(
+                    "ck_channel_sync_states_status_valid",
+                    "status IN ('Pending', 'InProgress', 'Succeeded', 'Failed')");
             });
         });
     }

@@ -64,4 +64,32 @@ public sealed class OutboxMessage
     public DateTimeOffset? ProcessedAtUtc { get; private set; }
 
     public DateTimeOffset CreatedAtUtc { get; private set; }
+
+    public void MarkProcessing(DateTimeOffset attemptedAtUtc)
+    {
+        Status = OutboxMessageStatus.Processing;
+        AttemptCount++;
+        NextAttemptAtUtc = null;
+        LastError = null;
+        ProcessedAtUtc = null;
+    }
+
+    public void MarkPublished(DateTimeOffset processedAtUtc)
+    {
+        Status = OutboxMessageStatus.Published;
+        NextAttemptAtUtc = null;
+        LastError = null;
+        ProcessedAtUtc = processedAtUtc;
+    }
+
+    public void MarkFailed(
+        DateTimeOffset attemptedAtUtc,
+        string errorSummary,
+        DateTimeOffset? nextAttemptAtUtc)
+    {
+        Status = OutboxMessageStatus.Failed;
+        LastError = errorSummary;
+        NextAttemptAtUtc = nextAttemptAtUtc;
+        ProcessedAtUtc = null;
+    }
 }
