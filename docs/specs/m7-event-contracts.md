@@ -43,10 +43,38 @@ Every outbox record stores:
 - `reason`
 - `sourceMutationId`
 
-The M7 plan reserves names for `ReservationCreated`, `ReservationReleased`, `ReservationExpired`, `ChannelSyncRequested`, `ChannelSyncSucceeded`, and `ChannelSyncFailed`. Their typed payload records exist in code so follow-up slices can add producers and processors without changing the outbox foundation.
+`ReservationCreated` version 1:
+
+- `reservationId`
+- `stockItemId`
+- `quantity`
+- `expiresAtUtc`
+- `status`
+- `createdAtUtc`
+
+`ReservationReleased` version 1:
+
+- `reservationId`
+- `stockItemId`
+- `quantity`
+- `releasedAtUtc`
+- `status`
+
+`ReservationExpired` version 1:
+
+- `reservationId`
+- `stockItemId`
+- `quantity`
+- `expiredAtUtc`
+- `status`
+
+The M7 plan reserves names for `ChannelSyncRequested`, `ChannelSyncSucceeded`, and `ChannelSyncFailed`. Their typed payload records exist in code so follow-up slices can add processors without changing the outbox foundation.
 
 ## Publication Rules
 
 - Successful stock item creation writes `StockItemCreated` and an initial `StockAvailabilityChanged` event in the same persistence unit as the new stock item.
-- Validation failures, missing references, duplicate conflicts, and oversell conflicts must not create outbox records.
+- Successful reservation creation writes `ReservationCreated` and `StockAvailabilityChanged` events.
+- Successful reservation release writes `ReservationReleased` and `StockAvailabilityChanged` events. Idempotent release of an already released reservation does not duplicate events.
+- Successful reservation expiration writes one `ReservationExpired` event per expired reservation and one `StockAvailabilityChanged` event per affected stock item.
+- Validation failures, missing references, duplicate conflicts, oversell conflicts, and not-due expiration scans must not create outbox records.
 - Outbox records are broker-ready integration events. Kafka or another broker can be added later by processing pending records without moving publication into controllers or rewriting domain behavior.

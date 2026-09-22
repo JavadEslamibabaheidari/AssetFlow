@@ -54,6 +54,71 @@ public static class IntegrationEvents
                 reason,
                 sourceMutationId));
     }
+
+    public static IntegrationEvent ReservationCreated(
+        Guid reservationId,
+        Guid stockItemId,
+        int quantity,
+        DateTimeOffset expiresAtUtc,
+        string status,
+        DateTimeOffset createdAtUtc)
+    {
+        return new IntegrationEvent(
+            IntegrationEventNames.ReservationCreated,
+            1,
+            "reservation",
+            reservationId,
+            createdAtUtc,
+            new ReservationCreatedPayload(
+                reservationId,
+                stockItemId,
+                quantity,
+                expiresAtUtc,
+                status,
+                createdAtUtc));
+    }
+
+    public static IntegrationEvent ReservationReleased(
+        Guid reservationId,
+        Guid stockItemId,
+        int quantity,
+        DateTimeOffset releasedAtUtc,
+        string status)
+    {
+        return new IntegrationEvent(
+            IntegrationEventNames.ReservationReleased,
+            1,
+            "reservation",
+            reservationId,
+            releasedAtUtc,
+            new ReservationReleasedPayload(
+                reservationId,
+                stockItemId,
+                quantity,
+                releasedAtUtc,
+                status));
+    }
+
+    public static IntegrationEvent ReservationExpired(
+        Guid reservationId,
+        Guid stockItemId,
+        int quantity,
+        DateTimeOffset expiredAtUtc,
+        string status)
+    {
+        return new IntegrationEvent(
+            IntegrationEventNames.ReservationExpired,
+            1,
+            "reservation",
+            reservationId,
+            expiredAtUtc,
+            new ReservationExpiredPayload(
+                reservationId,
+                stockItemId,
+                quantity,
+                expiredAtUtc,
+                status));
+    }
 }
 
 public sealed record StockItemCreatedPayload(

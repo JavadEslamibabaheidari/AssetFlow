@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Inventory.Api.Application.Events;
 using Inventory.Api.Infrastructure.Persistence;
+using Inventory.Api.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,6 +38,59 @@ public sealed class ReservationEndpointTests
         Assert.Null(body.Reservation.ReleasedAtUtc);
         Assert.Null(body.Reservation.ExpiredAtUtc);
         Assert.Equal($"/reservations/{body.Reservation.Id}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task CreateReservation_WhenSuccessful_WritesReservationAndAvailabilityEvents()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-115", "EVENTS-CREATE", 10);
+        await ClearOutboxMessagesAsync(factory);
+        var expiresAtUtc = DateTimeOffset.UtcNow.AddHours(1);
+
+        var response = await client.PostAsJsonAsync(
+            "/reservations",
+            new CreateReservationRequest(stockItem.Id, 3, expiresAtUtc));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<ReservationResponse>();
+        Assert.NotNull(body);
+
+        var messages = await ReadOutboxMessagesAsync(factory);
+        Assert.Collection(
+            messages.OrderBy(message => message.EventType),
+            message =>
+            {
+                Assert.Equal(IntegrationEventNames.ReservationCreated, message.EventType);
+                Assert.Equal("reservation", message.AggregateType);
+                Assert.Equal(body.Reservation.Id, message.AggregateId);
+                AssertOutboxDefaults(message);
+
+                using var payload = JsonDocument.Parse(message.PayloadJson);
+                Assert.Equal(body.Reservation.Id, payload.RootElement.GetProperty("reservationId").GetGuid());
+                Assert.Equal(stockItem.Id, payload.RootElement.GetProperty("stockItemId").GetGuid());
+                Assert.Equal(3, payload.RootElement.GetProperty("quantity").GetInt32());
+                Assert.Equal("Active", payload.RootElement.GetProperty("status").GetString());
+            },
+            message =>
+            {
+                Assert.Equal(IntegrationEventNames.StockAvailabilityChanged, message.EventType);
+                Assert.Equal("stockItem", message.AggregateType);
+                Assert.Equal(stockItem.Id, message.AggregateId);
+                AssertOutboxDefaults(message);
+
+                using var payload = JsonDocument.Parse(message.PayloadJson);
+                Assert.Equal(stockItem.Id, payload.RootElement.GetProperty("stockItemId").GetGuid());
+                Assert.Equal(stockItem.ProductId, payload.RootElement.GetProperty("productId").GetGuid());
+                Assert.Equal(stockItem.ChannelId, payload.RootElement.GetProperty("channelId").GetGuid());
+                Assert.Equal(10, payload.RootElement.GetProperty("onHandQuantity").GetInt32());
+                Assert.Equal(3, payload.RootElement.GetProperty("reservedQuantity").GetInt32());
+                Assert.Equal(7, payload.RootElement.GetProperty("availableQuantity").GetInt32());
+                Assert.Equal(IntegrationEventNames.ReservationCreated, payload.RootElement.GetProperty("reason").GetString());
+                Assert.Equal(body.Reservation.Id, payload.RootElement.GetProperty("sourceMutationId").GetGuid());
+            });
     }
 
     [Fact]
@@ -109,6 +164,8 @@ public sealed class ReservationEndpointTests
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         await AssertProblemCodeAsync(response, "stockItem.notFound");
+
+        Assert.Empty(await ReadOutboxMessagesAsync(factory));
     }
 
     [Fact]
@@ -124,6 +181,8 @@ public sealed class ReservationEndpointTests
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         await AssertProblemCodeAsync(response, "reservation.quantityNotPositive");
+
+        Assert.Equal(2, (await ReadOutboxMessagesAsync(factory)).Count);
     }
 
     [Fact]
@@ -139,6 +198,8 @@ public sealed class ReservationEndpointTests
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         await AssertProblemCodeAsync(response, "reservation.expirationNotFuture");
+
+        Assert.Equal(2, (await ReadOutboxMessagesAsync(factory)).Count);
     }
 
     [Fact]
@@ -149,6 +210,7 @@ public sealed class ReservationEndpointTests
         var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-106", "MARKET", 3);
 
         await CreateReservationAsync(client, stockItem.Id, 2);
+        await ClearOutboxMessagesAsync(factory);
 
         var response = await client.PostAsJsonAsync(
             "/reservations",
@@ -156,6 +218,7 @@ public sealed class ReservationEndpointTests
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         await AssertProblemCodeAsync(response, "reservation.insufficientAvailability");
+        Assert.Empty(await ReadOutboxMessagesAsync(factory));
     }
 
     [Fact]
@@ -192,6 +255,48 @@ public sealed class ReservationEndpointTests
     }
 
     [Fact]
+    public async Task ReleaseReservation_WhenActive_WritesReleasedAndAvailabilityEvents()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-116", "EVENTS-RELEASE", 5);
+        var created = await CreateReservationAsync(client, stockItem.Id, 2);
+        await ClearOutboxMessagesAsync(factory);
+
+        var response = await client.PostAsync($"/reservations/{created.Id}/release", content: null);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var messages = await ReadOutboxMessagesAsync(factory);
+        Assert.Collection(
+            messages.OrderBy(message => message.EventType),
+            message =>
+            {
+                Assert.Equal(IntegrationEventNames.ReservationReleased, message.EventType);
+                Assert.Equal(created.Id, message.AggregateId);
+                AssertOutboxDefaults(message);
+
+                using var payload = JsonDocument.Parse(message.PayloadJson);
+                Assert.Equal(created.Id, payload.RootElement.GetProperty("reservationId").GetGuid());
+                Assert.Equal(stockItem.Id, payload.RootElement.GetProperty("stockItemId").GetGuid());
+                Assert.Equal(2, payload.RootElement.GetProperty("quantity").GetInt32());
+                Assert.Equal("Released", payload.RootElement.GetProperty("status").GetString());
+            },
+            message =>
+            {
+                Assert.Equal(IntegrationEventNames.StockAvailabilityChanged, message.EventType);
+                Assert.Equal(stockItem.Id, message.AggregateId);
+                AssertOutboxDefaults(message);
+
+                using var payload = JsonDocument.Parse(message.PayloadJson);
+                Assert.Equal(0, payload.RootElement.GetProperty("reservedQuantity").GetInt32());
+                Assert.Equal(5, payload.RootElement.GetProperty("availableQuantity").GetInt32());
+                Assert.Equal(IntegrationEventNames.ReservationReleased, payload.RootElement.GetProperty("reason").GetString());
+                Assert.Equal(created.Id, payload.RootElement.GetProperty("sourceMutationId").GetGuid());
+            });
+    }
+
+    [Fact]
     public async Task ReleaseReservation_WhenAlreadyReleased_IsIdempotent()
     {
         await using var factory = new TestInventoryApiFactory();
@@ -217,6 +322,23 @@ public sealed class ReservationEndpointTests
     }
 
     [Fact]
+    public async Task ReleaseReservation_WhenAlreadyReleased_DoesNotWriteOutboxEvents()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-117", "EVENTS-RELEASE-IDEMPOTENT", 5);
+        var created = await CreateReservationAsync(client, stockItem.Id, 2);
+        var firstResponse = await client.PostAsync($"/reservations/{created.Id}/release", content: null);
+        firstResponse.EnsureSuccessStatusCode();
+        await ClearOutboxMessagesAsync(factory);
+
+        var secondResponse = await client.PostAsync($"/reservations/{created.Id}/release", content: null);
+
+        Assert.Equal(HttpStatusCode.OK, secondResponse.StatusCode);
+        Assert.Empty(await ReadOutboxMessagesAsync(factory));
+    }
+
+    [Fact]
     public async Task ReleaseReservation_WhenExpired_ReturnsConflictProblem()
     {
         await using var factory = new TestInventoryApiFactory();
@@ -229,6 +351,7 @@ public sealed class ReservationEndpointTests
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         await AssertProblemCodeAsync(response, "reservation.alreadyExpired");
+        Assert.Equal(4, (await ReadOutboxMessagesAsync(factory)).Count);
     }
 
     [Fact]
@@ -241,6 +364,7 @@ public sealed class ReservationEndpointTests
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         await AssertProblemCodeAsync(response, "reservation.notFound");
+        Assert.Empty(await ReadOutboxMessagesAsync(factory));
     }
 
     [Fact]
@@ -289,6 +413,51 @@ public sealed class ReservationEndpointTests
     }
 
     [Fact]
+    public async Task ExpireReservations_WhenReservationIsDue_WritesExpiredAndAvailabilityEvents()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var stockItem = await CreateStockItemWithProductAndChannelAsync(client, "RES-118", "EVENTS-EXPIRE", 5);
+        var expiresAtUtc = DateTimeOffset.UtcNow.AddMinutes(10);
+        var created = await CreateReservationAsync(client, stockItem.Id, 2, expiresAtUtc);
+        await ClearOutboxMessagesAsync(factory);
+
+        var response = await client.PostAsJsonAsync(
+            "/reservations/expire",
+            new ExpireReservationsRequest(expiresAtUtc.AddMinutes(1)));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var messages = await ReadOutboxMessagesAsync(factory);
+        Assert.Collection(
+            messages.OrderBy(message => message.EventType),
+            message =>
+            {
+                Assert.Equal(IntegrationEventNames.ReservationExpired, message.EventType);
+                Assert.Equal(created.Id, message.AggregateId);
+                AssertOutboxDefaults(message);
+
+                using var payload = JsonDocument.Parse(message.PayloadJson);
+                Assert.Equal(created.Id, payload.RootElement.GetProperty("reservationId").GetGuid());
+                Assert.Equal(stockItem.Id, payload.RootElement.GetProperty("stockItemId").GetGuid());
+                Assert.Equal(2, payload.RootElement.GetProperty("quantity").GetInt32());
+                Assert.Equal("Expired", payload.RootElement.GetProperty("status").GetString());
+            },
+            message =>
+            {
+                Assert.Equal(IntegrationEventNames.StockAvailabilityChanged, message.EventType);
+                Assert.Equal(stockItem.Id, message.AggregateId);
+                AssertOutboxDefaults(message);
+
+                using var payload = JsonDocument.Parse(message.PayloadJson);
+                Assert.Equal(0, payload.RootElement.GetProperty("reservedQuantity").GetInt32());
+                Assert.Equal(5, payload.RootElement.GetProperty("availableQuantity").GetInt32());
+                Assert.Equal(IntegrationEventNames.ReservationExpired, payload.RootElement.GetProperty("reason").GetString());
+                Assert.Equal(created.Id, payload.RootElement.GetProperty("sourceMutationId").GetGuid());
+            });
+    }
+
+    [Fact]
     public async Task ExpireReservations_WithoutBody_ReturnsOk()
     {
         await using var factory = new TestInventoryApiFactory();
@@ -303,6 +472,7 @@ public sealed class ReservationEndpointTests
         Assert.NotNull(body);
         Assert.Equal(0, body.ExpiredCount);
         Assert.Empty(body.Items);
+        Assert.Empty(await ReadOutboxMessagesAsync(factory));
     }
 
     [Fact]
@@ -330,6 +500,7 @@ public sealed class ReservationEndpointTests
         Assert.NotNull(body);
         Assert.Equal(0, body.ExpiredCount);
         Assert.Empty(body.Items);
+        Assert.Equal(10, (await ReadOutboxMessagesAsync(factory)).Count);
 
         var notDueResponse = await client.GetAsync($"/reservations/{notDue.Id}");
         var notDueBody = await notDueResponse.Content.ReadFromJsonAsync<ReservationResponse>();
@@ -538,6 +709,36 @@ public sealed class ReservationEndpointTests
 
         reservation.Expire(DateTimeOffset.UtcNow);
         await dbContext.SaveChangesAsync();
+    }
+
+    private static async Task<IReadOnlyList<OutboxMessage>> ReadOutboxMessagesAsync(
+        TestInventoryApiFactory factory)
+    {
+        using var scope = factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+
+        return await dbContext.OutboxMessages
+            .OrderBy(message => message.CreatedAtUtc)
+            .ToArrayAsync();
+    }
+
+    private static async Task ClearOutboxMessagesAsync(TestInventoryApiFactory factory)
+    {
+        using var scope = factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+
+        dbContext.OutboxMessages.RemoveRange(dbContext.OutboxMessages);
+        await dbContext.SaveChangesAsync();
+    }
+
+    private static void AssertOutboxDefaults(OutboxMessage message)
+    {
+        Assert.Equal(1, message.SchemaVersion);
+        Assert.Equal(OutboxMessageStatus.Pending, message.Status);
+        Assert.Equal(0, message.AttemptCount);
+        Assert.Null(message.NextAttemptAtUtc);
+        Assert.Null(message.LastError);
+        Assert.Null(message.ProcessedAtUtc);
     }
 
     private sealed record CreateVendorRequest(string Name);

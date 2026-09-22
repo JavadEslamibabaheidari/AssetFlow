@@ -1,4 +1,5 @@
 using Inventory.Api.Application.Availability;
+using Inventory.Api.Application.Events;
 using Inventory.Api.Domain.Entities;
 using Inventory.Api.Infrastructure.Persistence;
 using MediatR;
@@ -6,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Api.Application.Reservations.ExpireReservations;
 
-public sealed class ExpireReservationsCommandHandler(InventoryDbContext dbContext)
+public sealed class ExpireReservationsCommandHandler(
+    InventoryDbContext dbContext,
+    IIntegrationEventOutbox outbox)
     : IRequestHandler<ExpireReservationsCommand, ExpireReservationsDto>
 {
     public async Task<ExpireReservationsDto> Handle(
@@ -36,13 +39,42 @@ public sealed class ExpireReservationsCommandHandler(InventoryDbContext dbContex
         {
             await dbContext.SaveChangesAsync(cancellationToken);
 
+            foreach (var reservation in dueReservations)
+            {
+                outbox.Enqueue(IntegrationEvents.ReservationExpired(
+                    reservation.Id,
+                    reservation.StockItemId,
+                    reservation.Quantity,
+                    cutoffUtc,
+                    reservation.Status.ToString()));
+            }
+
             foreach (var stockItemId in dueReservations.Select(reservation => reservation.StockItemId).Distinct())
             {
-                await StockItemAvailabilityStore.RecalculateAsync(
+                var recalculatedAvailability = await StockItemAvailabilityStore.RecalculateAsync(
                     dbContext,
                     stockItemId,
                     cutoffUtc,
                     cancellationToken);
+                if (recalculatedAvailability is not null)
+                {
+                    var sourceReservationId = dueReservations
+                        .Where(reservation => reservation.StockItemId == stockItemId)
+                        .OrderBy(reservation => reservation.ExpiresAtUtc)
+                        .Select(reservation => reservation.Id)
+                        .First();
+                    outbox.Enqueue(IntegrationEvents.StockAvailabilityChanged(
+                        recalculatedAvailability.StockItemId,
+                        recalculatedAvailability.ProductId,
+                        recalculatedAvailability.ChannelId,
+                        recalculatedAvailability.OnHandQuantity,
+                        recalculatedAvailability.ReservedQuantity,
+                        recalculatedAvailability.AvailableQuantity,
+                        recalculatedAvailability.NextExpirationUtc,
+                        IntegrationEventNames.ReservationExpired,
+                        sourceReservationId,
+                        cutoffUtc));
+                }
             }
 
             await dbContext.SaveChangesAsync(cancellationToken);
