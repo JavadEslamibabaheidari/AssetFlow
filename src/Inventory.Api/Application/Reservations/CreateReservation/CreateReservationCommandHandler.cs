@@ -1,5 +1,6 @@
 using Inventory.Api.Application.Availability;
 using Inventory.Api.Application.Common;
+using Inventory.Api.Application.Events;
 using Inventory.Api.Domain.Entities;
 using Inventory.Api.Infrastructure.Persistence;
 using MediatR;
@@ -7,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Api.Application.Reservations.CreateReservation;
 
-public sealed class CreateReservationCommandHandler(InventoryDbContext dbContext)
+public sealed class CreateReservationCommandHandler(
+    InventoryDbContext dbContext,
+    IIntegrationEventOutbox outbox)
     : IRequestHandler<CreateReservationCommand, ApplicationResult<ReservationDto>>
 {
     public async Task<ApplicationResult<ReservationDto>> Handle(
@@ -85,11 +88,33 @@ public sealed class CreateReservationCommandHandler(InventoryDbContext dbContext
         dbContext.Reservations.Add(reservation);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        await StockItemAvailabilityStore.RecalculateAsync(
+        var recalculatedAvailability = await StockItemAvailabilityStore.RecalculateAsync(
             dbContext,
             request.StockItemId,
             nowUtc,
             cancellationToken);
+        outbox.Enqueue(IntegrationEvents.ReservationCreated(
+            reservation.Id,
+            reservation.StockItemId,
+            reservation.Quantity,
+            reservation.ExpiresAtUtc,
+            reservation.Status.ToString(),
+            reservation.CreatedAtUtc));
+        if (recalculatedAvailability is not null)
+        {
+            outbox.Enqueue(IntegrationEvents.StockAvailabilityChanged(
+                recalculatedAvailability.StockItemId,
+                recalculatedAvailability.ProductId,
+                recalculatedAvailability.ChannelId,
+                recalculatedAvailability.OnHandQuantity,
+                recalculatedAvailability.ReservedQuantity,
+                recalculatedAvailability.AvailableQuantity,
+                recalculatedAvailability.NextExpirationUtc,
+                IntegrationEventNames.ReservationCreated,
+                reservation.Id,
+                nowUtc));
+        }
+
         await dbContext.SaveChangesAsync(cancellationToken);
         await stockItemLock.CommitAsync(cancellationToken);
 

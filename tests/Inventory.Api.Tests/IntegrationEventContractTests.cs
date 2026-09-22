@@ -85,4 +85,51 @@ public sealed class IntegrationEventContractTests
         Assert.Equal("ChannelSyncSucceeded", IntegrationEventNames.ChannelSyncSucceeded);
         Assert.Equal("ChannelSyncFailed", IntegrationEventNames.ChannelSyncFailed);
     }
+
+    [Fact]
+    public void ReservationLifecycleEvents_UseStableEnvelopeAndPayloads()
+    {
+        var reservationId = Guid.NewGuid();
+        var stockItemId = Guid.NewGuid();
+        var createdAtUtc = DateTimeOffset.UtcNow;
+        var expiresAtUtc = createdAtUtc.AddMinutes(20);
+
+        var createdEvent = IntegrationEvents.ReservationCreated(
+            reservationId,
+            stockItemId,
+            4,
+            expiresAtUtc,
+            "Active",
+            createdAtUtc);
+        var releasedEvent = IntegrationEvents.ReservationReleased(
+            reservationId,
+            stockItemId,
+            4,
+            createdAtUtc.AddMinutes(5),
+            "Released");
+        var expiredEvent = IntegrationEvents.ReservationExpired(
+            reservationId,
+            stockItemId,
+            4,
+            expiresAtUtc,
+            "Expired");
+
+        Assert.Equal(IntegrationEventNames.ReservationCreated, createdEvent.EventType);
+        Assert.Equal(1, createdEvent.SchemaVersion);
+        Assert.Equal("reservation", createdEvent.AggregateType);
+        Assert.Equal(reservationId, createdEvent.AggregateId);
+        var createdPayload = Assert.IsType<ReservationCreatedPayload>(createdEvent.Payload);
+        Assert.Equal(expiresAtUtc, createdPayload.ExpiresAtUtc);
+        Assert.Equal("Active", createdPayload.Status);
+
+        Assert.Equal(IntegrationEventNames.ReservationReleased, releasedEvent.EventType);
+        Assert.Equal("reservation", releasedEvent.AggregateType);
+        var releasedPayload = Assert.IsType<ReservationReleasedPayload>(releasedEvent.Payload);
+        Assert.Equal("Released", releasedPayload.Status);
+
+        Assert.Equal(IntegrationEventNames.ReservationExpired, expiredEvent.EventType);
+        Assert.Equal("reservation", expiredEvent.AggregateType);
+        var expiredPayload = Assert.IsType<ReservationExpiredPayload>(expiredEvent.Payload);
+        Assert.Equal("Expired", expiredPayload.Status);
+    }
 }

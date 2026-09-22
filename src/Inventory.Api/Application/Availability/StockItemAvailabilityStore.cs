@@ -5,7 +5,7 @@ namespace Inventory.Api.Application.Availability;
 
 public static class StockItemAvailabilityStore
 {
-    public static async Task RecalculateAsync(
+    public static async Task<StockItemAvailabilitySnapshot?> RecalculateAsync(
         InventoryDbContext dbContext,
         Guid stockItemId,
         DateTimeOffset nowUtc,
@@ -16,7 +16,7 @@ public static class StockItemAvailabilityStore
 
         if (stockItem is null)
         {
-            return;
+            return null;
         }
 
         var reservations = await dbContext.Reservations
@@ -35,5 +35,23 @@ public static class StockItemAvailabilityStore
             nowUtc);
 
         stockItem.UpdateAvailableQuantity(availability.AvailableQuantity, nowUtc);
+
+        return new StockItemAvailabilitySnapshot(
+            stockItem.Id,
+            stockItem.ProductId,
+            stockItem.ChannelId,
+            stockItem.OnHandQuantity,
+            availability.ReservedQuantity,
+            availability.AvailableQuantity,
+            availability.NextExpirationUtc);
     }
 }
+
+public sealed record StockItemAvailabilitySnapshot(
+    Guid StockItemId,
+    Guid ProductId,
+    Guid ChannelId,
+    int OnHandQuantity,
+    int ReservedQuantity,
+    int AvailableQuantity,
+    DateTimeOffset? NextExpirationUtc);

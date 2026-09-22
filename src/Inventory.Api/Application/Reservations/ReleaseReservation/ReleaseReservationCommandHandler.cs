@@ -1,5 +1,6 @@
 using Inventory.Api.Application.Availability;
 using Inventory.Api.Application.Common;
+using Inventory.Api.Application.Events;
 using Inventory.Api.Domain.Entities;
 using Inventory.Api.Infrastructure.Persistence;
 using MediatR;
@@ -7,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Api.Application.Reservations.ReleaseReservation;
 
-public sealed class ReleaseReservationCommandHandler(InventoryDbContext dbContext)
+public sealed class ReleaseReservationCommandHandler(
+    InventoryDbContext dbContext,
+    IIntegrationEventOutbox outbox)
     : IRequestHandler<ReleaseReservationCommand, ApplicationResult<ReservationDto>>
 {
     public async Task<ApplicationResult<ReservationDto>> Handle(
@@ -36,16 +39,38 @@ public sealed class ReleaseReservationCommandHandler(InventoryDbContext dbContex
             [reservation.StockItemId],
             cancellationToken);
 
-        var changed = reservation.Release(DateTimeOffset.UtcNow);
+        var releasedAtUtc = DateTimeOffset.UtcNow;
+        var changed = reservation.Release(releasedAtUtc);
 
         if (changed)
         {
             await dbContext.SaveChangesAsync(cancellationToken);
-            await StockItemAvailabilityStore.RecalculateAsync(
+            var recalculatedAvailability = await StockItemAvailabilityStore.RecalculateAsync(
                 dbContext,
                 reservation.StockItemId,
-                DateTimeOffset.UtcNow,
+                releasedAtUtc,
                 cancellationToken);
+            outbox.Enqueue(IntegrationEvents.ReservationReleased(
+                reservation.Id,
+                reservation.StockItemId,
+                reservation.Quantity,
+                releasedAtUtc,
+                reservation.Status.ToString()));
+            if (recalculatedAvailability is not null)
+            {
+                outbox.Enqueue(IntegrationEvents.StockAvailabilityChanged(
+                    recalculatedAvailability.StockItemId,
+                    recalculatedAvailability.ProductId,
+                    recalculatedAvailability.ChannelId,
+                    recalculatedAvailability.OnHandQuantity,
+                    recalculatedAvailability.ReservedQuantity,
+                    recalculatedAvailability.AvailableQuantity,
+                    recalculatedAvailability.NextExpirationUtc,
+                    IntegrationEventNames.ReservationReleased,
+                    reservation.Id,
+                    releasedAtUtc));
+            }
+
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
