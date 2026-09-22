@@ -116,4 +116,20 @@ describe("InventoryApiClient", () => {
       })
     );
   });
+
+  it("reads channel sync statuses from the operations endpoint", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      createJsonResponse({
+        items: []
+      })
+    );
+    const client = new InventoryApiClient(new ApiHttpClient("http://localhost:8080", fetcher));
+
+    await client.listChannelSyncStatuses();
+
+    expect(fetcher).toHaveBeenCalledWith(
+      "http://localhost:8080/channel-sync/status",
+      expect.objectContaining({ method: "GET" })
+    );
+  });
 });

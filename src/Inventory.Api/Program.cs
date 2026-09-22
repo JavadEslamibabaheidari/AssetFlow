@@ -1,3 +1,4 @@
+using Inventory.Api.Api.ChannelSync;
 using Inventory.Api.Api.Channels;
 using Inventory.Api.Api.Products;
 using Inventory.Api.Api.Reservations;
@@ -31,6 +32,7 @@ app.MapGet("/health", () => Results.Ok(new
 app.MapVendorEndpoints();
 app.MapProductEndpoints();
 app.MapChannelEndpoints();
+app.MapChannelSyncEndpoints();
 app.MapStockItemEndpoints();
 app.MapReservationEndpoints();
 
