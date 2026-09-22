@@ -1,0 +1,6 @@
+interface:
+  display_name: "AssetFlow GitHub Status"
+  short_description: "Sync GitHub issues, milestones, and status"
+  default_prompt: "Use $assetflow-github-status to inspect or update AssetFlow GitHub tracking and local status docs."
+policy:
+  allow_implicit_invocation: true
