@@ -160,10 +160,37 @@ a:focus-visible {
   padding: 7px 10px;
   border: 1px solid var(--af-color-line);
   border-radius: 999px;
-  color: #33404c;
-  background: var(--af-color-surface);
   font-size: var(--af-text-sm);
   white-space: nowrap;
+}
+
+.status-badge-neutral {
+  color: #33404c;
+  background: var(--af-color-surface);
+}
+
+.status-badge-success {
+  color: #20583b;
+  background: #edf8f1;
+  border-color: #b9e4c8;
+}
+
+.status-badge-warning {
+  color: #75550f;
+  background: #fff6db;
+  border-color: #f1d58a;
+}
+
+.status-badge-danger {
+  color: #8a2b2b;
+  background: #fff0ee;
+  border-color: #efb8af;
+}
+
+.table-note {
+  margin-top: 4px;
+  color: var(--af-color-text-muted);
+  font-size: var(--af-text-sm);
 }
 
 .content {

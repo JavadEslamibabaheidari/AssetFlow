@@ -20,6 +20,8 @@ tags:
     description: Physical or logical inventory quantities for products.
   - name: Reservations
     description: Temporary stock holds that reduce availability until released or expired.
+  - name: ChannelSync
+    description: Channel synchronization status and retry visibility.
 paths:
   /vendors:
     get:
@@ -405,6 +407,23 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
+  /channel-sync/status:
+    get:
+      tags:
+        - ChannelSync
+      operationId: listChannelSyncStatuses
+      summary: List channel synchronization statuses.
+      description: Returns the latest synchronization state for channel and stock item pairs.
+      responses:
+        "200":
+          description: Channel synchronization statuses returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChannelSyncStatusListResponse"
+              examples:
+                syncStatuses:
+                  $ref: "#/components/examples/ChannelSyncStatusListExample"
 components:
   parameters:
     VendorId:
@@ -801,6 +820,80 @@ components:
       properties:
         availability:
           $ref: "#/components/schemas/StockItemAvailability"
+    ChannelSyncStatusValue:
+      type: string
+      enum:
+        - Pending
+        - InProgress
+        - Succeeded
+        - Failed
+    ChannelSyncStatus:
+      type: object
+      required:
+        - id
+        - channelId
+        - stockItemId
+        - sourceEventId
+        - availableQuantity
+        - status
+        - attemptCount
+        - lastAttemptedAtUtc
+        - nextAttemptAtUtc
+        - lastSucceededAtUtc
+        - lastError
+        - updatedAtUtc
+      properties:
+        id:
+          type: string
+          format: uuid
+        channelId:
+          type: string
+          format: uuid
+        stockItemId:
+          type: string
+          format: uuid
+        sourceEventId:
+          type: string
+          format: uuid
+        availableQuantity:
+          type: integer
+          minimum: 0
+        status:
+          $ref: "#/components/schemas/ChannelSyncStatusValue"
+        attemptCount:
+          type: integer
+          minimum: 0
+        lastAttemptedAtUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+        nextAttemptAtUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+        lastSucceededAtUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+        lastError:
+          type:
+            - string
+            - "null"
+        updatedAtUtc:
+          type: string
+          format: date-time
+    ChannelSyncStatusListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChannelSyncStatus"
     ProblemDetails:
       type: object
       required:
@@ -901,6 +994,22 @@ components:
           reservedQuantity: 2
           availableQuantity: 8
           nextExpirationUtc: "2026-09-19T15:30:00Z"
+    ChannelSyncStatusListExample:
+      summary: Channel sync status list
+      value:
+        items:
+          - id: "d565070d-204e-4c1a-a525-88c7a0830f67"
+            channelId: "9e67a6fa-c3cd-493e-84f9-4335794bce63"
+            stockItemId: "0b8f2e32-2335-4e20-b5ce-6ab7df8f05ad"
+            sourceEventId: "48461540-0aa6-46d7-9e92-b1e4c33f4fa1"
+            availableQuantity: 8
+            status: Failed
+            attemptCount: 1
+            lastAttemptedAtUtc: "2026-09-22T18:40:00Z"
+            nextAttemptAtUtc: "2026-09-22T18:45:00Z"
+            lastSucceededAtUtc: null
+            lastError: "Marketplace unavailable"
+            updatedAtUtc: "2026-09-22T18:40:00Z"
 x-edge-cases:
   - Duplicate vendor names should return 409 Conflict.
   - Duplicate product SKUs for the same vendor should return 409 Conflict.

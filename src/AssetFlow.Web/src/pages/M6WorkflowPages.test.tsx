@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { InventoryPage } from "./InventoryPage";
+import { OperationsPage } from "./OperationsPage";
 import { ReservationsPage } from "./ReservationsPage";
 
 const inventoryApiClientMock = vi.hoisted(() => ({
@@ -11,6 +12,7 @@ const inventoryApiClientMock = vi.hoisted(() => ({
   listProducts: vi.fn(),
   createProduct: vi.fn(),
   listChannels: vi.fn(),
+  listChannelSyncStatuses: vi.fn(),
   createChannel: vi.fn(),
   listStockItems: vi.fn(),
   createStockItem: vi.fn(),
@@ -86,6 +88,24 @@ describe("M6 workflow pages", () => {
     inventoryApiClientMock.listVendors.mockResolvedValue({ items: [vendor] });
     inventoryApiClientMock.listProducts.mockResolvedValue({ items: [product] });
     inventoryApiClientMock.listChannels.mockResolvedValue({ items: [channel] });
+    inventoryApiClientMock.listChannelSyncStatuses.mockResolvedValue({
+      items: [
+        {
+          id: "sync-1",
+          channelId: "channel-1",
+          stockItemId: "stock-1",
+          sourceEventId: "event-1",
+          availableQuantity: 8,
+          status: "Failed",
+          attemptCount: 2,
+          lastAttemptedAtUtc: "2026-09-21T09:05:00Z",
+          nextAttemptAtUtc: "2026-09-21T09:10:00Z",
+          lastSucceededAtUtc: null,
+          lastError: "Marketplace unavailable",
+          updatedAtUtc: "2026-09-21T09:05:00Z"
+        }
+      ]
+    });
     inventoryApiClientMock.listStockItems.mockResolvedValue({ items: [stockItem] });
     inventoryApiClientMock.getStockItem.mockResolvedValue({ stockItem });
     inventoryApiClientMock.getStockItemAvailability.mockResolvedValue({
@@ -134,5 +154,30 @@ describe("M6 workflow pages", () => {
     await waitFor(() => {
       expect(inventoryApiClientMock.releaseReservation).toHaveBeenCalledWith("reservation-1");
     });
+  });
+
+  it("shows operations sync health from backend status", async () => {
+    renderWithQueryClient(<OperationsPage />);
+
+    expect(await screen.findByText("Channel synchronization")).toBeVisible();
+    expect(await screen.findByText("AMAZON")).toBeVisible();
+    expect(await screen.findByText("Failed")).toBeVisible();
+    expect(await screen.findByText("Marketplace unavailable")).toBeVisible();
+    expect(screen.getByText("8")).toBeVisible();
+    expect(screen.getByText("2")).toBeVisible();
+
+    await waitFor(() => {
+      expect(inventoryApiClientMock.listChannelSyncStatuses).toHaveBeenCalled();
+    });
+  });
+
+  it("shows channels with no sync state as not synced", async () => {
+    inventoryApiClientMock.listChannelSyncStatuses.mockResolvedValue({ items: [] });
+
+    renderWithQueryClient(<OperationsPage />);
+
+    expect(await screen.findByText("No sync yet")).toBeVisible();
+    expect(await screen.findByText("Not synced")).toBeVisible();
+    expect(await screen.findByText("None scheduled")).toBeVisible();
   });
 });

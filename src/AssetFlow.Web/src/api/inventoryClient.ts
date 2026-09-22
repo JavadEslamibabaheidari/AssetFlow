@@ -78,6 +78,12 @@ export class InventoryApiClient {
     return this.http.request("/channels", { method: "POST", body, signal });
   }
 
+  public listChannelSyncStatuses(
+    signal?: AbortSignal
+  ): Promise<InventoryApiResponse<"listChannelSyncStatuses", 200>> {
+    return this.http.request("/channel-sync/status", { signal });
+  }
+
   public listStockItems(
     query: ListStockItemsQuery = {},
     signal?: AbortSignal

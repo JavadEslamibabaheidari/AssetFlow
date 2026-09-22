@@ -103,6 +103,8 @@ M7 issue #87 publishes reservation and availability events from M3 workflows. Su
 
 M7 issue #89 adds the first channel synchronization worker path. `ChannelSynchronizationProcessor` reads due `StockAvailabilityChanged` outbox records, sends channel/stock/available quantity work to `IChannelAvailabilitySyncAdapter`, marks source messages `Published` on success, records retryable failures with `next_attempt_at_utc`, and upserts `channel_sync_states` for later Operations visibility. The default `NoOpChannelAvailabilitySyncAdapter` succeeds without live provider calls; real adapters should replace that interface in future provider-specific work. `docs/specs/m7-channel-sync-worker.md` documents the processing path, persisted state, idempotency, and retry behavior.
 
+M7 issue #88 exposes backend-backed synchronization visibility. `GET /channel-sync/status` returns the latest persisted `channel_sync_states` rows, and `contracts/openapi/inventory-api.yaml` plus the generated frontend client include `listChannelSyncStatuses`. The Operations page now reads channel master data and sync status together, showing failed/retryable, succeeded, pending/in-progress, and no-sync states from backend data. Manual retry controls remain absent because M7 has automatic retry scheduling but no explicit retry command yet.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, dependency-injected application boundaries inside each service, and event-driven synchronization when the product need justifies it.

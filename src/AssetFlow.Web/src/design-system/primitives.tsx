@@ -58,10 +58,11 @@ export function InfoPanel({ title, children }: InfoPanelProps) {
 
 type StatusBadgeProps = {
   children: ReactNode;
+  tone?: "neutral" | "success" | "warning" | "danger";
 };
 
-export function StatusBadge({ children }: StatusBadgeProps) {
-  return <span className="status-badge">{children}</span>;
+export function StatusBadge({ children, tone = "neutral" }: StatusBadgeProps) {
+  return <span className={`status-badge status-badge-${tone}`}>{children}</span>;
 }
 
 type DefinitionListProps = {

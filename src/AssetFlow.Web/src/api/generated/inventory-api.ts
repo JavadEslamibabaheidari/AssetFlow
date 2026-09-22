@@ -276,6 +276,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/channel-sync/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List channel synchronization statuses.
+         * @description Returns the latest synchronization state for channel and stock item pairs.
+         */
+        get: operations["listChannelSyncStatuses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -416,6 +436,33 @@ export interface components {
         };
         StockItemAvailabilityResponse: {
             availability: components["schemas"]["StockItemAvailability"];
+        };
+        /** @enum {string} */
+        ChannelSyncStatusValue: "Pending" | "InProgress" | "Succeeded" | "Failed";
+        ChannelSyncStatus: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            channelId: string;
+            /** Format: uuid */
+            stockItemId: string;
+            /** Format: uuid */
+            sourceEventId: string;
+            availableQuantity: number;
+            status: components["schemas"]["ChannelSyncStatusValue"];
+            attemptCount: number;
+            /** Format: date-time */
+            lastAttemptedAtUtc: string | null;
+            /** Format: date-time */
+            nextAttemptAtUtc: string | null;
+            /** Format: date-time */
+            lastSucceededAtUtc: string | null;
+            lastError: string | null;
+            /** Format: date-time */
+            updatedAtUtc: string;
+        };
+        ChannelSyncStatusListResponse: {
+            items: components["schemas"]["ChannelSyncStatus"][];
         };
         ProblemDetails: {
             /** Format: uri */
@@ -872,6 +919,26 @@ export interface operations {
             };
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+        };
+    };
+    listChannelSyncStatuses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Channel synchronization statuses returned. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelSyncStatusListResponse"];
+                };
+            };
         };
     };
 }
