@@ -1,4 +1,5 @@
 using Inventory.Api.Domain.Entities;
+using Inventory.Api.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Api.Infrastructure.Persistence;
@@ -15,6 +16,8 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
     public DbSet<StockItem> StockItems => Set<StockItem>();
 
     public DbSet<Reservation> Reservations => Set<Reservation>();
+
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -218,6 +221,80 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
                 table.HasCheckConstraint(
                     "ck_reservations_expired_at_matches_status",
                     "(status = 'Expired' AND expired_at_utc IS NOT NULL) OR (status <> 'Expired' AND expired_at_utc IS NULL)");
+            });
+        });
+
+        modelBuilder.Entity<OutboxMessage>(builder =>
+        {
+            builder.ToTable("outbox_messages");
+
+            builder.HasKey(message => message.Id);
+
+            builder.Property(message => message.Id)
+                .HasColumnName("id");
+
+            builder.Property(message => message.EventType)
+                .HasColumnName("event_type")
+                .HasMaxLength(160)
+                .IsRequired();
+
+            builder.Property(message => message.SchemaVersion)
+                .HasColumnName("schema_version")
+                .IsRequired();
+
+            builder.Property(message => message.AggregateType)
+                .HasColumnName("aggregate_type")
+                .HasMaxLength(80)
+                .IsRequired();
+
+            builder.Property(message => message.AggregateId)
+                .HasColumnName("aggregate_id")
+                .IsRequired();
+
+            builder.Property(message => message.OccurredAtUtc)
+                .HasColumnName("occurred_at_utc")
+                .IsRequired();
+
+            builder.Property(message => message.PayloadJson)
+                .HasColumnName("payload_json")
+                .HasColumnType("jsonb")
+                .IsRequired();
+
+            builder.Property(message => message.Status)
+                .HasColumnName("status")
+                .HasConversion<string>()
+                .HasMaxLength(32)
+                .IsRequired();
+
+            builder.Property(message => message.AttemptCount)
+                .HasColumnName("attempt_count")
+                .IsRequired();
+
+            builder.Property(message => message.NextAttemptAtUtc)
+                .HasColumnName("next_attempt_at_utc");
+
+            builder.Property(message => message.LastError)
+                .HasColumnName("last_error")
+                .HasMaxLength(2000);
+
+            builder.Property(message => message.ProcessedAtUtc)
+                .HasColumnName("processed_at_utc");
+
+            builder.Property(message => message.CreatedAtUtc)
+                .HasColumnName("created_at_utc")
+                .IsRequired();
+
+            builder.HasIndex(message => new { message.Status, message.NextAttemptAtUtc, message.CreatedAtUtc });
+
+            builder.HasIndex(message => new { message.AggregateType, message.AggregateId });
+
+            builder.ToTable(table =>
+            {
+                table.HasCheckConstraint("ck_outbox_messages_schema_version_positive", "schema_version > 0");
+                table.HasCheckConstraint("ck_outbox_messages_attempt_count_non_negative", "attempt_count >= 0");
+                table.HasCheckConstraint(
+                    "ck_outbox_messages_status_valid",
+                    "status IN ('Pending', 'Processing', 'Published', 'Failed')");
             });
         });
     }

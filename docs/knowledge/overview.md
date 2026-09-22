@@ -97,6 +97,8 @@ M7 channel synchronization is planned as an idempotent worker path using mockabl
 
 M7 verification should include event contract tests, application tests for successful and failed mutation paths, outbox persistence/migration coverage, worker idempotency and retry/failure tests, OpenAPI and generated frontend type checks for sync endpoints, Operations page state tests, and Docker Compose or CI integration that proves the event/sync path sufficiently for milestone closure.
 
+M7 issue #86 adds the event/outbox foundation. `Inventory.Api` now has application-level integration event contracts under `Application/Events`, an EF-backed `IIntegrationEventOutbox`, and an `outbox_messages` table mapped through `InventoryDbContext`. The outbox envelope records event type, schema version, aggregate type/id, occurrence time, payload JSON, processing status, attempt metadata, safe error text, processed time, and creation time. Stock item creation now enqueues `StockItemCreated` and an initial `StockAvailabilityChanged` record in the same `SaveChangesAsync` unit as the created stock item. Failed stock item validation, missing references, duplicate conflicts, and other non-success paths must not append outbox records. `docs/specs/m7-event-contracts.md` documents the initial contract surface; reservation lifecycle producers are intentionally left for #87.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, dependency-injected application boundaries inside each service, and event-driven synchronization when the product need justifies it.

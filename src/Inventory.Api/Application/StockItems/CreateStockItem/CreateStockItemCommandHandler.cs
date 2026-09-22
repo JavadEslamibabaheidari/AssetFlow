@@ -1,4 +1,5 @@
 using Inventory.Api.Application.Common;
+using Inventory.Api.Application.Events;
 using Inventory.Api.Domain.Entities;
 using Inventory.Api.Infrastructure.Persistence;
 using MediatR;
@@ -6,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Api.Application.StockItems.CreateStockItem;
 
-public sealed class CreateStockItemCommandHandler(InventoryDbContext dbContext)
+public sealed class CreateStockItemCommandHandler(
+    InventoryDbContext dbContext,
+    IIntegrationEventOutbox outbox)
     : IRequestHandler<CreateStockItemCommand, ApplicationResult<StockItemDto>>
 {
     public async Task<ApplicationResult<StockItemDto>> Handle(
@@ -67,14 +70,33 @@ public sealed class CreateStockItemCommandHandler(InventoryDbContext dbContext)
                 "A stock item already exists for this product and channel.");
         }
 
+        var updatedAtUtc = DateTimeOffset.UtcNow;
         var stockItem = new StockItem(
             Guid.NewGuid(),
             request.ProductId,
             request.ChannelId,
             request.OnHandQuantity,
-            DateTimeOffset.UtcNow);
+            updatedAtUtc);
 
         dbContext.StockItems.Add(stockItem);
+        outbox.Enqueue(IntegrationEvents.StockItemCreated(
+            stockItem.Id,
+            stockItem.ProductId,
+            stockItem.ChannelId,
+            stockItem.OnHandQuantity,
+            stockItem.AvailableQuantity,
+            stockItem.UpdatedAtUtc));
+        outbox.Enqueue(IntegrationEvents.StockAvailabilityChanged(
+            stockItem.Id,
+            stockItem.ProductId,
+            stockItem.ChannelId,
+            stockItem.OnHandQuantity,
+            0,
+            stockItem.AvailableQuantity,
+            null,
+            "StockItemCreated",
+            stockItem.Id,
+            stockItem.UpdatedAtUtc));
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return ApplicationResult<StockItemDto>.Success(stockItem.ToDto());
