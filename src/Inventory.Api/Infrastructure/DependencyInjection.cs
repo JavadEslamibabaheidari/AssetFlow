@@ -1,4 +1,5 @@
 using Inventory.Api.Application.Events;
+using Inventory.Api.Infrastructure.ChannelSync;
 using Inventory.Api.Infrastructure.Persistence;
 using Inventory.Api.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,8 @@ public static class DependencyInjection
         services.AddDbContext<InventoryDbContext>(options =>
             options.UseNpgsql(connectionString));
         services.AddScoped<IIntegrationEventOutbox, EfIntegrationEventOutbox>();
+        services.AddScoped<IChannelAvailabilitySyncAdapter, NoOpChannelAvailabilitySyncAdapter>();
+        services.AddScoped<ChannelSynchronizationProcessor>();
 
         return services;
     }
