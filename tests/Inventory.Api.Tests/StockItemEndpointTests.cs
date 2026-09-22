@@ -1,6 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Inventory.Api.Application.Events;
+using Inventory.Api.Infrastructure.Persistence;
+using Inventory.Api.Infrastructure.Persistence.Outbox;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Inventory.Api.Tests;
 
@@ -30,6 +35,67 @@ public sealed class StockItemEndpointTests
         Assert.Equal(15, body.StockItem.AvailableQuantity);
         Assert.NotEqual(default, body.StockItem.UpdatedAtUtc);
         Assert.Equal($"/stock-items/{body.StockItem.Id}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task CreateStockItem_WhenSuccessful_WritesOutboxEvents()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        var product = await CreateProductWithVendorAsync(client, "SKU-107", "Jacket");
+        var channel = await CreateChannelAsync(client, "ETSY", "Etsy");
+
+        var response = await client.PostAsJsonAsync(
+            "/stock-items",
+            new CreateStockItemRequest(product.Id, channel.Id, 11));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<StockItemResponse>();
+        Assert.NotNull(body);
+
+        var messages = await ReadOutboxMessagesAsync(factory);
+
+        Assert.Collection(
+            messages.OrderBy(message => message.EventType),
+            message =>
+            {
+                Assert.Equal(IntegrationEventNames.StockAvailabilityChanged, message.EventType);
+                Assert.Equal(1, message.SchemaVersion);
+                Assert.Equal("stockItem", message.AggregateType);
+                Assert.Equal(body.StockItem.Id, message.AggregateId);
+                Assert.Equal(OutboxMessageStatus.Pending, message.Status);
+                Assert.Equal(0, message.AttemptCount);
+                Assert.Null(message.NextAttemptAtUtc);
+                Assert.Null(message.LastError);
+                Assert.Null(message.ProcessedAtUtc);
+
+                using var payload = JsonDocument.Parse(message.PayloadJson);
+                Assert.Equal(body.StockItem.Id, payload.RootElement.GetProperty("stockItemId").GetGuid());
+                Assert.Equal(product.Id, payload.RootElement.GetProperty("productId").GetGuid());
+                Assert.Equal(channel.Id, payload.RootElement.GetProperty("channelId").GetGuid());
+                Assert.Equal(11, payload.RootElement.GetProperty("onHandQuantity").GetInt32());
+                Assert.Equal(0, payload.RootElement.GetProperty("reservedQuantity").GetInt32());
+                Assert.Equal(11, payload.RootElement.GetProperty("availableQuantity").GetInt32());
+                Assert.Equal("StockItemCreated", payload.RootElement.GetProperty("reason").GetString());
+                Assert.Equal(body.StockItem.Id, payload.RootElement.GetProperty("sourceMutationId").GetGuid());
+            },
+            message =>
+            {
+                Assert.Equal(IntegrationEventNames.StockItemCreated, message.EventType);
+                Assert.Equal(1, message.SchemaVersion);
+                Assert.Equal("stockItem", message.AggregateType);
+                Assert.Equal(body.StockItem.Id, message.AggregateId);
+                Assert.Equal(OutboxMessageStatus.Pending, message.Status);
+                Assert.Equal(0, message.AttemptCount);
+
+                using var payload = JsonDocument.Parse(message.PayloadJson);
+                Assert.Equal(body.StockItem.Id, payload.RootElement.GetProperty("stockItemId").GetGuid());
+                Assert.Equal(product.Id, payload.RootElement.GetProperty("productId").GetGuid());
+                Assert.Equal(channel.Id, payload.RootElement.GetProperty("channelId").GetGuid());
+                Assert.Equal(11, payload.RootElement.GetProperty("onHandQuantity").GetInt32());
+                Assert.Equal(11, payload.RootElement.GetProperty("availableQuantity").GetInt32());
+            });
     }
 
     [Fact]
@@ -92,6 +158,8 @@ public sealed class StockItemEndpointTests
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         await AssertProblemCodeAsync(response, "product.notFound");
+
+        Assert.Empty(await ReadOutboxMessagesAsync(factory));
     }
 
     [Fact]
@@ -107,6 +175,8 @@ public sealed class StockItemEndpointTests
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         await AssertProblemCodeAsync(response, "channel.notFound");
+
+        Assert.Empty(await ReadOutboxMessagesAsync(factory));
     }
 
     [Fact]
@@ -125,6 +195,9 @@ public sealed class StockItemEndpointTests
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         await AssertProblemCodeAsync(response, "stockItem.duplicateProductChannel");
+
+        var messages = await ReadOutboxMessagesAsync(factory);
+        Assert.Equal(2, messages.Count);
     }
 
     [Fact]
@@ -141,6 +214,8 @@ public sealed class StockItemEndpointTests
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         await AssertProblemCodeAsync(response, "stockItem.onHandQuantityNegative");
+
+        Assert.Empty(await ReadOutboxMessagesAsync(factory));
     }
 
     [Fact]
@@ -223,6 +298,17 @@ public sealed class StockItemEndpointTests
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
         Assert.Equal(expectedCode, document.RootElement.GetProperty("code").GetString());
+    }
+
+    private static async Task<IReadOnlyList<OutboxMessage>> ReadOutboxMessagesAsync(
+        TestInventoryApiFactory factory)
+    {
+        using var scope = factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+
+        return await dbContext.OutboxMessages
+            .OrderBy(message => message.CreatedAtUtc)
+            .ToArrayAsync();
     }
 
     private sealed record CreateVendorRequest(string Name);
