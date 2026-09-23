@@ -2,7 +2,7 @@
 
 ## Status
 
-M7 implementation is complete and preparing final release closure through issue #90. The milestone adds a durable outbox boundary, reservation and availability event publication, an idempotent channel synchronization worker, and frontend Operations visibility for synchronization health.
+M7 is complete, merged, tagged, released, and closed. The milestone adds a durable outbox boundary, reservation and availability event publication, an idempotent channel synchronization worker, and frontend Operations visibility for synchronization health.
 
 ## Implemented
 
@@ -42,9 +42,10 @@ Backend CI, Frontend CI, and Integration CI passed on the merged M7 implementati
 
 ## GitHub Status
 
-- M7 tracking issues #85 through #89 are closed; #90 owns final validation, docs, tag, release, and milestone closure.
-- M7 PRs #91, #92, #93, #94, and #95 are merged into `main`.
-- Expected release tag: `v0.7.0`.
+- M7 tracking issues #85 through #90 are closed.
+- M7 PRs #91, #92, #93, #94, #95, and #96 are merged into `main`.
+- Tag and release `v0.7.0 - M7 Event-Driven Synchronization` exist.
+- GitHub milestone `M7 - Event-Driven Synchronization` is closed.
 - Project-board item and column mapping remains unverified from this environment.
 
 ## Known Gaps
