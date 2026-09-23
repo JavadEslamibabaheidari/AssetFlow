@@ -7,6 +7,8 @@ using Inventory.Api.Api.StockItems;
 using Inventory.Api.Api.Vendors;
 using Inventory.Api.Infrastructure;
 using Inventory.Api.Infrastructure.Observability;
+using Inventory.Api.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+if (app.Configuration.GetValue<bool>("AssetFlow:ApplyDatabaseMigrations"))
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
 
 app.UseCors(FrontendCorsPolicy);
 app.UseMiddleware<RequestObservabilityMiddleware>();
