@@ -101,12 +101,12 @@ Goal: publish changes and synchronize marketplace availability through events.
 
 Deliverables:
 
-- Kafka integration
-- stock changed events
+- PostgreSQL-backed outbox foundation with broker-ready event contracts
+- stock item and availability changed events
 - reservation events
 - event publication from application handlers or an outbox-style boundary
-- channel sync worker
-- frontend/admin visibility for synchronization status, failures, and retry needs where useful
+- idempotent channel sync worker with adapter seam and persisted attempt/retry state
+- frontend/admin visibility for synchronization status, failures, and automatic retry state
 - event documentation
 
 ## M8 - Observability and Monitoring

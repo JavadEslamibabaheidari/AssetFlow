@@ -62,19 +62,19 @@ Open questions:
 
 ## Acceptance Criteria
 
-- [ ] M6 closure artifacts are verified: report, knowledge, tag, release, closed milestone, and closed M6 issues.
-- [ ] Event contracts are documented and covered by tests.
-- [ ] Event/outbox records are created only when the business mutation succeeds.
-- [ ] Failed commands, validation failures, not-found results, oversell conflicts, and retry failures do not lose source state or create false downstream success.
-- [ ] Reservation create, release, and expire workflows produce expected events after successful commits.
-- [ ] Stock item creation and availability recalculation produce expected downstream signals.
-- [ ] Channel synchronization processes relevant availability events idempotently.
-- [ ] Failed sync attempts are recorded with retry state while preserving the source event.
-- [ ] Operations users can see healthy, pending, failed, and retryable sync state.
-- [ ] Retry actions are backend-backed and test-covered when exposed.
-- [ ] OpenAPI changes trigger backend, frontend, and integration checks.
-- [ ] Docker Compose or CI integration proves the event/sync path sufficiently for the milestone.
-- [ ] `docs/knowledge/` and the M7 report match the implemented final state before milestone closure.
+- [x] M6 closure artifacts are verified: report, knowledge, tag, release, closed milestone, and closed M6 issues.
+- [x] Event contracts are documented and covered by tests.
+- [x] Event/outbox records are created only when the business mutation succeeds.
+- [x] Failed commands, validation failures, not-found results, oversell conflicts, and retry failures do not lose source state or create false downstream success.
+- [x] Reservation create, release, and expire workflows produce expected events after successful commits.
+- [x] Stock item creation and availability recalculation produce expected downstream signals.
+- [x] Channel synchronization processes relevant availability events idempotently.
+- [x] Failed sync attempts are recorded with retry state while preserving the source event.
+- [x] Operations users can see healthy, pending, failed, and retryable sync state.
+- [x] Retry actions are backend-backed and test-covered when exposed. M7 exposes automatic backend retry scheduling; manual retry commands remain deferred because no explicit retry endpoint was added.
+- [x] OpenAPI changes trigger backend, frontend, and integration checks.
+- [x] Docker Compose or CI integration proves the event/sync path sufficiently for the milestone.
+- [x] `docs/knowledge/` and the M7 report match the implemented final state before milestone closure.
 
 ## Task Breakdown
 
@@ -140,10 +140,10 @@ The outbox schema and payload tests must make schema versioning explicit so late
 
 ## GitHub Tracking
 
-- Milestone: `M7 - Event-Driven Synchronization` is open with six issues.
-- Issues: #85 start gate, #86 event/outbox foundation, #87 reservation and availability events, #88 operations visibility, #89 channel synchronization worker, #90 validation/docs/release closure.
+- Milestone: `M7 - Event-Driven Synchronization` is in closure with five implementation issues closed and #90 validating docs/release state.
+- Issues: #85 start gate, #86 event/outbox foundation, #87 reservation and availability events, #88 operations visibility, and #89 channel synchronization worker are closed; #90 is the final validation/docs/release closure issue.
 - Project board: project item and column mapping is unavailable from this environment; issue project item lists are empty in `gh issue view`.
-- Follow-up issue alignment: #86 through #90 match this plan's task sequence and do not require scope changes before implementation starts.
+- Follow-up issue alignment: #86 through #90 matched this plan's task sequence. No scope change was required; live marketplace providers, Kafka as runtime infrastructure, observability dashboards, and manual retry commands remain deferred.
 
 ## Previous Milestone Closure
 
@@ -161,4 +161,4 @@ The outbox schema and payload tests must make schema versioning explicit so late
 - [x] GitHub tracking matches this plan.
 - [x] Knowledge docs capture durable planned behavior.
 
-Status: Ready to start after this start-gate PR is reviewed and merged.
+Status: Start gate passed and the planned M7 implementation slices have been completed. See `docs/milestone-7-report.md` for final validation and release closure notes.
