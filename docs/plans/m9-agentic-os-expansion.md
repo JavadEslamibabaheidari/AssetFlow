@@ -62,15 +62,15 @@ Open questions:
 
 ## Acceptance Criteria
 
-- [ ] M8 closure artifacts are verified: report, knowledge, closed milestone/issues, tag, and release.
-- [ ] M9 GitHub milestone and issue set match this plan.
-- [ ] Memory-layer options are evaluated and a concrete M9 decision is recorded with security/privacy boundaries.
-- [ ] Automation catalog distinguishes read-only status, suggested prompts, and mutating actions that require explicit approval.
-- [ ] Resource telemetry schema records trustworthy workflow/agent/skill signals and marks unavailable cost/token fields honestly.
-- [ ] Dashboard expansion surfaces memory, automation, resource, research, tracking, and degraded-source sections without committing generated output.
-- [ ] External workspace and research notebook integration plan records value, connector needs, security boundaries, and local-first fallbacks.
-- [ ] Tests or review checks cover changed tooling and dashboard behavior.
-- [ ] Docs, knowledge, GitHub tracking, and final M9 report match implemented behavior before closure.
+- [x] M8 closure artifacts are verified: report, knowledge, closed milestone/issues, tag, and release.
+- [x] M9 GitHub milestone and issue set match this plan.
+- [x] Memory-layer options are evaluated and a concrete M9 decision is recorded with security/privacy boundaries.
+- [x] Automation catalog distinguishes read-only status, suggested prompts, and mutating actions that require explicit approval.
+- [x] Resource telemetry schema records trustworthy workflow/agent/skill signals and marks unavailable cost/token fields honestly.
+- [x] Dashboard expansion surfaces memory, automation, resource, research, tracking, and degraded-source sections without committing generated output.
+- [x] External workspace and research notebook integration plan records value, connector needs, security boundaries, and local-first fallbacks.
+- [x] Tests or review checks cover changed tooling and dashboard behavior.
+- [x] Docs, knowledge, GitHub tracking, and final M9 report match implemented behavior before closure.
 
 ## Task Breakdown
 
@@ -133,4 +133,4 @@ Open questions:
 - [x] GitHub tracking matches this plan.
 - [x] Knowledge docs capture durable planned behavior.
 
-Status: Ready to start
+Status: Implementation complete and ready for review.

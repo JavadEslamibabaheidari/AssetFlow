@@ -18,7 +18,7 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 `M9 - Agentic OS Expansion`
 
-M9 is ready to start from `docs/plans/m9-agentic-os-expansion.md`. The milestone expands the repo-local Agentic Control Dashboard into a local-first human-plus-AI operating layer for memory, repeatable automation, research context, and resource-aware agent workflows, while keeping secrets, raw prompts, raw transcripts, generated dashboard output, and unavailable usage guesses out of Git.
+M9 is implemented and ready for closure from `docs/milestone-9-report.md`. The milestone expands the repo-local Agentic Control Dashboard into a local-first human-plus-AI operating layer for memory, repeatable automation, research context, and resource-aware agent workflows, while keeping secrets, raw prompts, raw transcripts, generated dashboard output, and unavailable usage guesses out of Git.
 
 ## Local Run
 
