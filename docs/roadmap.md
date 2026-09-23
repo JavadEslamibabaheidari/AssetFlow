@@ -128,8 +128,8 @@ Goal: expand the dashboard into a broader human-plus-AI operating layer for memo
 
 Deliverables:
 
-- evaluated memory layer with security review before adopting tools such as Obsidian or alternatives
-- skillpack and daily automation workflows for project, workspace, and research activity
-- deeper resource usage tracking by skill, agent, workflow, and automation
-- integration plan for external tools such as Google Workspace and research notebooks where they add clear value
-- expanded frontend/dashboard controls for orchestrating repeatable human-plus-AI work
+- evaluated memory layer with security, privacy, retention, and access boundaries before adopting tools such as Obsidian, repo-local notes, vector stores, external drives, or alternatives
+- local-first skillpack and automation catalog for project, workspace, and research activity, with mutating actions requiring explicit approval
+- resource usage telemetry model for skill, agent, workflow, and automation activity that marks unavailable token/cost fields honestly
+- integration plan for external tools such as Google Workspace and research notebooks where they add clear value, including connector prerequisites and local-first fallbacks
+- expanded Agentic Control Dashboard controls for memory, automation, resource telemetry, research links, workflow launch points, and degraded-source visibility
