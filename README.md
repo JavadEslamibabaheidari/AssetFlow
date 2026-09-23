@@ -16,9 +16,9 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 ## Current Milestone
 
-`M8 - Observability and Monitoring`
+`M9 - Agentic OS Expansion`
 
-M8 is in progress. The milestone builds on the M7 event-driven synchronization foundation by adding structured request logs, trace/correlation identifiers, operational health and metric endpoints, optional Prometheus/Grafana local monitoring, and Operations page visibility for service health, outbox backlog, synchronization failures, and retry delay.
+M9 is ready to start from `docs/plans/m9-agentic-os-expansion.md`. The milestone expands the repo-local Agentic Control Dashboard into a local-first human-plus-AI operating layer for memory, repeatable automation, research context, and resource-aware agent workflows, while keeping secrets, raw prompts, raw transcripts, generated dashboard output, and unavailable usage guesses out of Git.
 
 ## Local Run
 
