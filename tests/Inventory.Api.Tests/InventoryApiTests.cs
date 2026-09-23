@@ -42,6 +42,20 @@ public class InventoryApiTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotEqual(default, body.CheckedAtUtc);
     }
 
+    [Fact]
+    public async Task Cors_AllowsFrontendOrigin()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Options, "/vendors");
+        request.Headers.Add("Origin", "http://localhost:5173");
+        request.Headers.Add("Access-Control-Request-Method", "POST");
+
+        var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.True(response.Headers.TryGetValues("Access-Control-Allow-Origin", out var origins));
+        Assert.Contains("http://localhost:5173", origins);
+    }
+
     private sealed record ServiceInfoResponse(string Service, string Message);
 
     private sealed record HealthResponse(string Status, string Service, DateTimeOffset CheckedAtUtc);

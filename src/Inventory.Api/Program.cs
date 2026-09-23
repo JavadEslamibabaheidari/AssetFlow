@@ -10,13 +10,30 @@ using Inventory.Api.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string FrontendCorsPolicy = "AssetFlowFrontend";
+
 builder.Services.AddMediatR(configuration =>
     configuration.RegisterServicesFromAssembly(typeof(Program).Assembly));
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddInventoryPersistence(builder.Configuration);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(FrontendCorsPolicy, policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                "http://localhost:4173",
+                "http://127.0.0.1:4173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
+app.UseCors(FrontendCorsPolicy);
 app.UseMiddleware<RequestObservabilityMiddleware>();
 
 app.MapGet("/", () => Results.Ok(new

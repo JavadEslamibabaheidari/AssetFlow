@@ -125,6 +125,24 @@ The Agentic OS dashboard generator remains in `tools/agent-dashboard/generate.sh
 
 M9 safety boundaries are explicit: generated dashboard output, credentials, raw prompts, raw transcripts, personal/private data, and unavailable token/cost guesses must not be committed. `docs/knowledge/` remains the curated engineering knowledge cache. The static dashboard may present prompts, links, and command text, but it must not perform mutating operations by itself.
 
+M6 was reopened on 2026-09-23 after live frontend inspection showed that the
+frontend still had placeholder route pages rather than the promised API-backed
+inventory workflows. The reopened corrective plan is
+`docs/plans/m6-frontend-inventory-parity.md`; GitHub milestone #7 is open again,
+with #74, #75, #77, #78, #79, #80, and #81 reopened for unfinished parity work.
+The plan now contains an explicit backend/frontend parity map. Backend M2/M3
+operations remain the source of truth; the frontend must not invent update,
+delete, auth, tenant, checkout, payment, shipping, or event-sync behavior that
+the backend does not expose.
+
+The first corrective M6 implementation slice is #81, master-data workflows.
+The frontend `InventoryPage` now uses React Query and the generated API client
+to list and create vendors and products. The `OperationsPage` now lists and
+creates sales channels. The API client includes create methods for vendors,
+products, and channels. `Inventory.Api` now allows the Vite dev/preview origins
+through an explicit CORS policy so browser calls from `src/AssetFlow.Web` can
+reach the API during local development.
+
 ## Architecture Direction
 
 The current implementation is a single minimal ASP.NET Core API. The target direction is an inventory platform with clear service ownership, OpenAPI-documented APIs, PostgreSQL-backed business state, dependency-injected application boundaries inside each service, and event-driven synchronization when the product need justifies it.

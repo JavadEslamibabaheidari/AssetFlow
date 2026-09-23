@@ -4,6 +4,10 @@
 
 Bring the frontend product experience to the same functional surface the backend reached at the end of M3: core inventory management, reservations, and reservation-aware availability.
 
+## Reopen Note
+
+M6 was reopened on 2026-09-23 after live frontend inspection showed that the browser app still needed real API-backed inventory workflows before the milestone could honestly close. The corrective implementation keeps backend and frontend abilities aligned to the existing M2/M3 contracts and tracks remaining work through reopened GitHub issues.
+
 ## Start-Gate Summary
 
 M6 starts from the completed M5 frontend foundation and the completed M2/M3 backend contracts. The milestone should build real operational workflows in `src/AssetFlow.Web`; planning text, milestone status, and task guidance belong in docs, plans, and GitHub issues, not in the visible app UI.
@@ -157,8 +161,8 @@ Path-filter rules:
 ## GitHub Tracking
 
 - Milestone: `M6 - Frontend Inventory Parity`
-- Milestone status: open.
-- Issues: #74 through #81 are created and attached to this milestone.
+- Milestone status: open after the 2026-09-23 corrective reopen.
+- Issues: #74, #75, #77, #78, #79, #80, and #81 were reopened for unfinished frontend parity work. Issue #76 remains separate CI pipeline work unless later verification proves it incomplete.
 - Project board: project-board item and column mapping remains unverified from this environment; record the gap until board access is confirmed.
 - Branch/PR rule: keep each active task isolated to one branch and one pull request unless explicitly combined.
 
