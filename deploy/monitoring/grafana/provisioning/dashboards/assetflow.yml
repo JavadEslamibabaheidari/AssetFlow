@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: AssetFlow
+    orgId: 1
+    folder: AssetFlow
+    type: file
+    disableDeletion: true
+    editable: false
+    options:
+      path: /var/lib/grafana/dashboards

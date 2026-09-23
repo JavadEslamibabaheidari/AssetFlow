@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { inventoryApiClient } from "../api";
-import { PageHeader, StatusBadge } from "../design-system";
+import { MetricCard, PageHeader, StatusBadge } from "../design-system";
 import {
   ApiErrorFeedback,
   WorkflowEmptyState,
@@ -17,6 +17,10 @@ export function OperationsPage() {
     queryKey: ["markets", "sync-statuses"],
     queryFn: ({ signal }) =>
       inventoryApiClient.listChannelSyncStatuses(signal).then((response) => response.items)
+  });
+  const observability = useQuery({
+    queryKey: ["operations", "observability"],
+    queryFn: ({ signal }) => inventoryApiClient.getObservabilityHealth(signal)
   });
   const syncStatusByChannel = new Map(
     (syncStatuses.data ?? []).map((status) => [status.channelId, status])
@@ -40,6 +44,67 @@ export function OperationsPage() {
       ) : null}
       {channels.error ? <ApiErrorFeedback error={channels.error} /> : null}
       {syncStatuses.error ? <ApiErrorFeedback error={syncStatuses.error} /> : null}
+      {observability.error ? <ApiErrorFeedback error={observability.error} /> : null}
+
+      <section className="workflow-panel full-span" aria-labelledby="observability-title">
+        <div className="workflow-panel-heading">
+          <div>
+            <h3 id="observability-title">Service observability</h3>
+            <p>Operational signals for API health, event backlog, and sync retry pressure.</p>
+          </div>
+          <StatusBadge tone={observabilityTone(observability.data?.status)}>
+            {observability.data?.status ?? "Loading"}
+          </StatusBadge>
+        </div>
+
+        {observability.isLoading ? (
+          <WorkflowLoadingState
+            title="Loading service signals"
+            description="Reading health, outbox, and synchronization metrics."
+          />
+        ) : observability.data ? (
+          <>
+            <div className="metric-grid">
+              <MetricCard
+                label="Outbox backlog"
+                value={String(
+                  observability.data.outbox.pendingMessages +
+                    observability.data.outbox.processingMessages
+                )}
+                description={`${observability.data.outbox.failedMessages} failed event records`}
+              />
+              <MetricCard
+                label="Sync failures"
+                value={String(observability.data.channelSync.failedStates)}
+                description={`${observability.data.channelSync.retryableFailures} retryable failures`}
+              />
+              <MetricCard
+                label="Next retry"
+                value={
+                  observability.data.channelSync.nextRetryAtUtc
+                    ? formatDate(observability.data.channelSync.nextRetryAtUtc)
+                    : "None"
+                }
+                description="Earliest scheduled channel synchronization retry"
+              />
+            </div>
+            <div className="detail-grid">
+              <div>
+                <span>Trace</span>
+                <strong>{observability.data.traceId}</strong>
+              </div>
+              <div>
+                <span>Correlation</span>
+                <strong>{observability.data.correlationId}</strong>
+              </div>
+              <div>
+                <span>Checked</span>
+                <strong>{formatDate(observability.data.checkedAtUtc)}</strong>
+              </div>
+            </div>
+          </>
+        ) : null}
+      </section>
 
       <section className="workflow-panel full-span" aria-labelledby="channel-master-data-title">
         <div className="workflow-panel-heading">
@@ -108,6 +173,7 @@ export function OperationsPage() {
 }
 
 type SyncStatus = "Pending" | "InProgress" | "Succeeded" | "Failed";
+type ObservabilityStatus = "Healthy" | "Busy" | "Degraded";
 
 function statusLabel(status?: SyncStatus): string {
   if (!status) {
@@ -115,6 +181,21 @@ function statusLabel(status?: SyncStatus): string {
   }
 
   return status;
+}
+
+function observabilityTone(
+  status?: ObservabilityStatus
+): "neutral" | "success" | "warning" | "danger" {
+  switch (status) {
+    case "Healthy":
+      return "success";
+    case "Busy":
+      return "warning";
+    case "Degraded":
+      return "danger";
+    default:
+      return "neutral";
+  }
 }
 
 function statusTone(status?: SyncStatus): "neutral" | "success" | "warning" | "danger" {

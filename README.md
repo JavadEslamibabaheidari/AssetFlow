@@ -16,18 +16,9 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 ## Current Milestone
 
-`M7 - Event-Driven Synchronization`
+`M8 - Observability and Monitoring`
 
-M7 is implemented, tagged, released, and closed. The platform now publishes inventory and reservation changes through a PostgreSQL-backed outbox, processes availability changes through an idempotent channel synchronization worker, and exposes backend-backed synchronization health in the frontend Operations surface:
-
-- durable integration event envelopes and `outbox_messages` persistence
-- stock item, reservation lifecycle, availability, and channel sync event contracts
-- channel synchronization processing with persisted success, failure, retry, and attempt state
-- `GET /channel-sync/status` plus generated frontend client support
-- Operations page visibility for no-sync, pending/in-progress, succeeded, failed, and retryable states
-- backend, frontend, and integration CI coverage for contract and workflow changes
-
-The next milestone is M8, Observability and Monitoring, which should add deeper logs, metrics, traces, dashboards, and operational alerting around the synchronized product surface.
+M8 is in progress. The milestone builds on the M7 event-driven synchronization foundation by adding structured request logs, trace/correlation identifiers, operational health and metric endpoints, optional Prometheus/Grafana local monitoring, and Operations page visibility for service health, outbox backlog, synchronization failures, and retry delay.
 
 ## Local Run
 
@@ -58,6 +49,14 @@ docker compose up --build
 ```
 
 Compose exposes the backend at `http://localhost:8080` and the frontend at `http://localhost:5173`. Set `ASSETFLOW_WEB_PORT=6173` before `docker compose up --build` if `5173` is already in use locally.
+
+To include the optional local monitoring stack:
+
+```bash
+docker compose --profile monitoring up --build
+```
+
+Prometheus is exposed at `http://localhost:9090` and Grafana at `http://localhost:3000` with the local credentials `assetflow` / `assetflow`. Set `ASSETFLOW_PROMETHEUS_PORT` or `ASSETFLOW_GRAFANA_PORT` before starting Compose if those ports are already in use.
 
 ## Documentation
 

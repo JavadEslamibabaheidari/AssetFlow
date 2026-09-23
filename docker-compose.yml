@@ -18,3 +18,32 @@ services:
       - inventory-api
     ports:
       - "${ASSETFLOW_WEB_PORT:-5173}:8080"
+
+  prometheus:
+    image: prom/prometheus:v3.0.1
+    profiles:
+      - monitoring
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    volumes:
+      - ./deploy/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - inventory-api
+    ports:
+      - "${ASSETFLOW_PROMETHEUS_PORT:-9090}:9090"
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    profiles:
+      - monitoring
+    environment:
+      GF_SECURITY_ADMIN_USER: assetflow
+      GF_SECURITY_ADMIN_PASSWORD: assetflow
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./deploy/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    ports:
+      - "${ASSETFLOW_GRAFANA_PORT:-3000}:3000"

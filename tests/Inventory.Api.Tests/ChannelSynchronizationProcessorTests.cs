@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Net.Http.Json;
 using Inventory.Api.Infrastructure.ChannelSync;
+using Inventory.Api.Infrastructure.Observability;
 using Inventory.Api.Infrastructure.Persistence;
 using Inventory.Api.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
@@ -142,6 +144,42 @@ public sealed class ChannelSynchronizationProcessorTests
         Assert.Equal(stockItem.Id, syncState.StockItemId);
         Assert.Equal("Provider timeout", syncState.LastError);
         Assert.Equal(nowUtc.AddMinutes(5), syncState.NextAttemptAtUtc);
+    }
+
+    [Fact]
+    public async Task ProcessDueAsync_EmitsDiagnosticActivities()
+    {
+        await using var factory = new TestInventoryApiFactory();
+        var client = factory.CreateClient();
+        await CreateStockItemWithProductAndChannelAsync(client, "SYNC-103", "SYNC-ACTIVITY", 5);
+        var adapter = new RecordingChannelAvailabilitySyncAdapter(ChannelAvailabilitySyncResult.Success());
+        var activities = new List<Activity>();
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == InventoryDiagnostics.ActivitySourceName,
+            Sample = (ref ActivityCreationOptions<ActivityContext> options) => ActivitySamplingResult.AllData,
+            ActivityStopped = activity => activities.Add(activity)
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        var processed = await ProcessDueAsync(factory, adapter, DateTimeOffset.UtcNow);
+
+        Assert.Equal(1, processed);
+        var batchActivity = Assert.Single(
+            activities,
+            activity => activity.OperationName == "channel.sync.process_due");
+        Assert.Contains(
+            batchActivity.TagObjects,
+            tag => tag.Key == "assetflow.channel_sync.batch_size" && tag.Value is int value && value == 10);
+        Assert.Contains(
+            batchActivity.TagObjects,
+            tag => tag.Key == "assetflow.channel_sync.processed_count" && tag.Value is int value && value == 1);
+        Assert.Contains(
+            activities,
+            activity => activity.OperationName == "channel.sync.process_message" &&
+                activity.TagObjects.Any(tag => tag.Key == "assetflow.channel_sync.outcome" &&
+                    tag.Value is string value &&
+                    value == "Succeeded"));
     }
 
     private static async Task<int> ProcessDueAsync(

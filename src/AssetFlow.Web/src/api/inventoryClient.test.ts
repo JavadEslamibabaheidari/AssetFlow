@@ -132,4 +132,84 @@ describe("InventoryApiClient", () => {
       expect.objectContaining({ method: "GET" })
     );
   });
+
+  it("reads observability health and metrics from operations endpoints", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        createJsonResponse({
+          status: "Healthy",
+          service: "Inventory API",
+          checkedAtUtc: "2026-09-23T06:00:00Z",
+          traceId: "trace-1",
+          correlationId: "corr-1",
+          outbox: {
+            totalMessages: 0,
+            pendingMessages: 0,
+            processingMessages: 0,
+            publishedMessages: 0,
+            failedMessages: 0,
+            oldestPendingAtUtc: null,
+            nextAttemptAtUtc: null,
+            byStatus: [],
+            byEventType: []
+          },
+          channelSync: {
+            totalStates: 0,
+            pendingStates: 0,
+            inProgressStates: 0,
+            succeededStates: 0,
+            failedStates: 0,
+            retryableFailures: 0,
+            nextRetryAtUtc: null,
+            lastFailureAtUtc: null
+          }
+        })
+      )
+      .mockResolvedValueOnce(
+        createJsonResponse({
+          status: "Healthy",
+          service: "Inventory API",
+          checkedAtUtc: "2026-09-23T06:00:00Z",
+          traceId: "trace-2",
+          correlationId: "corr-2",
+          outbox: {
+            totalMessages: 0,
+            pendingMessages: 0,
+            processingMessages: 0,
+            publishedMessages: 0,
+            failedMessages: 0,
+            oldestPendingAtUtc: null,
+            nextAttemptAtUtc: null,
+            byStatus: [],
+            byEventType: []
+          },
+          channelSync: {
+            totalStates: 0,
+            pendingStates: 0,
+            inProgressStates: 0,
+            succeededStates: 0,
+            failedStates: 0,
+            retryableFailures: 0,
+            nextRetryAtUtc: null,
+            lastFailureAtUtc: null
+          }
+        })
+      );
+    const client = new InventoryApiClient(new ApiHttpClient("http://localhost:8080", fetcher));
+
+    await client.getObservabilityHealth();
+    await client.getObservabilityMetrics();
+
+    expect(fetcher).toHaveBeenNthCalledWith(
+      1,
+      "http://localhost:8080/observability/health",
+      expect.objectContaining({ method: "GET" })
+    );
+    expect(fetcher).toHaveBeenNthCalledWith(
+      2,
+      "http://localhost:8080/observability/metrics",
+      expect.objectContaining({ method: "GET" })
+    );
+  });
 });

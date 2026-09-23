@@ -84,6 +84,18 @@ export class InventoryApiClient {
     return this.http.request("/channel-sync/status", { signal });
   }
 
+  public getObservabilityHealth(
+    signal?: AbortSignal
+  ): Promise<InventoryApiResponse<"getObservabilityHealth", 200>> {
+    return this.http.request("/observability/health", { signal });
+  }
+
+  public getObservabilityMetrics(
+    signal?: AbortSignal
+  ): Promise<InventoryApiResponse<"getObservabilityMetrics", 200>> {
+    return this.http.request("/observability/metrics", { signal });
+  }
+
   public listStockItems(
     query: ListStockItemsQuery = {},
     signal?: AbortSignal
