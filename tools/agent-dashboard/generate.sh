@@ -45,27 +45,6 @@ append_degraded_state() {
           </div>"
 }
 
-issue_title_for_number() {
-  case "$1" in
-    49) printf 'Define dashboard MVP spec and data contract' ;;
-    50) printf 'Build repo-local dashboard foundation' ;;
-    51) printf 'Add GitHub and local status views' ;;
-    52) printf 'Add workflow launch points' ;;
-    53) printf 'Complete M4 validation and docs' ;;
-    *) printf 'Unknown task' ;;
-  esac
-}
-
-next_issue_for_number() {
-  case "$1" in
-    49) printf '50' ;;
-    50) printf '51' ;;
-    51) printf '52' ;;
-    52) printf '53' ;;
-    *) printf '' ;;
-  esac
-}
-
 branch="$(run_git branch --show-current)"
 if [[ -z "${branch}" ]]; then
   branch="detached"
@@ -90,28 +69,10 @@ fi
 
 generated_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-active_issue_number=""
-if [[ "${branch}" =~ (^|/)([0-9]+)- ]]; then
-  active_issue_number="${BASH_REMATCH[2]}"
-fi
-
-if [[ -z "${active_issue_number}" ]]; then
-  active_issue_number="51"
-fi
-
-active_issue_title="$(issue_title_for_number "${active_issue_number}")"
-next_issue_number="$(next_issue_for_number "${active_issue_number}")"
-if [[ -n "${next_issue_number}" ]]; then
-  next_issue_title="$(issue_title_for_number "${next_issue_number}")"
-  next_issue_html="<a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/$(html_escape "${next_issue_number}")\">#$(html_escape "${next_issue_number}") $(html_escape "${next_issue_title}")</a>"
-else
-  next_issue_html="No later M4 implementation issue detected"
-fi
-
 milestone_state="unverified"
 milestone_open_issues="unverified"
 milestone_closed_issues="unverified"
-milestone_url="https://github.com/JavadEslamibabaheidari/AssetFlow/milestone/5"
+milestone_url="https://github.com/JavadEslamibabaheidari/AssetFlow/milestone/10"
 issues_html=""
 activity_html=""
 degraded_states_html=""
@@ -119,13 +80,12 @@ project_board_html="
           <div class=\"card\">
             <strong>GitHub project board</strong>
             <span class=\"badge badge-warn\">Unverified</span>
-            <span>GitHub status has not been checked yet.</span>
+            <span>Project-board status has not been checked yet.</span>
             <span>Issue and milestone status may still be available separately.</span>
           </div>"
-github_available="false"
 
 if [[ "${ASSETFLOW_DASHBOARD_DISABLE_GITHUB:-}" == "1" ]]; then
-  append_degraded_state "GitHub status" "GitHub reads disabled by ASSETFLOW_DASHBOARD_DISABLE_GITHUB=1." "Local Git and curated repository links are still shown."
+  append_degraded_state "GitHub status" "GitHub reads disabled by ASSETFLOW_DASHBOARD_DISABLE_GITHUB=1." "Local Git, docs, and curated Agentic OS controls are still shown."
   project_board_html="
           <div class=\"card\">
             <strong>GitHub project board</strong>
@@ -135,24 +95,15 @@ if [[ "${ASSETFLOW_DASHBOARD_DISABLE_GITHUB:-}" == "1" ]]; then
           </div>"
 elif ! command -v gh >/dev/null 2>&1; then
   append_degraded_state "GitHub CLI" "The gh CLI was not found on PATH." "Milestone, issue, PR, and project-board status are unavailable."
-  project_board_html="
-          <div class=\"card\">
-            <strong>GitHub project board</strong>
-            <span class=\"badge badge-warn\">Unverified</span>
-            <span>The gh CLI was not found on PATH.</span>
-            <span>Board column status is unavailable.</span>
-          </div>"
 else
-  github_available="true"
-
-  milestone_line="$(gh api repos/:owner/:repo/milestones/5 --jq '[.state, .open_issues, .closed_issues, .html_url] | @tsv' 2>/dev/null || true)"
+  milestone_line="$(gh api repos/:owner/:repo/milestones/10 --jq '[.state, .open_issues, .closed_issues, .html_url] | @tsv' 2>/dev/null || true)"
   if [[ -n "${milestone_line}" ]]; then
     IFS=$'\t' read -r milestone_state milestone_open_issues milestone_closed_issues milestone_url <<< "${milestone_line}"
   else
-    append_degraded_state "GitHub milestone" "Could not read M4 milestone through gh api." "Milestone counts are unavailable, but static milestone links remain."
+    append_degraded_state "GitHub milestone" "Could not read M9 milestone through gh api." "Milestone counts are unavailable, but static milestone links remain."
   fi
 
-  issues_tsv="$(gh issue list --milestone 'M4 - Agentic Control Dashboard MVP' --state all --limit 20 --json number,title,state,url,labels --jq 'sort_by(.number)[] | [.number, .title, .state, .url, ([.labels[].name] | join(", "))] | @tsv' 2>/dev/null || true)"
+  issues_tsv="$(gh issue list --milestone 'M9 - Agentic OS Expansion' --state all --limit 20 --json number,title,state,url,labels --jq 'sort_by(.number)[] | [.number, .title, .state, .url, ([.labels[].name] | join(", "))] | @tsv' 2>/dev/null || true)"
   if [[ -n "${issues_tsv}" ]]; then
     while IFS=$'\t' read -r issue_number issue_title issue_state issue_url issue_labels; do
       [[ -z "${issue_number}" ]] && continue
@@ -164,7 +115,7 @@ else
           </div>"
     done <<< "${issues_tsv}"
   else
-    append_degraded_state "GitHub issues" "Could not read M4 issues through gh issue list." "The dashboard falls back to static issue sequence links."
+    append_degraded_state "GitHub issues" "Could not read M9 issues through gh issue list." "The dashboard falls back to static M9 issue sequence links."
   fi
 
   pr_tsv="$(gh pr list --state merged --limit 5 --json number,title,url,mergedAt --jq '.[] | [.number, .title, .url, .mergedAt] | @tsv' 2>/dev/null || true)"
@@ -184,7 +135,7 @@ else
           <div class=\"card\">
             <strong>GitHub project board</strong>
             <span class=\"badge badge-warn\">Not mapped</span>
-            <span>GitHub project APIs are readable, but this MVP does not yet map AssetFlow board items or columns.</span>
+            <span>GitHub project APIs are readable, but this dashboard does not map AssetFlow board items or columns yet.</span>
             <span>Issue and milestone status are shown; board column status remains unverified.</span>
           </div>"
   else
@@ -201,8 +152,8 @@ fi
 if [[ -z "${issues_html}" ]]; then
   issues_html="
           <div class=\"card\">
-            <strong>M4 issue sequence</strong>
-            <span><a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/49\">#49 Spec</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/50\">#50 Foundation</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/51\">#51 Status views</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/52\">#52 Workflow launch points</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/53\">#53 Validation and docs</a></span>
+            <strong>M9 issue sequence</strong>
+            <span><a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/104\">#104 Start gate</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/105\">#105 Memory/security</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/106\">#106 Automation</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/107\">#107 Telemetry</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/108\">#108 Dashboard</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/109\">#109 Integrations</a> -> <a href=\"https://github.com/JavadEslamibabaheidari/AssetFlow/issues/110\">#110 Validation</a></span>
           </div>"
 fi
 
@@ -233,7 +184,7 @@ cat > "${output_file}" <<HTML
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AssetFlow Agentic Control Dashboard</title>
+  <title>AssetFlow Agentic OS Dashboard</title>
   <style>
     :root {
       color-scheme: light;
@@ -242,7 +193,6 @@ cat > "${output_file}" <<HTML
       --ink: #1d2430;
       --muted: #5d6878;
       --line: #d9dee7;
-      --accent: #0b6f6a;
       --accent-strong: #084f4b;
       --warn-bg: #fff5d7;
       --warn-ink: #6b4a00;
@@ -250,9 +200,7 @@ cat > "${output_file}" <<HTML
       --ok-ink: #145c35;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -282,23 +230,20 @@ cat > "${output_file}" <<HTML
 
     h1 {
       margin: 0;
-      font-size: clamp(2rem, 6vw, 3.6rem);
+      font-size: 2.8rem;
       line-height: 1;
       letter-spacing: 0;
     }
 
-    h2,
-    h3 {
+    h2, h3 {
       margin: 0;
       letter-spacing: 0;
     }
 
-    p {
-      margin: 0;
-    }
+    p { margin: 0; }
 
     .summary {
-      max-width: 780px;
+      max-width: 840px;
       color: var(--muted);
       font-size: 1.05rem;
     }
@@ -310,8 +255,7 @@ cat > "${output_file}" <<HTML
       margin-top: 4px;
     }
 
-    .nav a,
-    .chip {
+    .nav a, .chip {
       display: inline-flex;
       align-items: center;
       min-height: 36px;
@@ -330,33 +274,19 @@ cat > "${output_file}" <<HTML
       gap: 14px;
     }
 
-    section,
-    .panel {
+    section, .panel {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 18px;
     }
 
-    .span-4 {
-      grid-column: span 4;
-    }
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: 1 / -1; }
 
-    .span-6 {
-      grid-column: span 6;
-    }
-
-    .span-8 {
-      grid-column: span 8;
-    }
-
-    .span-12 {
-      grid-column: 1 / -1;
-    }
-
-    .metric-row,
-    .link-list,
-    .action-list {
+    .metric-row, .link-list, .action-list {
       display: grid;
       gap: 10px;
       margin-top: 14px;
@@ -413,12 +343,11 @@ cat > "${output_file}" <<HTML
       background: #fbfcfd;
     }
 
-    .card strong {
+    .card strong, .card span {
       overflow-wrap: anywhere;
     }
 
-    .card span,
-    .help {
+    .card span, .help {
       color: var(--muted);
       font-size: 0.92rem;
     }
@@ -435,16 +364,10 @@ cat > "${output_file}" <<HTML
         padding-top: 18px;
       }
 
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      h1 { font-size: 2.2rem; }
 
-      .span-4,
-      .span-6,
-      .span-8,
-      .span-12 {
-        grid-column: 1;
-      }
+      .grid { grid-template-columns: 1fr; }
+      .span-4, .span-6, .span-8, .span-12 { grid-column: 1; }
     }
   </style>
 </head>
@@ -452,13 +375,15 @@ cat > "${output_file}" <<HTML
   <main class="shell">
     <header>
       <div class="chip">Generated $(html_escape "${generated_at}")</div>
-      <h1>AssetFlow Agentic Control Dashboard</h1>
-      <p class="summary">A repo-local control surface for milestone status, durable planning docs, workflow agents, reusable skills, and explicit AI-assisted development launch points.</p>
+      <h1>AssetFlow Agentic OS Dashboard</h1>
+      <p class="summary">A repo-local control surface for safe memory, automation, research, resource telemetry, GitHub tracking, and explicit AI-assisted workflow launch points.</p>
       <nav class="nav" aria-label="Dashboard sections">
         <a href="#overview">Overview</a>
         <a href="#tracking">Tracking</a>
-        <a href="#docs">Docs</a>
-        <a href="#agents">Agents</a>
+        <a href="#memory">Memory</a>
+        <a href="#automation">Automation</a>
+        <a href="#resources">Resources</a>
+        <a href="#research">Research</a>
         <a href="#workflow">Workflow</a>
         <a href="#activity">Activity</a>
       </nav>
@@ -468,88 +393,73 @@ cat > "${output_file}" <<HTML
       <section id="overview" class="span-8">
         <h2>Overview</h2>
         <div class="metric-row">
-          <div class="metric">
-            <span class="label">Current milestone</span>
-            <span class="value">M4 - Agentic Control Dashboard MVP</span>
-          </div>
-          <div class="metric">
-            <span class="label">Active task</span>
-            <span class="value"><a href="https://github.com/JavadEslamibabaheidari/AssetFlow/issues/$(html_escape "${active_issue_number}")">#$(html_escape "${active_issue_number}") $(html_escape "${active_issue_title}")</a></span>
-          </div>
-          <div class="metric">
-            <span class="label">Next planned task</span>
-            <span class="value">${next_issue_html}</span>
-          </div>
+          <div class="metric"><span class="label">Current milestone</span><span class="value">M9 - Agentic OS Expansion</span></div>
+          <div class="metric"><span class="label">Operating model</span><span class="value">Local-first, Git-reviewable, static-dashboard-oriented</span></div>
+          <div class="metric"><span class="label">Safety boundary</span><span class="value">No secrets, raw prompts, raw transcripts, personal/private data, generated output, or guessed cost/token numbers in Git.</span></div>
         </div>
       </section>
 
       <section class="span-4">
         <h2>Local Checkout</h2>
         <div class="metric-row">
-          <div class="metric">
-            <span class="label">Repository path</span>
-            <span class="value"><code>$(html_escape "${repo_root}")</code></span>
-          </div>
-          <div class="metric">
-            <span class="label">Branch</span>
-            <span class="value"><code>$(html_escape "${branch}")</code></span>
-          </div>
-          <div class="metric">
-            <span class="label">HEAD</span>
-            <span class="value"><code>$(html_escape "${head_sha}")</code></span>
-          </div>
-          <div class="metric">
-            <span class="label">Working tree</span>
-            <span class="value"><span class="badge $(if [[ "${working_tree_state}" == "Clean" ]]; then printf 'badge-ok'; else printf 'badge-warn'; fi)">$(html_escape "${working_tree_state}")</span></span>
-          </div>
-          <div class="metric">
-            <span class="label">Remote</span>
-            <span class="value"><code>$(html_escape "${remote_url}")</code></span>
-          </div>
+          <div class="metric"><span class="label">Repository path</span><span class="value"><code>$(html_escape "${repo_root}")</code></span></div>
+          <div class="metric"><span class="label">Branch</span><span class="value"><code>$(html_escape "${branch}")</code></span></div>
+          <div class="metric"><span class="label">HEAD</span><span class="value"><code>$(html_escape "${head_sha}")</code></span></div>
+          <div class="metric"><span class="label">Working tree</span><span class="value"><span class="badge $(if [[ "${working_tree_state}" == "Clean" ]]; then printf 'badge-ok'; else printf 'badge-warn'; fi)">$(html_escape "${working_tree_state}")</span></span></div>
         </div>
       </section>
 
       <section id="tracking" class="span-12">
         <h2>Tracking</h2>
-        <p class="help">GitHub remains the source of truth. These are read-only milestone and issue views from approved local and GitHub sources.</p>
+        <p class="help">GitHub remains the source of truth. These are read-only M9 milestone and issue views from approved local and GitHub sources.</p>
         <div class="link-list">
           <div class="card">
-            <strong><a href="$(html_escape "${milestone_url}")">M4 GitHub milestone</a></strong>
+            <strong><a href="$(html_escape "${milestone_url}")">M9 GitHub milestone</a></strong>
             <span><span class="badge $(if [[ "${milestone_state}" == "open" ]]; then printf 'badge-warn'; elif [[ "${milestone_state}" == "closed" ]]; then printf 'badge-ok'; else printf 'badge-warn'; fi)">$(html_escape "${milestone_state}")</span></span>
             <span>Open issues: $(html_escape "${milestone_open_issues}") | Closed issues: $(html_escape "${milestone_closed_issues}")</span>
           </div>
 ${issues_html}
+${project_board_html}
         </div>
       </section>
 
-      <section id="docs" class="span-6">
-        <h2>Docs</h2>
+      <section id="memory" class="span-6">
+        <h2>Memory Layer</h2>
+        <p class="help">M9 keeps durable memory local-first and reviewable. External/personal memory tools remain optional until their boundaries are explicit.</p>
         <div class="link-list">
-          <div class="card"><strong><a href="../../../docs/roadmap.md">Roadmap</a></strong><span>$(file_state "docs/roadmap.md")</span></div>
-          <div class="card"><strong><a href="../../../docs/project-management.md">Project management</a></strong><span>$(file_state "docs/project-management.md")</span></div>
-          <div class="card"><strong><a href="../../../docs/ai-development-workflow.md">AI development workflow</a></strong><span>$(file_state "docs/ai-development-workflow.md")</span></div>
-          <div class="card"><strong><a href="../../../docs/knowledge/overview.md">Knowledge overview</a></strong><span>$(file_state "docs/knowledge/overview.md")</span></div>
-          <div class="card"><strong><a href="../../../docs/plans/m4-agentic-control-dashboard-mvp.md">M4 plan</a></strong><span>$(file_state "docs/plans/m4-agentic-control-dashboard-mvp.md")</span></div>
-          <div class="card"><strong><a href="../../../docs/specs/m4-agentic-control-dashboard-mvp.md">M4 dashboard spec</a></strong><span>$(file_state "docs/specs/m4-agentic-control-dashboard-mvp.md")</span></div>
-          <div class="card"><strong><a href="../../../docs/milestone-3-report.md">M3 report</a></strong><span>$(file_state "docs/milestone-3-report.md")</span></div>
+          <div class="card"><strong><a href="../../../docs/specs/m9-agentic-os-memory-security.md">Memory and security model</a></strong><span>$(file_state "docs/specs/m9-agentic-os-memory-security.md")</span></div>
+          <div class="card"><strong>Decision</strong><span>Use <code>docs/knowledge/</code> as curated engineering memory and add repo-local specs/runbooks. Do not adopt Obsidian, vector stores, or external sync in M9.</span></div>
+          <div class="card"><strong>Forbidden in Git</strong><span>Credentials, personal/private notes, raw prompts, raw transcripts, customer data, and external notebook exports with sensitive content.</span></div>
         </div>
       </section>
 
-      <section id="agents" class="span-6">
-        <h2>Agents And Skills</h2>
+      <section id="automation" class="span-6">
+        <h2>Automation Catalog</h2>
+        <p class="help">Controls are explicit launch points. Mutating work requires user approval through Codex, Git, GitHub, or connector UI.</p>
         <div class="link-list">
-          <div class="card">
-            <strong><a href="../../../.agents/small-task-agent.md">Small Task Agent</a></strong>
-            <span>Contained fixes, simple maintenance, and narrow verification work.</span>
-          </div>
-          <div class="card">
-            <strong><a href="../../../.agents/large-feature-agent.md">Large Feature Agent</a></strong>
-            <span>Substantial features, contracts, persistence, messaging, infrastructure, or architecture work.</span>
-          </div>
-          <div class="card">
-            <strong><a href="../../../.codex/skills/README.md">Project skills</a></strong>
-            <span><code>\$assetflow-planner</code>, <code>\$assetflow-prioritizer</code>, <code>\$assetflow-dotnet-implementer</code>, <code>\$assetflow-tester</code>, <code>\$assetflow-reviewer</code>, <code>\$assetflow-knowledge-keeper</code>, <code>\$assetflow-github-status</code></span>
-          </div>
+          <div class="card"><strong><a href="../../../docs/specs/m9-agentic-os-automation-telemetry.md">Automation and telemetry spec</a></strong><span>$(file_state "docs/specs/m9-agentic-os-automation-telemetry.md")</span></div>
+          <div class="card"><strong>Read-only checks</strong><span>GitHub milestone status, local Git state, docs availability, recent merged PRs, generated dashboard review.</span></div>
+          <div class="card"><strong>Approval-required actions</strong><span>Issue/PR updates, branch deletion, tag/release creation, scheduled automations, external connector writes, and generated artifact commits.</span></div>
+        </div>
+      </section>
+
+      <section id="resources" class="span-6">
+        <h2>Resource Telemetry</h2>
+        <p class="help">Resource views use only trustworthy sources and show unavailable fields plainly.</p>
+        <div class="link-list">
+          <div class="card"><strong>Trusted sources</strong><span>GitHub issues/PRs, local Git metadata, verification commands recorded in reports, dashboard generation time, and optional user-provided exports.</span></div>
+          <div class="card"><strong>Unavailable fields</strong><span>Provider token and cost totals are not available from this repository and must be displayed as unavailable, not estimated.</span></div>
+          <div class="card"><strong>Privacy boundary</strong><span>No raw AI transcripts, raw prompts, secrets, customer data, or personal notes are ingested.</span></div>
+        </div>
+      </section>
+
+      <section id="research" class="span-6">
+        <h2>Research And Workspace Integrations</h2>
+        <p class="help">M9 records integration value and prerequisites without making external services required for the repo.</p>
+        <div class="link-list">
+          <div class="card"><strong><a href="../../../docs/specs/m9-agentic-os-integrations.md">Integration plan</a></strong><span>$(file_state "docs/specs/m9-agentic-os-integrations.md")</span></div>
+          <div class="card"><strong>Local fallback</strong><span>Use Markdown specs, reports, and curated <code>docs/knowledge/</code> entries when Google Workspace, research notebooks, or other connectors are unavailable.</span></div>
+          <div class="card"><strong>Connector boundary</strong><span>Install/use external plugins only when explicitly requested and after security/data scope is understood.</span></div>
         </div>
       </section>
 
@@ -557,88 +467,37 @@ ${issues_html}
         <h2>Workflow Launch Points</h2>
         <p class="help">These are explicit launch points, not automatic mutations. Use the prompt or command text intentionally in Codex or a shell.</p>
         <div class="action-list">
-          <div class="card">
-            <strong>Status check</strong>
-            <span><span class="badge badge-ok">Read-only</span></span>
-            <span><code>\$assetflow-github-status</code></span>
-            <span>Inspect GitHub milestone/issues, PR state, local branch state, and tracking gaps.</span>
-            <span>Source: <a href="../../../.codex/skills/assetflow-github-status/SKILL.md">assetflow-github-status</a></span>
-          </div>
-          <div class="card">
-            <strong>Planning</strong>
-            <span><span class="badge badge-warn">Write action</span></span>
-            <span><code>\$assetflow-planner</code></span>
-            <span>Create or update milestone, feature, and task plans only after the user asks for planning work.</span>
-            <span>Source: <a href="../../../.codex/skills/assetflow-planner/SKILL.md">assetflow-planner</a></span>
-          </div>
-          <div class="card">
-            <strong>Prioritization</strong>
-            <span><span class="badge badge-warn">Write action</span></span>
-            <span><code>\$assetflow-prioritizer</code></span>
-            <span>Order ready tasks by dependency, risk, value, and feedback speed when the active plan needs sequencing.</span>
-            <span>Source: <a href="../../../.codex/skills/assetflow-prioritizer/SKILL.md">assetflow-prioritizer</a></span>
-          </div>
-          <div class="card">
-            <strong>Implementation</strong>
-            <span><span class="badge badge-warn">Write action</span></span>
-            <span><code>\$assetflow-dotnet-implementer</code></span>
-            <span>Implement a scoped issue after GitHub tracking, plan, and acceptance criteria are ready.</span>
-            <span>Source: <a href="../../../.codex/skills/assetflow-dotnet-implementer/SKILL.md">assetflow-dotnet-implementer</a></span>
-          </div>
-          <div class="card">
-            <strong>Testing</strong>
-            <span><span class="badge badge-ok">Read/check action</span></span>
-            <span><code>\$assetflow-tester</code></span>
-            <span>Run risk-based verification and add tests when the implementation risk calls for it.</span>
-            <span>Source: <a href="../../../.codex/skills/assetflow-tester/SKILL.md">assetflow-tester</a></span>
-          </div>
-          <div class="card">
-            <strong>Review</strong>
-            <span><span class="badge badge-ok">Read/check action</span></span>
-            <span><code>\$assetflow-reviewer</code></span>
-            <span>Review diffs for correctness, regressions, security, performance, tests, and maintainability.</span>
-            <span>Source: <a href="../../../.codex/skills/assetflow-reviewer/SKILL.md">assetflow-reviewer</a></span>
-          </div>
-          <div class="card">
-            <strong>Knowledge update</strong>
-            <span><span class="badge badge-warn">Write action</span></span>
-            <span><code>\$assetflow-knowledge-keeper</code></span>
-            <span>Update durable project knowledge when architecture, contracts, behavior, or milestone state changes.</span>
-            <span>Source: <a href="../../../.codex/skills/assetflow-knowledge-keeper/SKILL.md">assetflow-knowledge-keeper</a></span>
-          </div>
-          <div class="card">
-            <strong>GitHub sync</strong>
-            <span><span class="badge badge-warn">Write action</span></span>
-            <span><code>\$assetflow-github-status</code></span>
-            <span>Synchronize issues, milestones, labels, PRs, and status docs after plan or implementation changes.</span>
-            <span>Source: <a href="../../../docs/project-management.md">project management</a></span>
-          </div>
-          <div class="card">
-            <strong>Post-merge cleanup</strong>
-            <span><span class="badge badge-warn">Write action</span></span>
-            <span><code>Verify merge, CI, docs, issues, and branch dependencies before deleting merged branches.</code></span>
-            <span>Use only after a PR is merged and no dependent work still needs the branch.</span>
-            <span>Source: <a href="../../../docs/ai-development-workflow.md">AI development workflow</a></span>
-          </div>
-          <div class="card">
-            <strong>External workspace automation</strong>
-            <span><span class="badge badge-warn">Unavailable in M4</span></span>
-            <span>No command is provided because Google Workspace, Notion, research notebooks, memory migration, and deep automation are deferred.</span>
-            <span>Source: <a href="../../../docs/specs/m4-agentic-control-dashboard-mvp.md">M4 dashboard spec</a></span>
-          </div>
+          <div class="card"><strong>Status check</strong><span><span class="badge badge-ok">Read-only</span></span><span><code>\$assetflow-github-status</code></span><span>Inspect GitHub milestone/issues, PR state, local branch state, and tracking gaps.</span></div>
+          <div class="card"><strong>Planning</strong><span><span class="badge badge-warn">Approval required for writes</span></span><span><code>\$assetflow-planner</code></span><span>Create or update milestone, feature, and task plans only after planning work is requested.</span></div>
+          <div class="card"><strong>Implementation</strong><span><span class="badge badge-warn">Approval required for tracked writes</span></span><span><code>\$assetflow-dotnet-implementer</code></span><span>Implement a scoped issue after GitHub tracking, plan, and acceptance criteria are ready.</span></div>
+          <div class="card"><strong>Testing</strong><span><span class="badge badge-ok">Read/check action</span></span><span><code>\$assetflow-tester</code></span><span>Run risk-based verification and add tests when implementation risk calls for it.</span></div>
+          <div class="card"><strong>Review</strong><span><span class="badge badge-ok">Read/check action</span></span><span><code>\$assetflow-reviewer</code></span><span>Review diffs for correctness, regressions, security, performance, tests, and maintainability.</span></div>
+          <div class="card"><strong>Knowledge update</strong><span><span class="badge badge-warn">Approval required for writes</span></span><span><code>\$assetflow-knowledge-keeper</code></span><span>Update durable project knowledge when architecture, contracts, behavior, or milestone state changes.</span></div>
+          <div class="card"><strong>Dashboard generation</strong><span><span class="badge badge-ok">Local generated output</span></span><span><code>./tools/agent-dashboard/generate.sh</code></span><span>Generated output remains ignored by Git and should be reviewed, not committed.</span></div>
         </div>
       </section>
 
-      <section id="activity" class="span-4">
-        <h2>Activity And Gaps</h2>
+      <section id="docs" class="span-4">
+        <h2>Docs</h2>
+        <div class="link-list">
+          <div class="card"><strong><a href="../../../docs/plans/m9-agentic-os-expansion.md">M9 plan</a></strong><span>$(file_state "docs/plans/m9-agentic-os-expansion.md")</span></div>
+          <div class="card"><strong><a href="../../../docs/milestone-9-report.md">M9 report</a></strong><span>$(file_state "docs/milestone-9-report.md")</span></div>
+          <div class="card"><strong><a href="../../../docs/knowledge/overview.md">Knowledge overview</a></strong><span>$(file_state "docs/knowledge/overview.md")</span></div>
+          <div class="card"><strong><a href="../../../docs/ai-development-workflow.md">AI workflow</a></strong><span>$(file_state "docs/ai-development-workflow.md")</span></div>
+        </div>
+      </section>
+
+      <section id="activity" class="span-6">
+        <h2>Activity</h2>
         <div class="link-list">
 ${activity_html}
-${project_board_html}
+        </div>
+      </section>
+
+      <section class="span-6">
+        <h2>Unavailable Or Degraded Sources</h2>
+        <div class="link-list">
 ${degraded_states_html}
-          <div class="card">
-            <strong>Generated output</strong>
-            <span>This file is generated locally and ignored by Git.</span>
-          </div>
         </div>
       </section>
     </div>
