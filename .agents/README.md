@@ -15,5 +15,12 @@ These project-local agents coordinate the reusable Codex skills in `.codex/skill
 - `$assetflow-tester`
 - `$assetflow-reviewer`
 - `$assetflow-knowledge-keeper`
+- `$assetflow-github-status`
+- `$assetflow-frontend-motion`
 
-Use the small agent for routine fixes. Use the large feature agent when work crosses contracts, services, data models, messaging, realtime behavior, infrastructure, or architecture.
+Use the small agent for routine fixes. Use the large feature agent when work
+crosses contracts, services, data models, messaging, realtime behavior,
+infrastructure, or architecture.
+
+Agents should open context progressively: agent prompt, active phase skill, then
+only the references needed for that phase.

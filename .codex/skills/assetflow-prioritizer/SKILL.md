@@ -9,20 +9,17 @@ metadata:
 
 Use this skill after planning substantial work, when tasks need an execution order. Do not spend much time prioritizing trivial fixes.
 
-## Prioritization Criteria
+## Open Only What You Need
 
-Do not simply execute tasks in the order they were written. Build an order that accounts for:
+- For a short task list, use this file only and produce an executable order.
+- For milestone or multi-phase sequencing, open `references/prioritization.md`.
+- Record priority decisions in the relevant `docs/plans/` file when one exists.
 
-- dependencies and blockers
-- architectural foundations
-- business value and user-visible progress
-- uncertainty and technical risk
-- feedback speed and testing ability
-- integration, migration, and infrastructure requirements
+Do not simply execute tasks in the order they were written. Build an order that
+accounts for dependencies, foundations, value, uncertainty, feedback speed, and
+integration risk.
 
 Prefer early work that reduces uncertainty. For example, prove a risky PostgreSQL design, Kafka interaction, SignalR flow, or integration boundary before building a large feature around it.
-
-## Output
 
 Produce an executable order. When useful, classify tasks by priority:
 
@@ -38,5 +35,3 @@ Also classify task type when it clarifies sequencing:
 - integration
 - verification
 - cleanup
-
-Record priority decisions in the relevant plan under `docs/plans/` when a plan document exists.

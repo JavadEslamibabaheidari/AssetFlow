@@ -9,22 +9,15 @@ metadata:
 
 Use this skill for final review, requested review, or when implementation needs a senior quality gate. Inspect the actual diff and relevant surrounding code.
 
-Review against:
+## Open Only What You Need
 
-- original request, requirements, acceptance criteria, and plan
-- architecture, coding standards, public contracts, and repository conventions
-- tests, security, performance, observability, maintainability, and deployment impact
+- For small diffs, inspect the diff, touched code, and tests using this file only.
+- For substantial diffs, architecture, contracts, security/performance risk, or final quality gates, open `references/review-checklist.md`.
+- When the user asks for a code review, lead with findings ordered by severity and include file/line references.
 
-Look specifically for missing requirements, unnecessary complexity, architectural violations, duplicated logic, poor naming, inappropriate abstractions, concurrency problems, resource leaks, incorrect async behavior, missing cancellation, SQL issues, transaction problems, Kafka reliability problems, event consistency problems, security issues, insufficient tests, breaking contracts, and avoidable performance regressions.
+Review against the original request, requirements, acceptance criteria, plan,
+architecture, conventions, public contracts, tests, security, performance,
+observability, maintainability, and deployment impact.
 
-## Feedback Loop
-
-Classify issues by severity and route work accordingly:
-
-- Minor: naming, cleanup, edge-case test, or localized mistake. Fix, test, and review again.
-- Moderate: approach is wrong, several tasks need revision, or a contract needs adjustment. Return to implementation, update plan tasks if needed, test, and review again.
-- Major: requirement misunderstood, architecture wrong, core assumption invalid, feature scope changed, or event model incorrect. Return to planning, then prioritize, implement, test, and review.
-
-Never preserve a bad implementation just because it matches an outdated plan. The product need wins over the plan document.
-
-When the user asks for a code review, lead with findings ordered by severity and include file and line references where available.
+Never preserve a bad implementation just because it matches an outdated plan.
+The product need wins over the plan document.

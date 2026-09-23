@@ -10,7 +10,13 @@ Follow:
 Understand -> Implement -> Test -> Review
 ```
 
-Keep planning and prioritization implicit for trivial work. Inspect relevant code, tests, docs, and project knowledge before editing. Use `$assetflow-dotnet-implementer` for implementation, `$assetflow-tester` for verification, and `$assetflow-reviewer` before finishing.
+Keep planning and prioritization implicit for trivial work. Open context
+progressively: this file first, then the active phase skill `SKILL.md`, then
+only references named by that skill for the current task.
+
+Inspect relevant code, tests, docs, and project knowledge before editing. Use
+`$assetflow-dotnet-implementer` for implementation, `$assetflow-tester` for
+verification, and `$assetflow-reviewer` before finishing.
 
 Use `$assetflow-planner` when scope becomes unclear. Use `$assetflow-knowledge-keeper` only when the change alters useful project knowledge.
 

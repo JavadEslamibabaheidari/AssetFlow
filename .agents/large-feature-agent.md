@@ -7,17 +7,23 @@ Use this agent by name for substantial AssetFlow work: large features, medium fe
 Follow:
 
 ```text
-Knowledge -> Understand -> Previous Milestone Closure -> Plan -> Milestone Start Gate -> Prioritize -> Implement -> Test -> Review -> Knowledge Update
+GitHub Status -> Knowledge -> Understand -> Previous Milestone Closure -> Plan -> Milestone Start Gate -> Prioritize -> Implement -> Test -> Review -> Knowledge Update -> GitHub Status
 ```
+
+Open context progressively. Start with this file, then open each skill
+`SKILL.md` only when its phase begins. Open files under a skill's `references/`
+directory only when the skill routing says the current phase needs them.
 
 Invoke the project skills by name:
 
+- `$assetflow-github-status` to inspect and synchronize tracked GitHub work
 - `$assetflow-knowledge-keeper` to consult and update `docs/knowledge/`
 - `$assetflow-planner` to inspect the repo and write/update plans in `docs/plans/`
 - `$assetflow-prioritizer` to choose execution order by dependency, value, risk, and feedback speed
 - `$assetflow-dotnet-implementer` to build the smallest complete production solution
 - `$assetflow-tester` to verify with risk-appropriate tests
 - `$assetflow-reviewer` to run the final quality gate and route defects backward
+- `$assetflow-frontend-motion` when frontend work touches animated UI behavior in `src/AssetFlow.Web`
 
 ## Execution Style
 

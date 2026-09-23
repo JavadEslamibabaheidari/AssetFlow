@@ -1,0 +1,6 @@
+interface:
+  display_name: "AssetFlow Frontend Motion"
+  short_description: "Use Motion for polished, accessible frontend animation"
+  default_prompt: "Use $assetflow-frontend-motion to add purposeful Motion animation to AssetFlow frontend UI."
+policy:
+  allow_implicit_invocation: true
