@@ -1,4 +1,7 @@
+import { motion } from "motion/react";
 import type { ReactNode } from "react";
+
+const surfaceTransition = { duration: 0.2, ease: [0.22, 1, 0.36, 1] as const };
 
 type PageHeaderProps = {
   eyebrow: string;
@@ -16,13 +19,18 @@ export function PageHeader({
   compact = false
 }: PageHeaderProps) {
   return (
-    <div className={`section-heading${compact ? " compact" : ""}`}>
+    <motion.div
+      className={`section-heading${compact ? " compact" : ""}`}
+      initial={{ y: 10 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+    >
       <div>
         <p className="eyebrow">{eyebrow}</p>
         <h2 id={titleId}>{title}</h2>
       </div>
       <p>{description}</p>
-    </div>
+    </motion.div>
   );
 }
 
@@ -34,11 +42,18 @@ type MetricCardProps = {
 
 export function MetricCard({ label, value, description }: MetricCardProps) {
   return (
-    <article className="metric-card">
+    <motion.article
+      className="metric-card"
+      initial={{ y: 12 }}
+      animate={{ y: 0 }}
+      whileHover={{ y: -4, scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      transition={surfaceTransition}
+    >
       <span>{label}</span>
       <strong>{value}</strong>
       <p>{description}</p>
-    </article>
+    </motion.article>
   );
 }
 
@@ -49,10 +64,16 @@ type InfoPanelProps = {
 
 export function InfoPanel({ title, children }: InfoPanelProps) {
   return (
-    <article className="info-panel">
+    <motion.article
+      className="info-panel"
+      initial={{ y: 10 }}
+      animate={{ y: 0 }}
+      whileHover={{ y: -3 }}
+      transition={surfaceTransition}
+    >
       <h3>{title}</h3>
       <div>{children}</div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -75,11 +96,17 @@ type DefinitionListProps = {
 export function DefinitionList({ items }: DefinitionListProps) {
   return (
     <dl className="settings-list">
-      {items.map((item) => (
-        <div key={item.term}>
+      {items.map((item, index) => (
+        <motion.div
+          key={item.term}
+          initial={{ x: -10 }}
+          animate={{ x: 0 }}
+          transition={{ ...surfaceTransition, delay: index * 0.04 }}
+          whileHover={{ x: 3 }}
+        >
           <dt>{item.term}</dt>
           <dd>{item.description}</dd>
-        </div>
+        </motion.div>
       ))}
     </dl>
   );
