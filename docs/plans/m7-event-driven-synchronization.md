@@ -140,8 +140,8 @@ The outbox schema and payload tests must make schema versioning explicit so late
 
 ## GitHub Tracking
 
-- Milestone: `M7 - Event-Driven Synchronization` is in closure with five implementation issues closed and #90 validating docs/release state.
-- Issues: #85 start gate, #86 event/outbox foundation, #87 reservation and availability events, #88 operations visibility, and #89 channel synchronization worker are closed; #90 is the final validation/docs/release closure issue.
+- Milestone: `M7 - Event-Driven Synchronization` is closed.
+- Issues: #85 start gate, #86 event/outbox foundation, #87 reservation and availability events, #88 operations visibility, #89 channel synchronization worker, and #90 final validation/docs/release closure are closed.
 - Project board: project item and column mapping is unavailable from this environment; issue project item lists are empty in `gh issue view`.
 - Follow-up issue alignment: #86 through #90 matched this plan's task sequence. No scope change was required; live marketplace providers, Kafka as runtime infrastructure, observability dashboards, and manual retry commands remain deferred.
 

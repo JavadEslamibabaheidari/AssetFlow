@@ -18,7 +18,7 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 `M7 - Event-Driven Synchronization`
 
-M7 is implemented and preparing release closure. The platform now publishes inventory and reservation changes through a PostgreSQL-backed outbox, processes availability changes through an idempotent channel synchronization worker, and exposes backend-backed synchronization health in the frontend Operations surface:
+M7 is implemented, tagged, released, and closed. The platform now publishes inventory and reservation changes through a PostgreSQL-backed outbox, processes availability changes through an idempotent channel synchronization worker, and exposes backend-backed synchronization health in the frontend Operations surface:
 
 - durable integration event envelopes and `outbox_messages` persistence
 - stock item, reservation lifecycle, availability, and channel sync event contracts
