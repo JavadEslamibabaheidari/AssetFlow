@@ -16,17 +16,18 @@ The engineering goal is to build the platform through a disciplined AI developme
 
 ## Current Milestone
 
-`M6 - Frontend Inventory Parity`
+`M7 - Event-Driven Synchronization`
 
-M6 is implemented in the current development branch. The frontend now reaches the backend inventory and reservation surface completed by M3:
+M7 is implemented and preparing release closure. The platform now publishes inventory and reservation changes through a PostgreSQL-backed outbox, processes availability changes through an idempotent channel synchronization worker, and exposes backend-backed synchronization health in the frontend Operations surface:
 
-- API-backed vendor, product, sales-channel, stock-item, reservation, and availability workflows
-- reservation create, list, detail, release, expiration, and oversell-conflict feedback
-- operational loading, empty, validation, conflict, not-found, disabled, and success states
-- focused component tests and Playwright smoke coverage
-- split backend, frontend, and integration/Compose CI workflows
+- durable integration event envelopes and `outbox_messages` persistence
+- stock item, reservation lifecycle, availability, and channel sync event contracts
+- channel synchronization processing with persisted success, failure, retry, and attempt state
+- `GET /channel-sync/status` plus generated frontend client support
+- Operations page visibility for no-sync, pending/in-progress, succeeded, failed, and retryable states
+- backend, frontend, and integration CI coverage for contract and workflow changes
 
-The next milestone is M7, Event-Driven Synchronization, which should add event publication and channel synchronization behavior.
+The next milestone is M8, Observability and Monitoring, which should add deeper logs, metrics, traces, dashboards, and operational alerting around the synchronized product surface.
 
 ## Local Run
 
