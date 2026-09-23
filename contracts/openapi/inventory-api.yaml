@@ -22,6 +22,8 @@ tags:
     description: Temporary stock holds that reduce availability until released or expired.
   - name: ChannelSync
     description: Channel synchronization status and retry visibility.
+  - name: Observability
+    description: Service health, metrics, and monitoring integration endpoints.
 paths:
   /vendors:
     get:
@@ -424,6 +426,48 @@ paths:
               examples:
                 syncStatuses:
                   $ref: "#/components/examples/ChannelSyncStatusListExample"
+  /observability/health:
+    get:
+      tags:
+        - Observability
+      operationId: getObservabilityHealth
+      summary: Get service health and operational summary.
+      description: Returns current API health, outbox backlog, synchronization failure, retry, trace, and correlation details.
+      responses:
+        "200":
+          description: Observability health returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObservabilityHealthResponse"
+  /observability/metrics:
+    get:
+      tags:
+        - Observability
+      operationId: getObservabilityMetrics
+      summary: Get JSON operational metrics.
+      description: Returns aggregate operational metrics for frontend and agent consumption.
+      responses:
+        "200":
+          description: Observability metrics returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObservabilityMetricsResponse"
+  /observability/prometheus:
+    get:
+      tags:
+        - Observability
+      operationId: getPrometheusMetrics
+      summary: Get Prometheus metrics.
+      description: Returns Prometheus text exposition for optional local scraping.
+      responses:
+        "200":
+          description: Prometheus metrics returned.
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   parameters:
     VendorId:
@@ -894,6 +938,152 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ChannelSyncStatus"
+    ObservabilityStatus:
+      type: string
+      enum:
+        - Healthy
+        - Busy
+        - Degraded
+    OutboxStatusMetric:
+      type: object
+      required:
+        - status
+        - count
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+          minimum: 0
+    OutboxEventMetric:
+      type: object
+      required:
+        - eventType
+        - status
+        - count
+      properties:
+        eventType:
+          type: string
+        status:
+          type: string
+        count:
+          type: integer
+          minimum: 0
+    OutboxObservability:
+      type: object
+      required:
+        - totalMessages
+        - pendingMessages
+        - processingMessages
+        - publishedMessages
+        - failedMessages
+        - oldestPendingAtUtc
+        - nextAttemptAtUtc
+        - byStatus
+        - byEventType
+      properties:
+        totalMessages:
+          type: integer
+          minimum: 0
+        pendingMessages:
+          type: integer
+          minimum: 0
+        processingMessages:
+          type: integer
+          minimum: 0
+        publishedMessages:
+          type: integer
+          minimum: 0
+        failedMessages:
+          type: integer
+          minimum: 0
+        oldestPendingAtUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+        nextAttemptAtUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+        byStatus:
+          type: array
+          items:
+            $ref: "#/components/schemas/OutboxStatusMetric"
+        byEventType:
+          type: array
+          items:
+            $ref: "#/components/schemas/OutboxEventMetric"
+    ChannelSyncObservability:
+      type: object
+      required:
+        - totalStates
+        - pendingStates
+        - inProgressStates
+        - succeededStates
+        - failedStates
+        - retryableFailures
+        - nextRetryAtUtc
+        - lastFailureAtUtc
+      properties:
+        totalStates:
+          type: integer
+          minimum: 0
+        pendingStates:
+          type: integer
+          minimum: 0
+        inProgressStates:
+          type: integer
+          minimum: 0
+        succeededStates:
+          type: integer
+          minimum: 0
+        failedStates:
+          type: integer
+          minimum: 0
+        retryableFailures:
+          type: integer
+          minimum: 0
+        nextRetryAtUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+        lastFailureAtUtc:
+          type:
+            - string
+            - "null"
+          format: date-time
+    ObservabilityHealthResponse:
+      type: object
+      required:
+        - status
+        - service
+        - checkedAtUtc
+        - traceId
+        - correlationId
+        - outbox
+        - channelSync
+      properties:
+        status:
+          $ref: "#/components/schemas/ObservabilityStatus"
+        service:
+          type: string
+        checkedAtUtc:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+        correlationId:
+          type: string
+        outbox:
+          $ref: "#/components/schemas/OutboxObservability"
+        channelSync:
+          $ref: "#/components/schemas/ChannelSyncObservability"
+    ObservabilityMetricsResponse:
+      allOf:
+        - $ref: "#/components/schemas/ObservabilityHealthResponse"
     ProblemDetails:
       type: object
       required:

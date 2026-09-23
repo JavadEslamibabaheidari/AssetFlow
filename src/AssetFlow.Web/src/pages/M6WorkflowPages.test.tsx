@@ -13,6 +13,8 @@ const inventoryApiClientMock = vi.hoisted(() => ({
   createProduct: vi.fn(),
   listChannels: vi.fn(),
   listChannelSyncStatuses: vi.fn(),
+  getObservabilityHealth: vi.fn(),
+  getObservabilityMetrics: vi.fn(),
   createChannel: vi.fn(),
   listStockItems: vi.fn(),
   createStockItem: vi.fn(),
@@ -106,6 +108,39 @@ describe("M6 workflow pages", () => {
         }
       ]
     });
+    inventoryApiClientMock.getObservabilityHealth.mockResolvedValue({
+      status: "Degraded",
+      service: "Inventory API",
+      checkedAtUtc: "2026-09-21T09:06:00Z",
+      traceId: "trace-123",
+      correlationId: "corr-123",
+      outbox: {
+        totalMessages: 4,
+        pendingMessages: 1,
+        processingMessages: 1,
+        publishedMessages: 1,
+        failedMessages: 1,
+        oldestPendingAtUtc: "2026-09-21T09:00:00Z",
+        nextAttemptAtUtc: "2026-09-21T09:10:00Z",
+        byStatus: [
+          { status: "Pending", count: 1 },
+          { status: "Processing", count: 1 },
+          { status: "Published", count: 1 },
+          { status: "Failed", count: 1 }
+        ],
+        byEventType: [{ eventType: "StockAvailabilityChanged", status: "Failed", count: 1 }]
+      },
+      channelSync: {
+        totalStates: 1,
+        pendingStates: 0,
+        inProgressStates: 0,
+        succeededStates: 0,
+        failedStates: 1,
+        retryableFailures: 1,
+        nextRetryAtUtc: "2026-09-21T09:10:00Z",
+        lastFailureAtUtc: "2026-09-21T09:05:00Z"
+      }
+    });
     inventoryApiClientMock.listStockItems.mockResolvedValue({ items: [stockItem] });
     inventoryApiClientMock.getStockItem.mockResolvedValue({ stockItem });
     inventoryApiClientMock.getStockItemAvailability.mockResolvedValue({
@@ -160,14 +195,20 @@ describe("M6 workflow pages", () => {
     renderWithQueryClient(<OperationsPage />);
 
     expect(await screen.findByText("Channel synchronization")).toBeVisible();
+    expect(await screen.findByText("Service observability")).toBeVisible();
+    expect(await screen.findByText("Outbox backlog")).toBeVisible();
+    expect(await screen.findByText("Sync failures")).toBeVisible();
+    expect(await screen.findByText("trace-123")).toBeVisible();
+    expect(await screen.findByText("corr-123")).toBeVisible();
     expect(await screen.findByText("AMAZON")).toBeVisible();
     expect(await screen.findByText("Failed")).toBeVisible();
     expect(await screen.findByText("Marketplace unavailable")).toBeVisible();
     expect(screen.getByText("8")).toBeVisible();
-    expect(screen.getByText("2")).toBeVisible();
+    expect(screen.getAllByText("2").length).toBeGreaterThanOrEqual(1);
 
     await waitFor(() => {
       expect(inventoryApiClientMock.listChannelSyncStatuses).toHaveBeenCalled();
+      expect(inventoryApiClientMock.getObservabilityHealth).toHaveBeenCalled();
     });
   });
 

@@ -296,6 +296,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/observability/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get service health and operational summary. */
+        get: operations["getObservabilityHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/observability/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get JSON operational metrics. */
+        get: operations["getObservabilityMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/observability/prometheus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Prometheus metrics. */
+        get: operations["getPrometheusMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -464,6 +515,53 @@ export interface components {
         ChannelSyncStatusListResponse: {
             items: components["schemas"]["ChannelSyncStatus"][];
         };
+        /** @enum {string} */
+        ObservabilityStatus: "Healthy" | "Busy" | "Degraded";
+        OutboxStatusMetric: {
+            status: string;
+            count: number;
+        };
+        OutboxEventMetric: {
+            eventType: string;
+            status: string;
+            count: number;
+        };
+        OutboxObservability: {
+            totalMessages: number;
+            pendingMessages: number;
+            processingMessages: number;
+            publishedMessages: number;
+            failedMessages: number;
+            /** Format: date-time */
+            oldestPendingAtUtc: string | null;
+            /** Format: date-time */
+            nextAttemptAtUtc: string | null;
+            byStatus: components["schemas"]["OutboxStatusMetric"][];
+            byEventType: components["schemas"]["OutboxEventMetric"][];
+        };
+        ChannelSyncObservability: {
+            totalStates: number;
+            pendingStates: number;
+            inProgressStates: number;
+            succeededStates: number;
+            failedStates: number;
+            retryableFailures: number;
+            /** Format: date-time */
+            nextRetryAtUtc: string | null;
+            /** Format: date-time */
+            lastFailureAtUtc: string | null;
+        };
+        ObservabilityHealthResponse: {
+            status: components["schemas"]["ObservabilityStatus"];
+            service: string;
+            /** Format: date-time */
+            checkedAtUtc: string;
+            traceId: string;
+            correlationId: string;
+            outbox: components["schemas"]["OutboxObservability"];
+            channelSync: components["schemas"]["ChannelSyncObservability"];
+        };
+        ObservabilityMetricsResponse: components["schemas"]["ObservabilityHealthResponse"];
         ProblemDetails: {
             /** Format: uri */
             type: string;
@@ -937,6 +1035,66 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChannelSyncStatusListResponse"];
+                };
+            };
+        };
+    };
+    getObservabilityHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Observability health returned. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservabilityHealthResponse"];
+                };
+            };
+        };
+    };
+    getObservabilityMetrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Observability metrics returned. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservabilityMetricsResponse"];
+                };
+            };
+        };
+    };
+    getPrometheusMetrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Prometheus metrics returned. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
                 };
             };
         };

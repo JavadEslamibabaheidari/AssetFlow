@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Inventory.Api.Application.Events;
+using Inventory.Api.Infrastructure.Observability;
 using Inventory.Api.Infrastructure.Persistence;
 using Inventory.Api.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +19,12 @@ public sealed class ChannelSynchronizationProcessor(
         DateTimeOffset nowUtc,
         CancellationToken cancellationToken)
     {
+        using var activity = InventoryDiagnostics.ActivitySource.StartActivity("channel.sync.process_due");
+        activity?.SetTag("assetflow.channel_sync.batch_size", batchSize);
+
         if (batchSize <= 0)
         {
+            activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, "Batch size must be greater than zero.");
             throw new ArgumentOutOfRangeException(nameof(batchSize), "Batch size must be greater than zero.");
         }
 
@@ -41,6 +46,9 @@ public sealed class ChannelSynchronizationProcessor(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
+        activity?.SetTag("assetflow.channel_sync.processed_count", messages.Length);
+        activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Ok);
+
         return messages.Length;
     }
 
@@ -49,6 +57,10 @@ public sealed class ChannelSynchronizationProcessor(
         DateTimeOffset nowUtc,
         CancellationToken cancellationToken)
     {
+        using var activity = InventoryDiagnostics.ActivitySource.StartActivity("channel.sync.process_message");
+        activity?.SetTag("assetflow.outbox.event_type", message.EventType);
+        activity?.SetTag("assetflow.outbox.status", message.Status.ToString());
+
         var payload = JsonSerializer.Deserialize<StockAvailabilityChangedPayload>(
             message.PayloadJson,
             SerializerOptions);
@@ -56,6 +68,7 @@ public sealed class ChannelSynchronizationProcessor(
         if (payload is null)
         {
             message.MarkFailed(nowUtc, "Stock availability payload could not be deserialized.", null);
+            activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, "Payload could not be deserialized.");
             return;
         }
 
@@ -98,6 +111,8 @@ public sealed class ChannelSynchronizationProcessor(
         {
             message.MarkPublished(nowUtc);
             syncState.MarkSucceeded(nowUtc);
+            activity?.SetTag("assetflow.channel_sync.outcome", "Succeeded");
+            activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Ok);
             return;
         }
 
@@ -105,5 +120,8 @@ public sealed class ChannelSynchronizationProcessor(
         DateTimeOffset? nextAttemptAtUtc = result.Retryable ? nowUtc.Add(RetryDelay) : null;
         message.MarkFailed(nowUtc, errorSummary, nextAttemptAtUtc);
         syncState.MarkFailed(errorSummary, nowUtc, nextAttemptAtUtc);
+        activity?.SetTag("assetflow.channel_sync.outcome", "Failed");
+        activity?.SetTag("assetflow.channel_sync.retryable", result.Retryable);
+        activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, errorSummary);
     }
 }
