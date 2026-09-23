@@ -2,7 +2,9 @@ import { expect, test, type APIRequestContext, type Page } from "@playwright/tes
 
 const apiBaseUrl = "http://localhost:8080";
 
-test("assets buttons create vendor, product, channel, and stock records", async ({ page }) => {
+test("assets buttons create vendor, product, channel, and stock records @backend", async ({
+  page
+}) => {
   const suffix = Date.now().toString();
   const vendorName = `Browser Vendor ${suffix}`;
   const sku = `BROWSER-${suffix}`;
@@ -50,7 +52,7 @@ test("assets buttons create vendor, product, channel, and stock records", async 
   await expect(stockRow.getByRole("cell", { name: channelCode, exact: true })).toBeVisible();
 });
 
-test("reservation buttons create, inspect, release, and expire holds", async ({
+test("reservation buttons create, inspect, release, and expire holds @backend", async ({
   page,
   request
 }) => {
@@ -83,7 +85,7 @@ test("reservation buttons create, inspect, release, and expire holds", async ({
   await expect(page.getByText(/reservations expired|reservation expired/)).toBeVisible();
 });
 
-test("marketplace page reads channel and observability data from the backend", async ({
+test("marketplace page reads channel and observability data from the backend @backend", async ({
   page,
   request
 }) => {
