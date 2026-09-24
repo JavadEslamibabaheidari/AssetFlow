@@ -28,6 +28,7 @@ const reservationKeys = {
 
 export function ReservationsPage() {
   const queryClient = useQueryClient();
+  const [reservationStockItemId, setReservationStockItemId] = useState("");
   const [selectedStockItemId, setSelectedStockItemId] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | ReservationStatus>("");
   const [selectedReservationId, setSelectedReservationId] = useState("");
@@ -92,6 +93,7 @@ export function ReservationsPage() {
     mutationFn: (body: { stockItemId: string; quantity: number; expiresAtUtc: string }) =>
       inventoryApiClient.createReservation(body),
     onSuccess: async ({ reservation }) => {
+      setReservationStockItemId(reservation.stockItemId);
       setSelectedReservationId(reservation.id);
       setSelectedStockItemId(reservation.stockItemId);
       setSuccess("Reservation created.");
@@ -173,8 +175,11 @@ export function ReservationsPage() {
                 name="stockItemId"
                 required
                 disabled={stockItemOptions.length === 0}
-                value={selectedStockItemId}
-                onChange={(event) => setSelectedStockItemId(event.target.value)}
+                value={reservationStockItemId}
+                onChange={(event) => {
+                  setReservationStockItemId(event.target.value);
+                  setSelectedStockItemId(event.target.value);
+                }}
               >
                 <option value="">Select stock</option>
                 {stockItemOptions.map(({ stockItem, label }) => (
@@ -434,7 +439,6 @@ function handleReservationSubmit(
     quantity: Number(data.get("quantity") ?? 0),
     expiresAtUtc: toIso(String(data.get("expiresAtUtc") ?? ""))
   });
-  form.reset();
 }
 
 function handleExpireSubmit(

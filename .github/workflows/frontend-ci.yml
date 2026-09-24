@@ -62,7 +62,7 @@ jobs:
 
       - name: Playwright
         working-directory: src/AssetFlow.Web
-        run: npm run test:e2e -- --project=chromium
+        run: npm run test:e2e -- --project=chromium --grep-invert @backend
 
       - name: Docker build frontend
         run: docker build -t assetflow-web:ci ./src/AssetFlow.Web

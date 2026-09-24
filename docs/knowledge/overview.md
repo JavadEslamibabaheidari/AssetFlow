@@ -73,6 +73,8 @@ M5 issue #64 added frontend quality gates for `src/AssetFlow.Web`: Prettier form
 
 M5 issue #65 added the frontend Docker Compose verification path. `src/AssetFlow.Web/Dockerfile` builds the Vite app with Node 20 and serves static output with Nginx on container port 8080. `docker-compose.yml` now runs `inventory-api` on host port 8080 and `assetflow-web` on host port 5173, with the frontend build configured to call the browser-facing API base URL `http://localhost:8080`.
 
+The local Compose stack includes PostgreSQL for real frontend/backend workflows. The `inventory-api` service uses `ConnectionStrings__InventoryDb=Host=postgres;...` and `AssetFlow__ApplyDatabaseMigrations=true`; `Program.cs` applies EF Core migrations only when that explicit flag is set. This keeps WebApplicationFactory tests and ordinary host scenarios from unexpectedly migrating a real database while making `docker compose up --build` usable for create/list/reservation flows.
+
 M5 final validation confirmed the plan acceptance criteria against the implemented workspace, documentation, CI, and Docker Compose path. Local backend tests and Compose smoke checks passed; frontend package-script checks were verified by GitHub CI because the local validation shell exposed Node but no `npm` executable. Project-board item/column mapping remains unverified from this environment, while GitHub issues, PRs, CI, and milestone state were verified through the available GitHub CLI/API path.
 
 M6, Frontend Inventory Parity, is complete. Its plan is `docs/plans/m6-frontend-inventory-parity.md`, its report is `docs/milestone-6-report.md`, and its GitHub milestone `M6 - Frontend Inventory Parity` is closed. The final M6 state is tagged and released as `v0.6.0 - M6 Frontend Inventory Parity`; issues #74 through #81 are closed, and PRs #82, #83, and #84 are merged.
@@ -124,6 +126,29 @@ M9 external workspace and research integration planning is recorded in `docs/spe
 The Agentic OS dashboard generator remains in `tools/agent-dashboard/generate.sh`. It now surfaces M9 memory, automation, resource telemetry, research, tracking, workflow launch points, activity, and degraded-source sections. The generator reads local Git metadata and, when available, M9 GitHub milestone/issues/recent PR state through `gh`. It still generates ignored static output under `tools/agent-dashboard/dist/`; generated output must not be committed.
 
 M9 safety boundaries are explicit: generated dashboard output, credentials, raw prompts, raw transcripts, personal/private data, and unavailable token/cost guesses must not be committed. `docs/knowledge/` remains the curated engineering knowledge cache. The static dashboard may present prompts, links, and command text, but it must not perform mutating operations by itself.
+
+M6 was reopened on 2026-09-23 after live frontend inspection showed that the
+frontend still had placeholder route pages rather than the promised API-backed
+inventory workflows. The reopened corrective plan is
+`docs/plans/m6-frontend-inventory-parity.md`; GitHub milestone #7 is open again,
+with #74, #75, #77, #78, #79, #80, and #81 reopened for unfinished parity work.
+The plan now contains an explicit backend/frontend parity map. Backend M2/M3
+operations remain the source of truth; the frontend must not invent update,
+delete, auth, tenant, checkout, payment, shipping, or event-sync behavior that
+the backend does not expose.
+
+The first corrective M6 implementation slice is #81, master-data workflows.
+The frontend `InventoryPage` now uses React Query and the generated API client
+to list and create vendors, products, channels, and stock items. The
+`ReservationsPage` keeps reservation creation state separate from ledger
+filtering so create/release/expire actions work reliably. The `OperationsPage`
+lists sales channels and backend observability/synchronization status. The API
+client includes create methods for vendors, products, channels, stock items, and
+reservations. `Inventory.Api` now allows the Vite dev/preview origins through an
+explicit CORS policy so browser calls from `src/AssetFlow.Web` can reach the API
+during local development. Playwright backend workflow coverage verifies Assets
+create buttons, Reservation create/inspect/release/expire buttons, and
+Marketplace backend reads against the running Compose API/PostgreSQL stack.
 
 ## Architecture Direction
 

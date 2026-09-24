@@ -38,8 +38,23 @@ jobs:
       - name: Docker Compose build
         run: docker compose build
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        working-directory: src/AssetFlow.Web
+        run: npm install
+
+      - name: Install Playwright browser
+        working-directory: src/AssetFlow.Web
+        run: npx playwright install --with-deps chromium
+
       - name: Docker Compose smoke test
         shell: bash
+        env:
+          PLAYWRIGHT_REUSE_SERVER: "true"
         run: |
           set -euo pipefail
 
@@ -81,3 +96,5 @@ jobs:
             docker compose logs assetflow-web
             exit 1
           fi
+
+          npm --prefix src/AssetFlow.Web run test:e2e -- --project=chromium --grep @backend

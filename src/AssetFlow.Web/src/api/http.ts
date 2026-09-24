@@ -15,7 +15,10 @@ export class ApiHttpClient {
   private readonly baseUrl: string;
   private readonly fetcher: typeof fetch;
 
-  public constructor(baseUrl = getAppConfig().apiBaseUrl, fetcher: typeof fetch = fetch) {
+  public constructor(
+    baseUrl = getAppConfig().apiBaseUrl,
+    fetcher: typeof fetch = globalThis.fetch.bind(globalThis)
+  ) {
     this.baseUrl = baseUrl.replace(/\/$/, "");
     this.fetcher = fetcher;
   }

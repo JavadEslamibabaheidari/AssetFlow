@@ -35,6 +35,8 @@ docker compose up --build
 
 The frontend container listens on `http://localhost:5173` and serves `/health`. If `5173` is already busy locally, run `ASSETFLOW_WEB_PORT=6173 docker compose up --build` to choose another host port. Its browser-facing API base URL is set at image build time through `VITE_ASSETFLOW_API_BASE_URL`, defaulting to `http://localhost:8080` in `docker-compose.yml`.
 
+Compose also starts PostgreSQL for the Inventory API. The API uses the internal `postgres` service hostname and applies EF Core migrations at startup when `AssetFlow__ApplyDatabaseMigrations=true`, which is set only for the Compose path.
+
 ## Scripts
 
 - `npm run dev`: start the Vite dev server
@@ -43,7 +45,7 @@ The frontend container listens on `http://localhost:5173` and serves `/health`. 
 - `npm run lint`: run ESLint
 - `npm run preview`: preview the production build locally
 - `npm run test`: run Vitest component/unit tests
-- `npm run test:e2e`: run Playwright smoke tests
+- `npm run test:e2e`: run Playwright smoke and backend workflow tests. Keep Docker Compose running when executing backend workflow coverage locally.
 - `npm run typecheck`: run TypeScript without emitting files
 
 ## Design System
