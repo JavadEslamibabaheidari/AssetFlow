@@ -129,6 +129,7 @@ Open questions:
 - #115 is complete: the previous milestone closure hook and M10 start gate passed, and PR #127 merged the synchronized plan and tracking state.
 - #117 architecture prototype is implemented on `codex/117-3d-architecture-prototype`: the React Three Fiber decision is documented in `docs/specs/m10-3d-frontend-architecture.md`, the shell has a responsive CSS spatial fallback, routes remain available, and reduced-motion plus desktop/mobile checks pass.
 - The actual Three.js/React Three Fiber canvas, dependency installation, bundle delta, WebGL detection, and runtime failure proof remain scoped to #123.
+- #123 uses React 18-compatible pinned versions, lazy-loads the live WebGL canvas above the CSS fallback, disables it for reduced-motion users, and records the initial 3D chunk cost in the architecture note.
 
 ## GitHub Tracking
 

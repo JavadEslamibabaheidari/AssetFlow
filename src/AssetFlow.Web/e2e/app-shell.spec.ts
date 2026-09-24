@@ -47,5 +47,24 @@ test("keeps the spatial fallback available with reduced motion", async ({ page }
   await page.goto("/");
 
   await expect(page.getByTestId("immersive-backdrop")).toBeVisible();
+  await expect(page.getByTestId("immersive-scene-canvas")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Assets" })).toBeVisible();
+});
+
+test("renders a live WebGL canvas when motion is allowed", async ({ page }) => {
+  await page.goto("/");
+
+  const canvas = page.getByTestId("immersive-scene-canvas");
+  await expect(canvas).toBeVisible();
+  const canvasSurface = canvas.locator("canvas");
+  await expect(canvasSurface).toBeVisible();
+  await expect
+    .poll(async () => canvas.evaluate((element) => element.getBoundingClientRect().width))
+    .toBeGreaterThan(300);
+
+  const hasWebGLContext = await canvasSurface.evaluate((element) => {
+    const target = element as HTMLCanvasElement;
+    return Boolean(target.getContext("webgl2") || target.getContext("webgl"));
+  });
+  expect(hasWebGLContext).toBe(true);
 });
