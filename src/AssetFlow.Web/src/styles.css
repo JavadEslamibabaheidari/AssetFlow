@@ -34,13 +34,30 @@ a:focus-visible {
   overflow: hidden;
 }
 
-.immersive-backdrop {
+.immersive-scene-host {
   position: fixed;
   z-index: -2;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
   background: #071014;
+}
+
+.immersive-backdrop,
+.immersive-scene-canvas {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.immersive-backdrop {
+  z-index: 0;
+}
+
+.immersive-scene-canvas {
+  z-index: 1;
+  opacity: 0.82;
 }
 
 .spatial-grid {
@@ -817,8 +834,12 @@ a:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .immersive-backdrop * {
+  .immersive-scene-host * {
     animation: none !important;
     transition: none !important;
+  }
+
+  .immersive-scene-canvas {
+    display: none;
   }
 }
