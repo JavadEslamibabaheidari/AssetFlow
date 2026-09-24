@@ -1,10 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { InventoryPage } from "./InventoryPage";
 import { OperationsPage } from "./OperationsPage";
 import { ReservationsPage } from "./ReservationsPage";
+import { ApiError } from "../api/errors";
 
 const inventoryApiClientMock = vi.hoisted(() => ({
   listVendors: vi.fn(),
@@ -154,8 +155,14 @@ describe("M6 workflow pages", () => {
     });
     inventoryApiClientMock.listReservations.mockResolvedValue({ items: [reservation] });
     inventoryApiClientMock.createVendor.mockResolvedValue({ vendor });
+    inventoryApiClientMock.createStockItem.mockResolvedValue({ stockItem });
+    inventoryApiClientMock.createReservation.mockResolvedValue({ reservation });
     inventoryApiClientMock.releaseReservation.mockResolvedValue({
       reservation: { ...reservation, status: "Released", releasedAtUtc: "2026-09-21T10:00:00Z" }
+    });
+    inventoryApiClientMock.expireReservations.mockResolvedValue({
+      expiredCount: 1,
+      items: [{ ...reservation, status: "Expired", expiredAtUtc: "2026-09-21T12:00:00Z" }]
     });
   });
 
@@ -178,6 +185,37 @@ describe("M6 workflow pages", () => {
     });
   });
 
+  it("creates stock items and inspects reservation-aware availability", async () => {
+    renderWithQueryClient(<InventoryPage />);
+
+    expect(await screen.findByText("BAT-200")).toBeVisible();
+    const stockItems = screen.getByRole("region", { name: "Stock items" });
+
+    fireEvent.change(within(stockItems).getByLabelText("Product"), {
+      target: { value: "product-1" }
+    });
+    fireEvent.change(within(stockItems).getByLabelText("Channel"), {
+      target: { value: "channel-1" }
+    });
+    fireEvent.change(within(stockItems).getByLabelText("On hand"), {
+      target: { value: "12" }
+    });
+    fireEvent.click(within(stockItems).getByRole("button", { name: "Create stock" }));
+
+    await waitFor(() => {
+      expect(inventoryApiClientMock.createStockItem).toHaveBeenCalledWith({
+        productId: "product-1",
+        channelId: "channel-1",
+        onHandQuantity: 12
+      });
+    });
+
+    expect(await screen.findByText("Stock item created.")).toBeVisible();
+    expect(await screen.findByLabelText("Selected stock item detail")).toBeVisible();
+    expect(screen.getByText("Reserved")).toBeVisible();
+    expect(screen.getAllByText("8").length).toBeGreaterThanOrEqual(1);
+  });
+
   it("lists reservations and releases active holds through the API client", async () => {
     renderWithQueryClient(<ReservationsPage />);
 
@@ -189,6 +227,89 @@ describe("M6 workflow pages", () => {
     await waitFor(() => {
       expect(inventoryApiClientMock.releaseReservation).toHaveBeenCalledWith("reservation-1");
     });
+  });
+
+  it("creates reservations and shows oversell conflict feedback", async () => {
+    renderWithQueryClient(<ReservationsPage />);
+
+    await screen.findByRole("heading", { name: "Create reservation" });
+    const createReservation = screen.getByRole("region", { name: "Create reservation" });
+    const stockItemSelect = within(createReservation).getByLabelText("Stock item");
+    await waitFor(() => {
+      expect(stockItemSelect).not.toBeDisabled();
+    });
+    fireEvent.change(stockItemSelect, {
+      target: { value: "stock-1" }
+    });
+    await waitFor(() => {
+      expect(stockItemSelect).toHaveValue("stock-1");
+    });
+    fireEvent.change(within(createReservation).getByLabelText("Quantity"), {
+      target: { value: "3" }
+    });
+    const createReservationButton = within(createReservation).getByRole("button", {
+      name: "Create reservation"
+    });
+    const reservationForm = createReservationButton.closest("form");
+    expect(reservationForm).not.toBeNull();
+    fireEvent.submit(reservationForm!);
+
+    await waitFor(() => {
+      expect(inventoryApiClientMock.createReservation).toHaveBeenCalledWith(
+        expect.objectContaining({
+          stockItemId: "stock-1",
+          quantity: 3
+        })
+      );
+    });
+    expect(await screen.findByText("Reservation created.")).toBeVisible();
+
+    inventoryApiClientMock.createReservation.mockRejectedValueOnce(
+      new ApiError("conflict", "Not enough availability", 409, {
+        type: "https://assetflow.local/problems/insufficient-availability",
+        title: "Insufficient availability",
+        status: 409,
+        detail: "Only 8 units are currently available."
+      })
+    );
+
+    fireEvent.change(within(createReservation).getByLabelText("Quantity"), {
+      target: { value: "99" }
+    });
+    fireEvent.submit(reservationForm!);
+
+    expect(await screen.findByText("This change conflicts with current inventory")).toBeVisible();
+    expect(await screen.findByText("Only 8 units are currently available.")).toBeVisible();
+  });
+
+  it("disables unavailable reservation actions and reports expiration results", async () => {
+    inventoryApiClientMock.listReservations.mockResolvedValue({
+      items: [{ ...reservation, status: "Released" }]
+    });
+
+    renderWithQueryClient(<ReservationsPage />);
+
+    const releaseButton = await screen.findByRole("button", { name: "Release" });
+    expect(releaseButton).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Expire reservations" }));
+
+    await waitFor(() => {
+      expect(inventoryApiClientMock.expireReservations).toHaveBeenCalledWith({});
+    });
+    expect(await screen.findByText("Expiration complete")).toBeVisible();
+  });
+
+  it("disables reservation creation when no stock item is available", async () => {
+    inventoryApiClientMock.listStockItems.mockResolvedValue({ items: [] });
+    inventoryApiClientMock.listReservations.mockResolvedValue({ items: [] });
+
+    renderWithQueryClient(<ReservationsPage />);
+
+    expect(await screen.findByRole("button", { name: "Create reservation" })).toBeDisabled();
+    expect(
+      screen.getByText("Choose a stock item to inspect reservation-aware availability.")
+    ).toBeVisible();
   });
 
   it("shows operations sync health from backend status", async () => {
