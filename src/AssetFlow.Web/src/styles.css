@@ -730,6 +730,29 @@ select:focus-visible {
   grid-template-rows: auto auto 1fr;
 }
 
+.reservation-control-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.reservation-control-grid .workflow-panel:last-child {
+  grid-column: 1 / -1;
+}
+
+.availability-snapshot-grid div {
+  position: relative;
+  min-height: 72px;
+  align-content: center;
+  padding: 12px;
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-sm);
+  background: var(--af-color-surface-muted);
+}
+
+.availability-snapshot-grid strong {
+  color: var(--af-color-accent-strong);
+  font-size: 1.2rem;
+}
+
 .workflow-panel {
   display: grid;
   gap: var(--af-space-4);
@@ -795,6 +818,22 @@ select:focus-visible {
 
 .filter-row {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.filter-row:has(.filter-icon) {
+  grid-template-columns: 34px repeat(2, minmax(0, 1fr));
+  align-items: end;
+}
+
+.filter-icon {
+  display: grid;
+  width: 34px;
+  height: var(--af-control-height);
+  place-items: center;
+  color: var(--af-color-accent);
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-sm);
+  background: var(--af-color-surface-muted);
 }
 
 .workflow-form label,
@@ -1219,6 +1258,7 @@ select:focus-visible {
   .command-links,
   .asset-summary,
   .workflow-grid,
+  .reservation-control-grid,
   .filter-row,
   .detail-grid,
   .detail-grid.compact {
@@ -1236,6 +1276,18 @@ select:focus-visible {
 
   .registry-stat:last-child {
     border-bottom: 0;
+  }
+
+  .reservation-control-grid .workflow-panel:last-child {
+    grid-column: auto;
+  }
+
+  .filter-row:has(.filter-icon) {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .filter-row:has(.filter-icon) label {
+    grid-column: 1 / -1;
   }
 
   .asset-inspector {
