@@ -161,8 +161,8 @@ Path-filter rules:
 ## GitHub Tracking
 
 - Milestone: `M6 - Frontend Inventory Parity`
-- Milestone status: open after the 2026-09-23 corrective reopen.
-- Issues: #74, #75, #77, #78, #79, #80, and #81 were reopened for unfinished frontend parity work. Issue #76 remains separate CI pipeline work unless later verification proves it incomplete.
+- Milestone status: corrective implementation and validation complete after the 2026-09-23 reopen; ready for GitHub milestone closure once the final validation branch is merged and the remaining issues are closed.
+- Issues: #74, #77, #78, and #81 are closed after corrective implementation slices. #79, #80, and #75 are satisfied by the final validation/testing/docs pass.
 - Project board: project-board item and column mapping remains unverified from this environment; record the gap until board access is confirmed.
 - Branch/PR rule: keep each active task isolated to one branch and one pull request unless explicitly combined.
 
@@ -192,4 +192,4 @@ Created under the `M6 - Frontend Inventory Parity` milestone:
 - [x] GitHub issue tracking matches this plan.
 - [x] Knowledge docs capture durable planned behavior.
 
-Status: Implemented pending PR merge and milestone closure.
+Status: Corrective implementation and validation complete pending final PR merge and milestone closure.
