@@ -134,6 +134,7 @@ Open questions:
 - #118 replaces the app shell and overview with route-aware command navigation, a keyboard skip path, a live inventory topology, and compact workspace links that remain usable on mobile and with reduced motion.
 - #120 replaces the Assets presentation with a live registry summary, entity creation stations, a stock ledger, and a reservation-aware availability inspector while preserving the existing API workflows.
 - #121 replaces the Reservations presentation with guarded-stock summaries, clearer hold controls, availability snapshots, lifecycle filters, and status treatments while retaining create, conflict, release, expire, and detail behavior.
+- #122 replaces Operations and Settings with channel health summaries, explicit delivery/retry state, observability surfaces, and visible runtime API configuration while preserving existing data sources.
 
 ## GitHub Tracking
 

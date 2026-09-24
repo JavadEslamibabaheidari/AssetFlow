@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Activity, CircleCheck, Clock3, RadioTower, TriangleAlert } from "lucide-react";
 import { inventoryApiClient } from "../api";
 import { MetricCard, PageHeader, StatusBadge } from "../design-system";
 import {
@@ -25,6 +26,12 @@ export function OperationsPage() {
   const syncStatusByChannel = new Map(
     (syncStatuses.data ?? []).map((status) => [status.channelId, status])
   );
+  const syncRows = syncStatuses.data ?? [];
+  const succeededCount = syncRows.filter((status) => status.status === "Succeeded").length;
+  const activeCount = syncRows.filter(
+    (status) => status.status === "Pending" || status.status === "InProgress"
+  ).length;
+  const failedCount = syncRows.filter((status) => status.status === "Failed").length;
 
   return (
     <section className="page-section" aria-labelledby="operations-title">
@@ -46,9 +53,19 @@ export function OperationsPage() {
       {syncStatuses.error ? <ApiErrorFeedback error={syncStatuses.error} /> : null}
       {observability.error ? <ApiErrorFeedback error={observability.error} /> : null}
 
+      <div className="asset-summary operations-summary" aria-label="Channel operations summary">
+        <OperationStat icon={RadioTower} label="Channels" value={channels.data?.length ?? 0} />
+        <OperationStat icon={CircleCheck} label="Succeeded" value={succeededCount} />
+        <OperationStat icon={Clock3} label="In flight" value={activeCount} />
+        <OperationStat icon={TriangleAlert} label="Delivery failures" value={failedCount} danger />
+      </div>
+
       <section className="workflow-panel full-span" aria-labelledby="observability-title">
         <div className="workflow-panel-heading">
-          <div>
+          <span className="workflow-panel-icon" aria-hidden="true">
+            <Activity size={18} />
+          </span>
+          <div className="workflow-panel-copy">
             <h3 id="observability-title">Service observability</h3>
             <p>Operational signals for API health, event backlog, and sync retry pressure.</p>
           </div>
@@ -108,7 +125,10 @@ export function OperationsPage() {
 
       <section className="workflow-panel full-span" aria-labelledby="channel-master-data-title">
         <div className="workflow-panel-heading">
-          <div>
+          <span className="workflow-panel-icon" aria-hidden="true">
+            <RadioTower size={18} />
+          </span>
+          <div className="workflow-panel-copy">
             <h3 id="channel-master-data-title">Channel synchronization</h3>
             <p>Channels define where stock items can be listed and synchronized.</p>
           </div>
@@ -169,6 +189,26 @@ export function OperationsPage() {
         )}
       </section>
     </section>
+  );
+}
+
+function OperationStat({
+  icon: Icon,
+  label,
+  value,
+  danger = false
+}: {
+  icon: typeof Activity;
+  label: string;
+  value: number;
+  danger?: boolean;
+}) {
+  return (
+    <div className={`registry-stat${danger && value > 0 ? " registry-stat-danger" : ""}`}>
+      <Icon size={17} aria-hidden="true" />
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
 
