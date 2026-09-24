@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
-import type { ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 
 const surfaceTransition = { duration: 0.2, ease: [0.22, 1, 0.36, 1] as const };
 
@@ -74,6 +75,60 @@ export function InfoPanel({ title, children }: InfoPanelProps) {
       <h3>{title}</h3>
       <div>{children}</div>
     </motion.article>
+  );
+}
+
+type OperationalPanelProps = {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+};
+
+export function OperationalPanel({
+  title,
+  description,
+  action,
+  children,
+  className = ""
+}: OperationalPanelProps) {
+  return (
+    <section className={`workflow-panel${className ? ` ${className}` : ""}`}>
+      <div className="workflow-panel-heading">
+        <div>
+          <h3>{title}</h3>
+          {description ? <p>{description}</p> : null}
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+type ActionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  icon?: LucideIcon;
+  tone?: "primary" | "secondary" | "danger";
+};
+
+export function ActionButton({
+  icon: Icon,
+  tone = "primary",
+  className = "",
+  children,
+  type = "button",
+  ...props
+}: ActionButtonProps) {
+  return (
+    <button
+      type={type}
+      className={`action-button action-button-${tone}${className ? ` ${className}` : ""}`}
+      {...props}
+    >
+      {Icon ? <Icon size={16} aria-hidden="true" /> : null}
+      <span>{children}</span>
+    </button>
   );
 }
 

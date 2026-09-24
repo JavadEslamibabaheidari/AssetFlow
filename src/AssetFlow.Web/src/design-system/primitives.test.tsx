@@ -1,6 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { DefinitionList, InfoPanel, MetricCard, PageHeader, StatusBadge } from "./primitives";
+import { Activity } from "lucide-react";
+import {
+  ActionButton,
+  DefinitionList,
+  InfoPanel,
+  MetricCard,
+  OperationalPanel,
+  PageHeader,
+  StatusBadge
+} from "./primitives";
 
 describe("design-system primitives", () => {
   it("renders a route page header with an accessible title id", () => {
@@ -49,5 +58,16 @@ describe("design-system primitives", () => {
 
     expect(screen.getByText("Primary markets")).toBeVisible();
     expect(screen.getByText("Amazon, MediaWorld, and Unieuro")).toBeVisible();
+  });
+
+  it("renders reusable operational panels and action buttons", () => {
+    render(
+      <OperationalPanel title="Sync health" description="Current channel state">
+        <ActionButton icon={Activity}>Run check</ActionButton>
+      </OperationalPanel>
+    );
+
+    expect(screen.getByRole("heading", { name: "Sync health" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Run check" })).toHaveAttribute("type", "button");
   });
 });

@@ -1,6 +1,6 @@
-# AssetFlow Design System Foundation
+# AssetFlow Immersive Design System
 
-The M5 design system is intentionally small. It gives frontend contributors shared names, tokens, and component conventions before M6 adds full inventory workflows.
+The M10 design system keeps AssetFlow's operational workflows readable over a spatial 3D field. Surfaces are compact, translucent, and restrained; depth supports hierarchy without turning routine work into decoration.
 
 ## Tokens
 
@@ -15,6 +15,8 @@ Starter primitives live in `primitives.tsx`:
 - `InfoPanel` for repeated panels and placeholders
 - `StatusBadge` for non-interactive state labels
 - `DefinitionList` for settings and configuration rows
+- `OperationalPanel` for consistently headed workflow regions
+- `ActionButton` for icon-aware primary, secondary, and destructive commands
 
 Keep components narrow, accessible, and easy to scan. Use semantic HTML first, then add classes for layout and visual treatment.
 
