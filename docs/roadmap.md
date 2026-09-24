@@ -124,9 +124,9 @@ Deliverables:
 
 ## M9 - Agentic OS Expansion
 
-Goal: expand the dashboard into a broader human-plus-AI operating layer for memory, automation, research, and resource-aware agent workflows.
+Goal: expand the dashboard into a broader human-plus-AI operating layer for memory, automation, research, resource-aware agent workflows, and visible AI orchestration.
 
-Status: implemented and ready for milestone closure.
+Status: closed after cockpit adoption.
 
 Deliverables:
 
