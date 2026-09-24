@@ -1,5 +1,6 @@
-import { FormEvent, ReactNode, useState } from "react";
+import { type CSSProperties, FormEvent, ReactNode, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Boxes, Building2, PackagePlus, Plus, Store, Warehouse } from "lucide-react";
 import {
   ApiErrorFeedback,
   WorkflowEmptyState,
@@ -136,8 +137,19 @@ export function InventoryPage() {
         />
       ) : null}
 
-      <div className="workflow-grid">
-        <WorkflowPanel title="Vendors" description="Supplier ownership for products.">
+      <div className="asset-summary" aria-label="Asset registry summary">
+        <RegistryStat icon={Building2} label="Vendors" value={vendorItems.length} />
+        <RegistryStat icon={Boxes} label="Products" value={productItems.length} />
+        <RegistryStat icon={Store} label="Channels" value={channelItems.length} />
+        <RegistryStat icon={Warehouse} label="Stock records" value={stockItemRows.length} />
+      </div>
+
+      <div className="workflow-grid asset-catalog-grid">
+        <WorkflowPanel
+          title="Vendors"
+          description="Supplier ownership for products."
+          icon={Building2}
+        >
           <form
             className="workflow-form"
             onSubmit={(event) => handleVendorSubmit(event, createVendor.mutate)}
@@ -147,6 +159,7 @@ export function InventoryPage() {
               <input name="name" placeholder="Northwind Supply" required />
             </label>
             <button type="submit" disabled={createVendor.isPending}>
+              <Plus size={16} aria-hidden="true" />
               Create vendor
             </button>
           </form>
@@ -164,7 +177,11 @@ export function InventoryPage() {
           {createVendor.error ? <ApiErrorFeedback error={createVendor.error} /> : null}
         </WorkflowPanel>
 
-        <WorkflowPanel title="Products" description="Catalog records with vendor-owned SKUs.">
+        <WorkflowPanel
+          title="Products"
+          description="Catalog records with vendor-owned SKUs."
+          icon={Boxes}
+        >
           <form
             className="workflow-form"
             onSubmit={(event) => handleProductSubmit(event, createProduct.mutate)}
@@ -189,6 +206,7 @@ export function InventoryPage() {
               <input name="name" placeholder="Battery pack" required />
             </label>
             <button type="submit" disabled={createProduct.isPending || vendorItems.length === 0}>
+              <Plus size={16} aria-hidden="true" />
               Create product
             </button>
           </form>
@@ -206,7 +224,11 @@ export function InventoryPage() {
           {createProduct.error ? <ApiErrorFeedback error={createProduct.error} /> : null}
         </WorkflowPanel>
 
-        <WorkflowPanel title="Sales channels" description="Markets where stock can be listed.">
+        <WorkflowPanel
+          title="Sales channels"
+          description="Markets where stock can be listed."
+          icon={Store}
+        >
           <form
             className="workflow-form"
             onSubmit={(event) => handleChannelSubmit(event, createChannel.mutate)}
@@ -220,6 +242,7 @@ export function InventoryPage() {
               <input name="name" placeholder="Amazon" required />
             </label>
             <button type="submit" disabled={createChannel.isPending}>
+              <Plus size={16} aria-hidden="true" />
               Create channel
             </button>
           </form>
@@ -240,6 +263,7 @@ export function InventoryPage() {
         <WorkflowPanel
           title="Stock items"
           description="On-hand stock by product and sales channel."
+          icon={PackagePlus}
         >
           <form
             className="workflow-form"
@@ -277,6 +301,7 @@ export function InventoryPage() {
                 createStockItem.isPending || productItems.length === 0 || channelItems.length === 0
               }
             >
+              <Plus size={16} aria-hidden="true" />
               Create stock
             </button>
           </form>
@@ -319,7 +344,11 @@ export function InventoryPage() {
                     <td>{findProductLabel(productItems, stockItem.productId)}</td>
                     <td>{findChannelLabel(channelItems, stockItem.channelId)}</td>
                     <td>{stockItem.onHandQuantity}</td>
-                    <td>{stockItem.availableQuantity}</td>
+                    <td>
+                      <StatusBadge tone={stockItem.availableQuantity > 0 ? "success" : "warning"}>
+                        {stockItem.availableQuantity}
+                      </StatusBadge>
+                    </td>
                     <td>{formatDate(stockItem.updatedAtUtc)}</td>
                     <td>
                       <button type="button" onClick={() => setSelectedStockItemId(stockItem.id)}>
@@ -352,19 +381,41 @@ type WorkflowPanelProps = {
   title: string;
   description: string;
   children: ReactNode;
+  icon: typeof Boxes;
 };
 
-function WorkflowPanel({ title, description, children }: WorkflowPanelProps) {
+function WorkflowPanel({ title, description, children, icon: Icon }: WorkflowPanelProps) {
   return (
     <section className="workflow-panel" aria-labelledby={`${slugify(title)}-title`}>
       <div className="workflow-panel-heading">
-        <div>
+        <span className="workflow-panel-icon" aria-hidden="true">
+          <Icon size={18} />
+        </span>
+        <div className="workflow-panel-copy">
           <h3 id={`${slugify(title)}-title`}>{title}</h3>
           <p>{description}</p>
         </div>
       </div>
       {children}
     </section>
+  );
+}
+
+function RegistryStat({
+  icon: Icon,
+  label,
+  value
+}: {
+  icon: typeof Boxes;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="registry-stat">
+      <Icon size={17} aria-hidden="true" />
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
 
@@ -421,33 +472,47 @@ function StockItemDetail({
     return null;
   }
 
+  const reservedShare =
+    availability.onHandQuantity === 0
+      ? 0
+      : Math.min(100, (availability.reservedQuantity / availability.onHandQuantity) * 100);
+  const orbitStyle = { "--reserved-share": `${reservedShare}%` } as CSSProperties;
+
   return (
-    <div className="detail-grid" aria-label="Selected stock item detail">
-      <div>
-        <span>Product</span>
-        <strong>{findProductLabel(products, stockItem.productId)}</strong>
+    <div className="asset-inspector" aria-label="Selected stock item detail">
+      <div className="availability-orbit" style={orbitStyle} aria-hidden="true">
+        <span>
+          <strong>{availability.availableQuantity}</strong>
+          available
+        </span>
       </div>
-      <div>
-        <span>Channel</span>
-        <strong>{findChannelLabel(channels, stockItem.channelId)}</strong>
-      </div>
-      <div>
-        <span>On hand</span>
-        <strong>{availability.onHandQuantity}</strong>
-      </div>
-      <div>
-        <span>Reserved</span>
-        <strong>{availability.reservedQuantity}</strong>
-      </div>
-      <div>
-        <span>Available</span>
-        <strong>{availability.availableQuantity}</strong>
-      </div>
-      <div>
-        <span>Next expiration</span>
-        <strong>
-          {availability.nextExpirationUtc ? formatDate(availability.nextExpirationUtc) : "None"}
-        </strong>
+      <div className="detail-grid">
+        <div>
+          <span>Product</span>
+          <strong>{findProductLabel(products, stockItem.productId)}</strong>
+        </div>
+        <div>
+          <span>Channel</span>
+          <strong>{findChannelLabel(channels, stockItem.channelId)}</strong>
+        </div>
+        <div>
+          <span>On hand</span>
+          <strong>{availability.onHandQuantity}</strong>
+        </div>
+        <div>
+          <span>Reserved</span>
+          <strong>{availability.reservedQuantity}</strong>
+        </div>
+        <div>
+          <span>Available</span>
+          <strong>{availability.availableQuantity}</strong>
+        </div>
+        <div>
+          <span>Next expiration</span>
+          <strong>
+            {availability.nextExpirationUtc ? formatDate(availability.nextExpirationUtc) : "None"}
+          </strong>
+        </div>
       </div>
     </div>
   );
