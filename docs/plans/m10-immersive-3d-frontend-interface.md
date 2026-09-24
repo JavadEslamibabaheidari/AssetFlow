@@ -131,6 +131,7 @@ Open questions:
 - The actual Three.js/React Three Fiber canvas, dependency installation, bundle delta, WebGL detection, and runtime failure proof remain scoped to #123.
 - #123 uses React 18-compatible pinned versions, lazy-loads the live WebGL canvas above the CSS fallback, disables it for reduced-motion users, and records the initial 3D chunk cost in the architecture note.
 - #119 refreshes the shared tokens and primitives for dark spatial surfaces, operational controls, tables, forms, feedback states, and visible focus treatment.
+- #118 replaces the app shell and overview with route-aware command navigation, a keyboard skip path, a live inventory topology, and compact workspace links that remain usable on mobile and with reduced motion.
 
 ## GitHub Tracking
 

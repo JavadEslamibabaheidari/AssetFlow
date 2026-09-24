@@ -16,6 +16,22 @@ a {
   font: inherit;
 }
 
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 12px;
+  left: 12px;
+  padding: 10px 14px;
+  color: var(--af-color-accent-ink);
+  border-radius: var(--af-radius-sm);
+  background: var(--af-color-accent-strong);
+  transform: translateY(-160%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -254,7 +270,9 @@ select:focus-visible {
 }
 
 .sidebar-meta strong {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   margin-top: 4px;
   overflow-wrap: anywhere;
   color: var(--af-color-sidebar-text);
@@ -282,6 +300,25 @@ select:focus-visible {
 .topbar h1 {
   margin-top: 4px;
   font-size: clamp(1.35rem, 1.2rem + 1vw, 1.8rem);
+}
+
+.topbar-title {
+  display: flex;
+  align-items: center;
+  gap: var(--af-space-3);
+}
+
+.topbar-signal {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  color: var(--af-color-accent);
+  border: 1px solid var(--af-color-line-strong);
+  border-radius: var(--af-radius-md);
+  background: var(--af-color-surface-hover);
+  box-shadow: var(--af-shadow-glow);
 }
 
 .status-strip {
@@ -421,6 +458,223 @@ select:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+}
+
+.overview-command-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(250px, 0.7fr);
+  gap: var(--af-space-4);
+}
+
+.topology-panel,
+.overview-signal-panel {
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-md);
+  background: var(--af-color-surface);
+  box-shadow: var(--af-shadow-raised);
+  backdrop-filter: var(--af-blur-surface);
+}
+
+.topology-panel {
+  display: grid;
+  min-height: 340px;
+  gap: var(--af-space-5);
+  align-content: space-between;
+  padding: var(--af-space-6);
+  overflow: hidden;
+}
+
+.panel-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--af-color-accent);
+  font-size: var(--af-text-xs);
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.topology-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--af-space-5);
+}
+
+.topology-heading h3,
+.topology-heading p,
+.overview-signal-panel h3,
+.signal-list,
+.signal-list dd {
+  margin: 0;
+}
+
+.topology-heading h3,
+.overview-signal-panel h3 {
+  font-size: 1.1rem;
+}
+
+.topology-heading p {
+  max-width: 540px;
+  margin-top: 6px;
+  color: var(--af-color-text-subtle);
+  line-height: 1.5;
+}
+
+.topology-route {
+  display: grid;
+  grid-template-columns:
+    minmax(100px, 1fr) minmax(28px, 0.5fr) minmax(130px, 1.1fr) minmax(28px, 0.5fr)
+    minmax(100px, 1fr);
+  align-items: center;
+}
+
+.topology-node {
+  position: relative;
+  display: grid;
+  min-height: 82px;
+  align-content: center;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-md);
+  background: rgba(7, 19, 23, 0.84);
+}
+
+.topology-node::before {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--af-color-info);
+  box-shadow: 0 0 12px currentColor;
+  content: "";
+}
+
+.topology-node-core {
+  border-color: var(--af-color-line-strong);
+  box-shadow: var(--af-shadow-glow);
+}
+
+.topology-node-core::before {
+  background: var(--af-color-accent);
+}
+
+.topology-node span {
+  color: var(--af-color-text-muted);
+  font-size: var(--af-text-xs);
+  text-transform: uppercase;
+}
+
+.topology-node strong {
+  font-size: var(--af-text-sm);
+}
+
+.topology-line {
+  height: 1px;
+  background: var(--af-color-line-strong);
+  box-shadow: 0 0 10px rgba(88, 230, 189, 0.32);
+}
+
+.market-band {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.market-band span {
+  padding: 6px 9px;
+  color: var(--af-color-text-subtle);
+  border: 1px solid var(--af-color-line);
+  border-radius: 999px;
+  font-size: var(--af-text-xs);
+}
+
+.overview-signal-panel {
+  display: grid;
+  gap: var(--af-space-5);
+  align-content: start;
+  padding: var(--af-space-6);
+}
+
+.signal-list {
+  display: grid;
+}
+
+.signal-list div {
+  display: grid;
+  gap: 4px;
+  padding: 14px 0;
+  border-top: 1px solid var(--af-color-line);
+}
+
+.signal-list dt {
+  font-size: var(--af-text-sm);
+  font-weight: 750;
+}
+
+.signal-list dd {
+  color: var(--af-color-text-subtle);
+  font-size: var(--af-text-xs);
+}
+
+.command-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--af-space-3);
+}
+
+.command-link {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto 18px;
+  gap: 10px;
+  align-items: center;
+  min-height: 76px;
+  padding: 14px;
+  color: var(--af-color-text);
+  text-decoration: none;
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-md);
+  background: var(--af-color-surface);
+  backdrop-filter: var(--af-blur-surface);
+}
+
+.command-link:hover {
+  border-color: var(--af-color-line-strong);
+  background: var(--af-color-surface-strong);
+}
+
+.command-link-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--af-color-accent);
+  border-radius: var(--af-radius-sm);
+  background: var(--af-color-surface-hover);
+}
+
+.command-link-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.command-link-copy strong,
+.command-link-copy small {
+  overflow-wrap: anywhere;
+}
+
+.command-link-copy small,
+.command-link-signal {
+  color: var(--af-color-text-subtle);
+  font-size: var(--af-text-xs);
+}
+
+.command-link-signal {
+  white-space: nowrap;
 }
 
 .info-panel {
@@ -852,6 +1106,8 @@ select:focus-visible {
 
   .metric-grid,
   .work-list,
+  .overview-command-grid,
+  .command-links,
   .workflow-grid,
   .filter-row,
   .detail-grid,
@@ -861,6 +1117,17 @@ select:focus-visible {
 
   .workflow-panel-heading {
     display: grid;
+  }
+
+  .topology-route {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .topology-line {
+    width: 1px;
+    height: 24px;
+    margin-left: 26px;
   }
 
   .spatial-grid {
@@ -881,6 +1148,18 @@ select:focus-visible {
 
   .brand-block span,
   .status-strip {
+    display: none;
+  }
+
+  .topology-heading {
+    display: grid;
+  }
+
+  .command-link {
+    grid-template-columns: 38px minmax(0, 1fr) 18px;
+  }
+
+  .command-link-signal {
     display: none;
   }
 
