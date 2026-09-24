@@ -692,6 +692,44 @@ select:focus-visible {
   gap: 16px;
 }
 
+.asset-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--af-color-line);
+  border-radius: var(--af-radius-md);
+  background: rgba(8, 20, 24, 0.72);
+  backdrop-filter: var(--af-blur-surface);
+}
+
+.registry-stat {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 64px;
+  padding: 14px 16px;
+  color: var(--af-color-accent);
+  border-right: 1px solid var(--af-color-line);
+}
+
+.registry-stat:last-child {
+  border-right: 0;
+}
+
+.registry-stat span {
+  color: var(--af-color-text-subtle);
+  font-size: var(--af-text-sm);
+}
+
+.registry-stat strong {
+  color: var(--af-color-text);
+  font-size: 1.15rem;
+}
+
+.asset-catalog-grid .workflow-panel {
+  grid-template-rows: auto auto 1fr;
+}
+
 .workflow-panel {
   display: grid;
   gap: var(--af-space-4);
@@ -713,6 +751,22 @@ select:focus-visible {
   align-items: start;
   justify-content: space-between;
   gap: var(--af-space-4);
+}
+
+.workflow-panel-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  color: var(--af-color-accent);
+  border-radius: var(--af-radius-sm);
+  background: var(--af-color-surface-hover);
+}
+
+.workflow-panel-copy {
+  min-width: 0;
+  margin-right: auto;
 }
 
 .workflow-panel-heading h3,
@@ -877,6 +931,61 @@ select:focus-visible {
 
 .detail-grid.compact {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.asset-inspector {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: var(--af-space-5);
+  align-items: center;
+  padding: var(--af-space-5);
+  border: 1px solid var(--af-color-line-strong);
+  border-radius: var(--af-radius-md);
+  background: rgba(6, 16, 20, 0.66);
+}
+
+.availability-orbit {
+  display: grid;
+  width: 126px;
+  aspect-ratio: 1;
+  place-items: center;
+  margin: auto;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--af-color-warning) var(--reserved-share),
+    var(--af-color-accent) var(--reserved-share)
+  );
+  box-shadow: var(--af-shadow-glow);
+}
+
+.availability-orbit::before {
+  grid-area: 1 / 1;
+  width: 96px;
+  aspect-ratio: 1;
+  border: 1px solid var(--af-color-line);
+  border-radius: 50%;
+  background: var(--af-color-canvas-raised);
+  content: "";
+}
+
+.availability-orbit span {
+  z-index: 1;
+  grid-area: 1 / 1;
+  color: var(--af-color-text-subtle);
+  font-size: var(--af-text-xs);
+  text-align: center;
+}
+
+.availability-orbit strong {
+  display: block;
+  color: var(--af-color-accent-strong);
+  font-size: 1.55rem;
+}
+
+.asset-inspector .detail-grid {
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .detail-grid div {
@@ -1108,6 +1217,7 @@ select:focus-visible {
   .work-list,
   .overview-command-grid,
   .command-links,
+  .asset-summary,
   .workflow-grid,
   .filter-row,
   .detail-grid,
@@ -1117,6 +1227,19 @@ select:focus-visible {
 
   .workflow-panel-heading {
     display: grid;
+  }
+
+  .registry-stat {
+    border-right: 0;
+    border-bottom: 1px solid var(--af-color-line);
+  }
+
+  .registry-stat:last-child {
+    border-bottom: 0;
+  }
+
+  .asset-inspector {
+    grid-template-columns: 1fr;
   }
 
   .topology-route {
