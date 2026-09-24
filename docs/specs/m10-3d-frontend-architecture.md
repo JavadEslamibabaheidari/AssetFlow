@@ -38,6 +38,8 @@ The first production build keeps the main app chunk at about 425 kB minified / 1
 - Keyboard navigation, focus rings, touch targets, and route semantics remain DOM concerns.
 - The scene may communicate inventory flow, availability, channel synchronization, or service health only when the same meaning is available in readable UI.
 
+The M10 token layer uses translucent graphite surfaces over the scene, mint for primary operational signals, blue for informational depth, amber for attention, and coral for destructive or failed states. Shared surfaces cap their radius at 8px, retain stable control heights, and use visible high-contrast focus rings. The palette and component rules live in `src/AssetFlow.Web/src/design-system` so route work does not create one-off visual systems.
+
 ## Verification
 
 Issue #117 verifies the architecture note, CSS fallback prototype, route preservation, responsive rendering, and reduced-motion behavior. Issue #123 installs the selected dependencies and adds canvas/WebGL runtime proof, bundle review, and non-WebGL failure verification.

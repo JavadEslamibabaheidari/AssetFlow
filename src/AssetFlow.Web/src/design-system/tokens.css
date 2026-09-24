@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   font-family:
     Inter,
     ui-sans-serif,
@@ -13,19 +13,31 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --af-color-canvas: #f6f7f9;
-  --af-color-surface: #ffffff;
-  --af-color-surface-muted: #eef2f5;
-  --af-color-sidebar: #202a32;
-  --af-color-sidebar-text: #f8fafc;
-  --af-color-sidebar-muted: #c8d1da;
-  --af-color-text: #17202a;
-  --af-color-text-subtle: #5c6975;
-  --af-color-line: #d8dee5;
-  --af-color-accent: #0f766e;
-  --af-color-danger: #b42318;
-  --af-focus-ring: 0 0 0 3px rgba(15, 118, 110, 0.35);
-  --af-shadow-raised: 0 18px 45px rgba(23, 32, 42, 0.08);
+  --af-color-canvas: #071014;
+  --af-color-canvas-raised: #0b171c;
+  --af-color-surface: rgba(15, 29, 35, 0.88);
+  --af-color-surface-strong: rgba(20, 38, 45, 0.96);
+  --af-color-surface-muted: rgba(151, 177, 188, 0.08);
+  --af-color-surface-hover: rgba(156, 255, 226, 0.09);
+  --af-color-sidebar: rgba(7, 17, 22, 0.9);
+  --af-color-sidebar-text: #f4fbfa;
+  --af-color-sidebar-muted: #91a7af;
+  --af-color-text: #eef7f6;
+  --af-color-text-subtle: #9eb1b8;
+  --af-color-text-muted: #758b94;
+  --af-color-line: rgba(171, 205, 211, 0.16);
+  --af-color-line-strong: rgba(130, 237, 211, 0.34);
+  --af-color-accent: #58e6bd;
+  --af-color-accent-strong: #9affe0;
+  --af-color-accent-ink: #062019;
+  --af-color-info: #75a7ff;
+  --af-color-warning: #f2c66d;
+  --af-color-danger: #ff8178;
+  --af-color-success: #67e0a3;
+  --af-focus-ring: 0 0 0 3px rgba(88, 230, 189, 0.34);
+  --af-shadow-raised: 0 18px 48px rgba(0, 0, 0, 0.26);
+  --af-shadow-glow: 0 0 28px rgba(88, 230, 189, 0.12);
+  --af-blur-surface: blur(20px);
   --af-space-1: 4px;
   --af-space-2: 8px;
   --af-space-3: 12px;
@@ -33,10 +45,12 @@
   --af-space-5: 20px;
   --af-space-6: 24px;
   --af-space-8: 32px;
-  --af-radius-sm: 6px;
+  --af-space-10: 40px;
+  --af-radius-sm: 5px;
   --af-radius-md: 8px;
-  --af-text-xs: 0.76rem;
+  --af-text-xs: 0.74rem;
   --af-text-sm: 0.86rem;
   --af-text-md: 1rem;
-  --af-text-lg: 1.05rem;
+  --af-text-lg: 1.08rem;
+  --af-control-height: 42px;
 }
