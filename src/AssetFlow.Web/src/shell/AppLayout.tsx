@@ -1,6 +1,7 @@
 import { AnimatePresence, LayoutGroup, MotionConfig, motion } from "motion/react";
 import { Boxes, LayoutDashboard, PackageCheck, Settings, Store, TimerReset } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { ImmersiveBackdrop } from "./ImmersiveBackdrop";
 
 const navItems = [
   { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
@@ -16,6 +17,7 @@ export function AppLayout() {
   return (
     <MotionConfig reducedMotion="user" transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}>
       <div className="app-shell">
+        <ImmersiveBackdrop />
         <aside className="sidebar" aria-label="Primary navigation">
           <motion.div
             className="brand-block"
