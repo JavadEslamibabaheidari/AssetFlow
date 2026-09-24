@@ -1,5 +1,14 @@
 import { FormEvent, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  CalendarClock,
+  CheckCircle2,
+  Clock3,
+  Filter,
+  Plus,
+  ShieldCheck,
+  TimerOff
+} from "lucide-react";
 import { inventoryApiClient } from "../api";
 import type { components } from "../api/generated/inventory-api";
 import { PageHeader, StatusBadge } from "../design-system";
@@ -137,6 +146,15 @@ export function ReservationsPage() {
     selectedAvailability.error;
   const isLoading =
     products.isLoading || channels.isLoading || stockItems.isLoading || reservations.isLoading;
+  const activeCount = reservationRows.filter(
+    (reservation) => reservation.status === "Active"
+  ).length;
+  const releasedCount = reservationRows.filter(
+    (reservation) => reservation.status === "Released"
+  ).length;
+  const expiredCount = reservationRows.filter(
+    (reservation) => reservation.status === "Expired"
+  ).length;
 
   return (
     <section className="page-section reservation-workspace" aria-labelledby="reservations-title">
@@ -157,10 +175,24 @@ export function ReservationsPage() {
         />
       ) : null}
 
-      <div className="workflow-grid">
+      <div className="asset-summary reservation-summary" aria-label="Reservation summary">
+        <ReservationStat icon={ShieldCheck} label="Active holds" value={activeCount} />
+        <ReservationStat icon={CheckCircle2} label="Released" value={releasedCount} />
+        <ReservationStat icon={TimerOff} label="Expired" value={expiredCount} />
+        <ReservationStat
+          icon={CalendarClock}
+          label="Visible total"
+          value={reservationRows.length}
+        />
+      </div>
+
+      <div className="workflow-grid reservation-control-grid">
         <section className="workflow-panel" aria-labelledby="create-reservation-title">
           <div className="workflow-panel-heading">
-            <div>
+            <span className="workflow-panel-icon" aria-hidden="true">
+              <ShieldCheck size={18} />
+            </span>
+            <div className="workflow-panel-copy">
               <h3 id="create-reservation-title">Create reservation</h3>
               <p>Hold available stock until an order completes or the hold expires.</p>
             </div>
@@ -206,6 +238,7 @@ export function ReservationsPage() {
               type="submit"
               disabled={createReservation.isPending || stockItemOptions.length === 0}
             >
+              <Plus size={16} aria-hidden="true" />
               Create reservation
             </button>
           </form>
@@ -214,7 +247,10 @@ export function ReservationsPage() {
 
         <section className="workflow-panel" aria-labelledby="availability-snapshot-title">
           <div className="workflow-panel-heading">
-            <div>
+            <span className="workflow-panel-icon" aria-hidden="true">
+              <Clock3 size={18} />
+            </span>
+            <div className="workflow-panel-copy">
               <h3 id="availability-snapshot-title">Availability snapshot</h3>
               <p>Backend-calculated on-hand, reserved, and sellable quantity.</p>
             </div>
@@ -223,7 +259,7 @@ export function ReservationsPage() {
             <WorkflowLoadingState title="Loading availability" />
           ) : null}
           {selectedAvailability.data ? (
-            <div className="detail-grid compact">
+            <div className="detail-grid compact availability-snapshot-grid">
               <div>
                 <span>On hand</span>
                 <strong>{selectedAvailability.data.onHandQuantity}</strong>
@@ -255,7 +291,10 @@ export function ReservationsPage() {
 
         <section className="workflow-panel" aria-labelledby="expire-reservations-title">
           <div className="workflow-panel-heading">
-            <div>
+            <span className="workflow-panel-icon" aria-hidden="true">
+              <TimerOff size={18} />
+            </span>
+            <div className="workflow-panel-copy">
               <h3 id="expire-reservations-title">Expire due holds</h3>
               <p>Ask the backend to expire active reservations due before a cutoff.</p>
             </div>
@@ -269,6 +308,7 @@ export function ReservationsPage() {
               <input name="expiresBeforeUtc" type="datetime-local" />
             </label>
             <button type="submit" disabled={expireReservations.isPending}>
+              <Clock3 size={16} aria-hidden="true" />
               Expire reservations
             </button>
           </form>
@@ -291,6 +331,9 @@ export function ReservationsPage() {
         </div>
 
         <div className="filter-row" aria-label="Reservation filters">
+          <span className="filter-icon" aria-hidden="true">
+            <Filter size={17} />
+          </span>
           <label>
             Stock
             <select
@@ -343,7 +386,9 @@ export function ReservationsPage() {
                     <td>{findStockLabel(stockItemOptions, reservation.stockItemId)}</td>
                     <td>{reservation.quantity}</td>
                     <td>
-                      <StatusBadge>{reservation.status}</StatusBadge>
+                      <StatusBadge tone={getReservationTone(reservation.status)}>
+                        {reservation.status}
+                      </StatusBadge>
                     </td>
                     <td>{formatDate(reservation.expiresAtUtc)}</td>
                     <td>{formatDate(reservation.updatedAtUtc)}</td>
@@ -383,6 +428,24 @@ export function ReservationsPage() {
         ) : null}
       </section>
     </section>
+  );
+}
+
+function ReservationStat({
+  icon: Icon,
+  label,
+  value
+}: {
+  icon: typeof ShieldCheck;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="registry-stat">
+      <Icon size={17} aria-hidden="true" />
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
 
@@ -489,4 +552,16 @@ function formatDate(value: string): string {
     dateStyle: "medium",
     timeStyle: "short"
   }).format(new Date(value));
+}
+
+function getReservationTone(status: ReservationStatus): "success" | "warning" | "neutral" {
+  if (status === "Active") {
+    return "warning";
+  }
+
+  if (status === "Released") {
+    return "success";
+  }
+
+  return "neutral";
 }
