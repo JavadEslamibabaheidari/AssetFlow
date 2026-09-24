@@ -111,6 +111,7 @@ Recommended GitHub setup:
 - `M7 - Event-Driven Synchronization`
 - `M8 - Observability and Monitoring`
 - `M9 - Agentic OS Expansion`
+- `M10 - Immersive 3D Frontend Interface`
 
 ## Label Set
 

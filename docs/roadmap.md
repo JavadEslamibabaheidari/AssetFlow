@@ -134,4 +134,26 @@ Deliverables:
 - local-first skillpack and automation catalog for project, workspace, and research activity, with mutating actions requiring explicit approval
 - resource usage telemetry model for skill, agent, workflow, and automation activity that marks unavailable token/cost fields honestly
 - integration plan for external tools such as Google Workspace and research notebooks where they add clear value, including connector prerequisites and local-first fallbacks
-- expanded Agentic Control Dashboard controls for memory, automation, resource telemetry, research links, workflow launch points, and degraded-source visibility
+- expanded Agentic OS cockpit controls for memory, automation, resource telemetry, research links, workflow launch points, workflow graph, charts, bars, operating modes, human approval gates, evaluation/tracing cues, and degraded-source visibility
+
+## M10 - Immersive 3D Frontend Interface
+
+Goal: replace the current frontend interface with a clean, creative, production-ready 3D operational experience while preserving all existing AssetFlow workflows.
+
+Status: active. The previous milestone closure hook and M10 start gate passed on 2026-09-24; implementation begins with the 3D architecture/prototype and dependency/fallback proof.
+
+Definition of done:
+
+- the old visible frontend shell and page interface are replaced
+- the new 3D interface works well across overview, assets, reservations, operations, and settings
+- existing API-backed inventory, reservation, channel sync, observability, and settings workflows continue to work
+- loading, empty, validation, conflict, not-found, disabled, success, degraded, responsive, reduced-motion, and accessibility states are verified
+- frontend checks, Playwright smoke coverage, and Docker Compose frontend/backend verification pass
+
+Deliverables:
+
+- 3D frontend architecture and fallback decision
+- redesigned app shell, navigation, overview, assets, reservations, operations, and settings screens
+- refreshed frontend design primitives and motion patterns
+- focused frontend tests and visual/runtime verification
+- final M10 report, project knowledge update, and synchronized GitHub tracking
