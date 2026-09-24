@@ -42,6 +42,7 @@ describe("design-system primitives", () => {
 
     expect(screen.getByText("Markets")).toBeVisible();
     expect(screen.getByText("3")).toBeVisible();
+    expect(screen.getByText("Markets").closest("article")).not.toHaveAttribute("tabindex");
     expect(screen.getByRole("heading", { name: "Warehouse stock" })).toBeVisible();
     expect(screen.getByText("Ready")).toBeVisible();
   });
