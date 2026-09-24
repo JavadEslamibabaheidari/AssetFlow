@@ -66,20 +66,20 @@ Open questions:
 
 ## Acceptance Criteria
 
-- [ ] The old visible frontend shell and page presentation are fully replaced by the new 3D interface.
-- [ ] Overview presents an immediately useful operational command surface with meaningful 3D status context.
-- [ ] Assets workflows still create, list, and inspect vendors, products, sales channels, stock items, and availability.
-- [ ] Reservations workflows still create, filter, inspect, release, expire, and show oversell/conflict feedback correctly.
-- [ ] Operations still shows channel master data, synchronization status, retry/degraded states, and observability summaries.
-- [ ] Settings still communicates runtime/API configuration and relevant environment state.
-- [ ] Loading, empty, validation, conflict, not-found, disabled, success, and degraded-source states are redesigned and verified.
-- [ ] The 3D scene renders nonblank on desktop and mobile and does not obscure primary controls or text.
-- [ ] Reduced-motion users get a calm fallback without losing information or workflow access.
-- [ ] Keyboard focus, contrast, hit targets, and responsive behavior pass targeted accessibility review.
-- [ ] Text fits within controls, tables, panels, and mobile layouts without incoherent overlap.
-- [ ] Frontend unit/component tests, type checks, linting, build, and Playwright smoke checks pass.
-- [ ] Docker Compose can build and run the frontend and backend together after the redesign.
-- [ ] Documentation and `docs/knowledge/` match the implemented interface before closure.
+- [x] The old visible frontend shell and page presentation are fully replaced by the new 3D interface.
+- [x] Overview presents an immediately useful operational command surface with meaningful 3D status context.
+- [x] Assets workflows still create, list, and inspect vendors, products, sales channels, stock items, and availability.
+- [x] Reservations workflows still create, filter, inspect, release, expire, and show oversell/conflict feedback correctly.
+- [x] Operations still shows channel master data, synchronization status, retry/degraded states, and observability summaries.
+- [x] Settings still communicates runtime/API configuration and relevant environment state.
+- [x] Loading, empty, validation, conflict, not-found, disabled, success, and degraded-source states are redesigned and verified.
+- [x] The 3D scene renders nonblank on desktop and mobile and does not obscure primary controls or text.
+- [x] Reduced-motion users get a calm fallback without losing information or workflow access.
+- [x] Keyboard focus, contrast, hit targets, and responsive behavior pass targeted accessibility review.
+- [x] Text fits within controls, tables, panels, and mobile layouts without incoherent overlap.
+- [x] Frontend unit/component tests, type checks, linting, build, and Playwright smoke checks pass.
+- [x] Docker Compose can build and run the frontend and backend together after the redesign.
+- [x] Documentation and `docs/knowledge/` match the implemented interface before closure.
 
 ## Task Breakdown
 
@@ -127,21 +127,21 @@ Open questions:
 ## Implementation Progress
 
 - #115 is complete: the previous milestone closure hook and M10 start gate passed, and PR #127 merged the synchronized plan and tracking state.
-- #117 architecture prototype is implemented on `codex/117-3d-architecture-prototype`: the React Three Fiber decision is documented in `docs/specs/m10-3d-frontend-architecture.md`, the shell has a responsive CSS spatial fallback, routes remain available, and reduced-motion plus desktop/mobile checks pass.
-- The actual Three.js/React Three Fiber canvas, dependency installation, bundle delta, WebGL detection, and runtime failure proof remain scoped to #123.
+- #117 is complete: the React Three Fiber decision is documented in `docs/specs/m10-3d-frontend-architecture.md`, the shell has a responsive CSS spatial fallback, routes remain available, and reduced-motion plus desktop/mobile checks pass.
 - #123 uses React 18-compatible pinned versions, lazy-loads the live WebGL canvas above the CSS fallback, disables it for reduced-motion users, and records the initial 3D chunk cost in the architecture note.
 - #119 refreshes the shared tokens and primitives for dark spatial surfaces, operational controls, tables, forms, feedback states, and visible focus treatment.
 - #118 replaces the app shell and overview with route-aware command navigation, a keyboard skip path, a live inventory topology, and compact workspace links that remain usable on mobile and with reduced motion.
 - #120 replaces the Assets presentation with a live registry summary, entity creation stations, a stock ledger, and a reservation-aware availability inspector while preserving the existing API workflows.
 - #121 replaces the Reservations presentation with guarded-stock summaries, clearer hold controls, availability snapshots, lifecycle filters, and status treatments while retaining create, conflict, release, expire, and detail behavior.
 - #122 replaces Operations and Settings with channel health summaries, explicit delivery/retry state, observability surfaces, and visible runtime API configuration while preserving existing data sources.
+- #124 completes planned-state review, full frontend/backend/browser validation, CI-backed Compose verification, final documentation, and release closure.
 
 ## GitHub Tracking
 
 - Milestone: `M10 - Immersive 3D Frontend Interface` exists on GitHub as milestone #11.
 - Issues: #115 start gate/tracking cleanup, #117 3D architecture/prototype, #123 dependency/fallback proof, #119 design-system refresh, #118 shell/overview replacement, #120 Assets replacement, #121 Reservations replacement, #122 Operations/Settings replacement, and #124 verification/closure.
 - Project board: unavailable from this environment.
-- Current sync state: M6 issues #74 through #81 are closed, M9 issues #104 through #110 and milestone #10 are closed, M9 cockpit PR #126 is merged, and the M10 issue set matches this plan. Project-board fields remain unavailable from this environment.
+- Current sync state: M10 implementation issues #115, #117, #118, #119, #120, #121, #122, and #123 are closed. Issue #124 carries final verification and closure. Project-board fields remain unavailable from this environment.
 
 ## Previous Milestone Closure
 
@@ -159,4 +159,4 @@ Open questions:
 - [x] GitHub tracking has detailed M10 implementation issues.
 - [x] Knowledge docs capture durable planned behavior.
 
-Status: Ready to implement. The previous milestone closure hook and M10 start gate passed on 2026-09-24; begin with #117, then #123.
+Status: Complete. The M10 interface, preserved workflows, validation evidence, and closure documentation were completed on 2026-09-24.

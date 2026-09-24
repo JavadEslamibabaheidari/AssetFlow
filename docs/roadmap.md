@@ -140,7 +140,7 @@ Deliverables:
 
 Goal: replace the current frontend interface with a clean, creative, production-ready 3D operational experience while preserving all existing AssetFlow workflows.
 
-Status: active. The previous milestone closure hook and M10 start gate passed on 2026-09-24; implementation begins with the 3D architecture/prototype and dependency/fallback proof.
+Status: complete on 2026-09-24. The immersive shell and all product surfaces are replaced, API-backed workflows remain intact, and frontend, backend, browser, and CI-backed Compose validation pass.
 
 Definition of done:
 

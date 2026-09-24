@@ -48,7 +48,6 @@ export function MetricCard({ label, value, description }: MetricCardProps) {
       initial={{ y: 12 }}
       animate={{ y: 0 }}
       whileHover={{ y: -4, scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
       transition={surfaceTransition}
     >
       <span>{label}</span>
