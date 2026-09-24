@@ -124,6 +124,12 @@ Open questions:
 - Build/deploy: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, `npm run test:e2e`, frontend Docker build, and Docker Compose frontend/backend verification.
 - Docs/review: final planned-state validation against this plan, updated knowledge overview, final milestone report, and reviewer signoff.
 
+## Implementation Progress
+
+- #115 is complete: the previous milestone closure hook and M10 start gate passed, and PR #127 merged the synchronized plan and tracking state.
+- #117 architecture prototype is implemented on `codex/117-3d-architecture-prototype`: the React Three Fiber decision is documented in `docs/specs/m10-3d-frontend-architecture.md`, the shell has a responsive CSS spatial fallback, routes remain available, and reduced-motion plus desktop/mobile checks pass.
+- The actual Three.js/React Three Fiber canvas, dependency installation, bundle delta, WebGL detection, and runtime failure proof remain scoped to #123.
+
 ## GitHub Tracking
 
 - Milestone: `M10 - Immersive 3D Frontend Interface` exists on GitHub as milestone #11.
