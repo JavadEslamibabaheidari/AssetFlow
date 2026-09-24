@@ -2,7 +2,7 @@
 
 ## Goal
 
-Expand the repo-local Agentic Control Dashboard into a broader, safe human-plus-AI operating layer for project memory, repeatable automation, research context, and resource-aware agent workflows.
+Expand the repo-local Agentic Control Dashboard into a broader, safe human-plus-AI operating layer for project memory, repeatable automation, research context, resource-aware agent workflows, and a live-feeling Agentic OS cockpit that makes AI orchestration visible.
 
 ## Scope
 
@@ -12,7 +12,7 @@ In scope:
 - Define security, privacy, retention, and access boundaries for memory, automation, research, and usage telemetry artifacts.
 - Add a repo-local automation and skillpack foundation for repeated AssetFlow project, workspace, and research workflows.
 - Define a resource usage telemetry model for skills, agents, workflow runs, automation runs, and known unavailable cost/token fields.
-- Expand the static Agentic Control Dashboard with M9 memory, automation, resource, research, and degraded-source controls.
+- Expand the static Agentic Control Dashboard into an Agentic OS cockpit with visual orchestration state, workflow graph, live clock, charts, bars, operating modes, approval queue, evaluation/tracing signals, and degraded-source controls.
 - Define the external workspace and research notebook integration plan, including connector/plugin prerequisites and local-first fallbacks.
 - Keep generated dashboard output, secrets, credentials, raw prompts, raw transcripts, and personal/private data out of Git.
 - Update docs, knowledge, GitHub tracking, and release closure records.
@@ -36,7 +36,8 @@ Decided:
 - Memory adoption starts with evaluation and a security model. External or personal knowledge tools are not adopted until their data boundaries and fallback behavior are documented.
 - Automation is represented as a catalog of read-only checks, suggested prompts, runbooks, and explicit command text. Mutating actions require user approval through existing Codex/GitHub workflows.
 - Resource telemetry starts from trustworthy low-risk sources: GitHub issues/PRs, local dashboard metadata, workflow docs, verification commands, and optional user-provided exports. Unavailable token/cost data is recorded as unavailable.
-- The Agentic Control Dashboard remains a generated static repo-local artifact. It may display controls and command text, but it must not perform writes by itself.
+- The Agentic Control Dashboard remains a generated repo-local artifact. It may include client-side interaction, charts, bars, clock updates, tabs, and workflow highlighting, but it must not perform writes by itself.
+- M9 adopts the richer AI operating-system product direction reflected by current Agentic OS references: planning/routing, memory/context, secure tool/action control, human-in-the-loop governance, tracing/evaluation, and streaming-style execution visibility.
 - External workspace and research notebook integrations are planned with connector requirements and local-first fallbacks; M9 does not depend on unavailable connector access.
 
 Deferred out of scope:
@@ -56,7 +57,7 @@ Open questions:
 - Memory layer evaluation and security model.
 - Repo-local automation catalog and skillpack/workflow guidance.
 - Resource usage telemetry schema, source mapping, and degraded-data behavior.
-- Expanded Agentic Control Dashboard controls for memory, automation, resource telemetry, research, tracking, and degraded states.
+- Expanded Agentic OS cockpit controls for memory, automation, resource telemetry, research, tracking, workflow graph, charts/bars, operating modes, approval gates, evaluation/tracing, and degraded states.
 - External workspace and research notebook integration plan with connector prerequisites and local-first fallback.
 - M9 report, final planned-state validation, and release closure updates.
 
@@ -68,6 +69,7 @@ Open questions:
 - [x] Automation catalog distinguishes read-only status, suggested prompts, and mutating actions that require explicit approval.
 - [x] Resource telemetry schema records trustworthy workflow/agent/skill signals and marks unavailable cost/token fields honestly.
 - [x] Dashboard expansion surfaces memory, automation, resource, research, tracking, and degraded-source sections without committing generated output.
+- [x] Reopened dashboard adoption surfaces orchestration state, workflow graph, live visual telemetry, human approval gates, operating modes, and evaluation/tracing cues instead of a simple static reporter.
 - [x] External workspace and research notebook integration plan records value, connector needs, security boundaries, and local-first fallbacks.
 - [x] Tests or review checks cover changed tooling and dashboard behavior.
 - [x] Docs, knowledge, GitHub tracking, and final M9 report match implemented behavior before closure.
@@ -80,7 +82,7 @@ Open questions:
 | 2 | Critical foundation | Memory layer and security model | Evaluate memory options, decide the M9 memory approach, and define security/privacy/retention/access rules. | #104 | Docs/spec review, security checklist review | #105 |
 | 3 | High foundation | Workflow automation and skillpack foundation | Define repo-local automation catalog, recurring workflow runbooks, skillpack guidance, and approval boundaries. | #104, #105 | Docs/spec review, dashboard/tooling tests if behavior changes | #106 |
 | 4 | High foundation | Resource usage telemetry model | Define safe workflow/agent/skill telemetry schema, sources, aggregation, and unavailable-field behavior. | #104, #105 | Schema/spec review, tooling tests if code is added | #107 |
-| 5 | High product surface | Agentic OS dashboard controls | Expand the dashboard with memory, automation, resource, research, tracking, and degraded-source controls. | #105, #106, #107 | Normal/degraded dashboard generation and HTML review | #108 |
+| 5 | High product surface | Agentic OS cockpit controls | Expand the dashboard with memory, automation, resource, research, tracking, workflow graph, charts/bars, human approval gates, operating modes, evaluation/tracing cues, and degraded-source controls. | #105, #106, #107 | Normal/degraded dashboard generation and HTML review | #108 |
 | 6 | Medium integration | External workspace and research notebook plan | Define integration value, connector prerequisites, security boundaries, and local-first research fallbacks. | #105, #106 | Docs/spec review and connector fallback review | #109 |
 | 7 | Critical validation | M9 validation, docs, and release closure | Validate final implementation against plan, update reports and knowledge, synchronize GitHub, and prepare tag/release closure. | #105, #106, #107, #108, #109 | Relevant tests/checks, dashboard generation if changed, docs review | #110 |
 
@@ -133,4 +135,8 @@ Open questions:
 - [x] GitHub tracking matches this plan.
 - [x] Knowledge docs capture durable planned behavior.
 
-Status: Implementation complete and ready for review.
+## Reopened Adoption
+
+M9 was reopened on 2026-09-23 after product feedback that the milestone should deliver an AI-side Agentic OS cockpit rather than a simple reporter. Issues #108 and #110 were reopened to track cockpit adoption and validation, then closed as completed on 2026-09-24 after acceptance. The previous local-first memory, automation, telemetry, and integration specs remain valid foundations, and the dashboard acceptance bar now includes visible orchestration, workflow state, charts, bars, operating modes, approval gates, tracing/evaluation signals, and degraded-source behavior.
+
+Status: Closed after cockpit adoption.
