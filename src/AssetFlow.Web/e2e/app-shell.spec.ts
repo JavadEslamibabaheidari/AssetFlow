@@ -3,9 +3,9 @@ import { expect, test } from "@playwright/test";
 test("loads the product-facing operations overview", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Asset operations" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Marketplace channels" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Warehouse stock" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Inventory command" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Warehouse to market" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Operational workspaces" })).toBeVisible();
 });
 
 test("navigates between app shell routes", async ({ page }) => {
@@ -33,7 +33,7 @@ for (const viewport of [
 
     await expect(page.getByTestId("immersive-backdrop")).toBeVisible();
     await expect(page.getByRole("link", { name: "Assets" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Asset operations" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Inventory command" })).toBeVisible();
 
     const contentBox = await page.locator("#main-content").boundingBox();
     expect(contentBox).not.toBeNull();

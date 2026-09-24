@@ -1,23 +1,38 @@
 import { AnimatePresence, LayoutGroup, MotionConfig, motion } from "motion/react";
-import { Boxes, LayoutDashboard, PackageCheck, Settings, Store, TimerReset } from "lucide-react";
+import {
+  Activity,
+  Boxes,
+  LayoutDashboard,
+  PackageCheck,
+  Radio,
+  Settings,
+  Store,
+  TimerReset
+} from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { ImmersiveSceneHost } from "./ImmersiveSceneHost";
 
 const navItems = [
-  { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/inventory", label: "Assets", icon: Boxes },
-  { to: "/reservations", label: "Reservations", icon: TimerReset },
-  { to: "/operations", label: "Markets", icon: Store },
-  { to: "/settings", label: "Settings", icon: Settings }
+  { to: "/", label: "Overview", context: "Network overview", icon: LayoutDashboard, end: true },
+  { to: "/inventory", label: "Assets", context: "Inventory workspace", icon: Boxes },
+  { to: "/reservations", label: "Reservations", context: "Reservation control", icon: TimerReset },
+  { to: "/operations", label: "Markets", context: "Channel operations", icon: Store },
+  { to: "/settings", label: "Settings", context: "Configuration workspace", icon: Settings }
 ];
 
 export function AppLayout() {
   const location = useLocation();
+  const activeRoute = navItems.find((item) =>
+    item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)
+  );
 
   return (
     <MotionConfig reducedMotion="user" transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}>
       <div className="app-shell">
         <ImmersiveSceneHost />
+        <a className="skip-link" href="#main-content">
+          Skip to workspace
+        </a>
         <aside className="sidebar" aria-label="Primary navigation">
           <motion.div
             className="brand-block"
@@ -74,13 +89,29 @@ export function AppLayout() {
               })}
             </nav>
           </LayoutGroup>
+
+          <div className="sidebar-meta" aria-label="Workspace status">
+            <span>Workspace signal</span>
+            <strong>
+              <Radio size={14} aria-hidden="true" /> Connected
+            </strong>
+          </div>
         </aside>
 
         <div className="workspace">
           <header className="topbar">
-            <div>
-              <p className="eyebrow">Operations</p>
-              <h1>Asset command center</h1>
+            <div className="topbar-title">
+              <span className="topbar-signal" aria-hidden="true">
+                <Activity size={17} />
+              </span>
+              <div>
+                <p className="eyebrow">Asset command</p>
+                <h1>{activeRoute?.context ?? "Operations workspace"}</h1>
+              </div>
+            </div>
+            <div className="status-strip" aria-label="System status">
+              <span className="status-badge status-badge-success">System live</span>
+              <span className="status-badge status-badge-neutral">3 markets</span>
             </div>
           </header>
 
